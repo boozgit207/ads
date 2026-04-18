@@ -155,7 +155,7 @@ export default function ProductDetailClient({
 
   const getProductName = () => lang === 'fr' ? product.nom : (product.nom_en || product.nom);
   const getProductDesc = () => lang === 'fr' ? product.description : (product.description_en || product.description);
-  const getConservation = () => lang === 'fr' ? product.conditions_conservation : (product.conditions_conservation_en || product.conditions_conservation);
+  const getConservation = () => product.conditions_conservation;
 
   const getStockStatus = () => {
     if (product.quantite_stock === 0 || product.statut === 'rupture') {
