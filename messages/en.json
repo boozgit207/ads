@@ -1,0 +1,121 @@
+{
+  "metadata": {
+    "title": "ADS - Your Online Pharmacy",
+    "description": "ADS - Discover our quality products for your health and well-being. Fast delivery throughout Cameroon."
+  },
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "about": "About",
+    "contact": "Contact",
+    "account": "My Account",
+    "cart": "Cart",
+    "orders": "My Orders",
+    "logout": "Logout"
+  },
+  "hero": {
+    "title": "Your health, our priority",
+    "subtitle": "Discover our wide range of quality pharmaceutical and parapharmaceutical products",
+    "cta_catalog": "Browse catalog",
+    "cta_contact": "Contact us"
+  },
+  "features": {
+    "delivery": {
+      "title": "Fast delivery",
+      "desc": "Throughout Cameroon in 24-48h"
+    },
+    "secure": {
+      "title": "Secure payment",
+      "desc": "Mobile Money & credit cards"
+    },
+    "quality": {
+      "title": "Authentic products",
+      "desc": "100% certified and traceable"
+    },
+    "support": {
+      "title": "24/7 support",
+      "desc": "At your service every day"
+    }
+  },
+  "products": {
+    "featured": "Featured products",
+    "new": "New arrivals",
+    "bestsellers": "Bestsellers",
+    "view_all": "View all",
+    "add_to_cart": "Add to cart",
+    "out_of_stock": "Out of stock",
+    "price": "Price",
+    "category": "Category"
+  },
+  "cart": {
+    "title": "My cart",
+    "empty": "Your cart is empty",
+    "continue_shopping": "Continue shopping",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "quantity": "Quantity"
+  },
+  "checkout": {
+    "title": "Complete order",
+    "personal_info": "Personal information",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Delivery address",
+    "city": "City",
+    "payment_method": "Payment method",
+    "pay_mobile": "Mobile Money",
+    "pay_card": "Credit card",
+    "pay_on_delivery": "Cash on delivery",
+    "order_summary": "Order summary",
+    "place_order": "Place order",
+    "back_to_cart": "Back to cart"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot password?",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?",
+    "create_account": "Create account"
+  },
+  "account": {
+    "title": "My account",
+    "profile": "My profile",
+    "orders": "My orders",
+    "settings": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "dark_mode": "Dark mode",
+    "light_mode": "Light mode",
+    "save": "Save",
+    "member_since": "Member since"
+  },
+  "footer": {
+    "about": "About us",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "newsletter": "Newsletter",
+    "subscribe": "Subscribe",
+    "rights": "All rights reserved"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "apply": "Apply",
+    "reset": "Reset"
+  }
+}

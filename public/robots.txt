@@ -1,0 +1,17 @@
+# Robots.txt pour ADS - Angela Diagnostics et Services
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ads-diagnostics.com/sitemap.xml
+
+# Interdire l'accès aux pages admin et auth
+Disallow: /admin/
+Disallow: /auth/
+
+# Interdire l'accès aux API routes
+Disallow: /api/
+
+# Délai de crawl (Crawl-delay)
+Crawl-delay: 1

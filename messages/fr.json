@@ -1,0 +1,121 @@
+{
+  "metadata": {
+    "title": "ADS - Votre Pharmacie en Ligne",
+    "description": "ADS - Découvrez nos produits de qualité pour votre santé et bien-être. Livraison rapide partout au Cameroun."
+  },
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "about": "À propos",
+    "contact": "Contact",
+    "account": "Mon compte",
+    "cart": "Panier",
+    "orders": "Mes commandes",
+    "logout": "Déconnexion"
+  },
+  "hero": {
+    "title": "Votre santé, notre priorité",
+    "subtitle": "Découvrez notre large gamme de produits pharmaceutiques et parapharmaceutiques de qualité",
+    "cta_catalog": "Voir le catalogue",
+    "cta_contact": "Nous contacter"
+  },
+  "features": {
+    "delivery": {
+      "title": "Livraison rapide",
+      "desc": "Partout au Cameroun en 24-48h"
+    },
+    "secure": {
+      "title": "Paiement sécurisé",
+      "desc": "Mobile Money & cartes bancaires"
+    },
+    "quality": {
+      "title": "Produits authentiques",
+      "desc": "100% certifiés et traçables"
+    },
+    "support": {
+      "title": "Support 24/7",
+      "desc": "À votre service tous les jours"
+    }
+  },
+  "products": {
+    "featured": "Produits vedettes",
+    "new": "Nouveautés",
+    "bestsellers": "Meilleures ventes",
+    "view_all": "Voir tout",
+    "add_to_cart": "Ajouter au panier",
+    "out_of_stock": "Rupture de stock",
+    "price": "Prix",
+    "category": "Catégorie"
+  },
+  "cart": {
+    "title": "Mon panier",
+    "empty": "Votre panier est vide",
+    "continue_shopping": "Continuer les achats",
+    "total": "Total",
+    "checkout": "Commander",
+    "remove": "Retirer",
+    "quantity": "Quantité"
+  },
+  "checkout": {
+    "title": "Finaliser la commande",
+    "personal_info": "Informations personnelles",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse de livraison",
+    "city": "Ville",
+    "payment_method": "Mode de paiement",
+    "pay_mobile": "Mobile Money",
+    "pay_card": "Carte bancaire",
+    "pay_on_delivery": "Paiement à la livraison",
+    "order_summary": "Récapitulatif",
+    "place_order": "Valider la commande",
+    "back_to_cart": "Retour au panier"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "no_account": "Pas encore de compte ?",
+    "has_account": "Déjà un compte ?",
+    "create_account": "Créer un compte"
+  },
+  "account": {
+    "title": "Mon compte",
+    "profile": "Mon profil",
+    "orders": "Mes commandes",
+    "settings": "Paramètres",
+    "language": "Langue",
+    "theme": "Thème",
+    "dark_mode": "Mode sombre",
+    "light_mode": "Mode clair",
+    "save": "Enregistrer",
+    "member_since": "Membre depuis"
+  },
+  "footer": {
+    "about": "À propos de nous",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "newsletter": "Newsletter",
+    "subscribe": "S'abonner",
+    "rights": "Tous droits réservés"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "apply": "Appliquer",
+    "reset": "Réinitialiser"
+  }
+}
