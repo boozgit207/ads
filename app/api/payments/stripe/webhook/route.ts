@@ -121,10 +121,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-
-// Désactiver le body parser pour les webhooks Stripe
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
