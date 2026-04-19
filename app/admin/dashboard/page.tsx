@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { requireAdmin, logout } from '../../actions/auth';
+
+export const dynamic = 'force-dynamic';
 import { 
   Users, 
   FileText, 
