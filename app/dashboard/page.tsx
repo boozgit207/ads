@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { requireAuth, logout } from '../actions/auth';
+
+export const dynamic = 'force-dynamic';
 import { Home, ShoppingBag, Package, Heart, LogOut, PlusCircle, Search, User, FileText, Star, MessageSquare, Mail, Phone, Calendar } from 'lucide-react';
 
 export default async function DashboardPage() {
