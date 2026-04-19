@@ -4,7 +4,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://ads-diagnostics.com/sitemap.xml
+Sitemap: https://ads-str7.vercel.app/sitemap.xml
 
 # Interdire l'accès aux pages admin et auth
 Disallow: /admin/

@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getProducts } from './actions/catalog';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ads-diagnostics.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ads-str7.vercel.app';
   
   // Récupérer les produits pour le sitemap dynamique
   const productsResult = await getProducts();

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Accueil | ADS - Angela Diagnostics et Services",
     description: "Découvrez ADS, votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique",
-    url: "https://ads-diagnostics.com",
+    url: "https://ads-str7.vercel.app",
     type: "website",
   },
 };

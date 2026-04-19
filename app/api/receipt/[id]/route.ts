@@ -9,23 +9,48 @@ export async function GET(
     const { id } = await params;
     const supabase = await createAdminSupabaseClient();
 
-    // Récupérer le reçu avec ses items par l'ID de commande
-    const { data: receipt, error: receiptError } = await supabase
-      .from('recus')
+    // Récupérer la commande avec ses items
+    const { data: commande, error: commandeError } = await supabase
+      .from('commandes')
       .select(`
         *,
-        recu_items (*),
-        commande:commandes (*)
+        commande_items (
+          id,
+          produit_id,
+          produit_nom,
+          quantite,
+          prix_unitaire
+        )
       `)
-      .eq('commande_id', id)
+      .eq('id', id)
       .single();
 
-    if (receiptError || !receipt) {
+    if (commandeError || !commande) {
       return NextResponse.json(
-        { success: false, error: 'Reçu introuvable' },
+        { success: false, error: 'Commande introuvable' },
         { status: 404 }
       );
     }
+
+    // Construire un objet receipt-like depuis les données de la commande
+    const receipt = {
+      numero_recu: commande.numero_commande,
+      client_nom: commande.client_nom,
+      client_prenom: commande.client_prenom,
+      client_phone: commande.client_phone,
+      client_email: commande.client_email,
+      sous_total: commande.sous_total || commande.total_commande,
+      frais_livraison: commande.frais_livraison || 0,
+      total: commande.total_commande,
+      methode_paiement: commande.methode_paiement,
+      created_at: commande.created_at,
+      recu_items: commande.commande_items?.map((item: any) => ({
+        produit_nom: item.produit_nom,
+        quantite: item.quantite,
+        prix_unitaire: item.prix_unitaire,
+        prix_total: item.quantite * item.prix_unitaire,
+      })) || [],
+    };
 
     // Générer le HTML du reçu
     const html = generateReceiptHTML(receipt);
