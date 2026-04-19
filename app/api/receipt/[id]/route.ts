@@ -3,10 +3,10 @@ import { createAdminSupabaseClient } from '../../../actions/payments';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const supabase = await createAdminSupabaseClient();
 
     // Récupérer le reçu avec ses items par l'ID de commande
