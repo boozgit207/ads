@@ -601,15 +601,15 @@ export default function ProductDetailClient({
                       </div>
                     </div>
                   )}
-                  {(product.temperature_min !== null || product.temperature_max !== null) && (
+                  {product.date_peremption && (
                     <div className="p-6 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 flex items-start gap-4 hover:shadow-md transition-shadow">
-                      <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                        <Thermometer className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-6 h-6 text-red-600 dark:text-red-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{t.temperature}</p>
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{lang === 'fr' ? 'Date de péremption' : 'Expiry Date'}</p>
                         <p className="font-semibold text-zinc-900 dark:text-white text-lg">
-                          {product.temperature_min}°C - {product.temperature_max}°C
+                          {new Date(product.date_peremption).toLocaleDateString('fr-FR')}
                         </p>
                       </div>
                     </div>
