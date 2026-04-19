@@ -272,7 +272,7 @@ export default function ProductDetailClient({
   const StockIcon = stockStatus.icon;
 
   // Récupérer les images du produit
-  const images = product.images?.length > 0 
+  const images = product.images && product.images.length > 0
     ? product.images.sort((a, b) => a.ordre - b.ordre).map(img => img.url)
     : [product.image_principale_url].filter(Boolean);
 
