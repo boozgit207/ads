@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerSupabaseClient } from '@/lib/supabase';
+import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
 
 // Types pour les produits
 export interface Product {
@@ -76,7 +76,7 @@ export interface CatalogFilters {
 // Récupérer tous les produits actifs avec leurs relations
 export async function getProducts(filters?: CatalogFilters): Promise<{ success: boolean; products?: Product[]; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
 
     let query = supabase
       .from('produits')
@@ -136,7 +136,7 @@ export async function getProducts(filters?: CatalogFilters): Promise<{ success: 
 // Récupérer un produit par son ID
 export async function getProductById(id: string): Promise<{ success: boolean; product?: Product; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
     
     const { data, error } = await supabase
       .from('produits')
@@ -173,7 +173,7 @@ export async function getProductById(id: string): Promise<{ success: boolean; pr
 // Récupérer un produit par son slug (fallback sur ID si slug null)
 export async function getProductBySlug(slugOrId: string): Promise<{ success: boolean; product?: Product; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
     
     console.log('Recherche produit avec:', slugOrId);
     
@@ -235,7 +235,7 @@ export async function getProductBySlug(slugOrId: string): Promise<{ success: boo
 // Récupérer tous les laboratoires actifs
 export async function getLaboratories(): Promise<{ success: boolean; laboratories?: Laboratory[]; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
 
     const { data, error } = await supabase
       .from('laboratoires')
@@ -264,7 +264,7 @@ export async function getLaboratories(): Promise<{ success: boolean; laboratorie
 // Récupérer toutes les catégories actives
 export async function getCategories(laboratoryId?: string): Promise<{ success: boolean; categories?: Category[]; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
 
     let query = supabase
       .from('categories')
@@ -299,7 +299,7 @@ export async function getCategories(laboratoryId?: string): Promise<{ success: b
 // Récupérer les produits similaires (même catégorie)
 export async function getSimilarProducts(productId: string, categoryId: string, limit: number = 4): Promise<{ success: boolean; products?: Product[]; error?: string }> {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = createPublicSupabaseClient();
     
     const { data, error } = await supabase
       .from('produits')
