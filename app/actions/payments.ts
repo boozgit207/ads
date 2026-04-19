@@ -20,7 +20,7 @@ export async function createAdminSupabaseClient() {
 interface CamerpayPaymentRequest {
   amount: number;
   phone: string;
-  operator: 'orange' | 'mtn';
+  operator: 'orange' | 'mtn' | 'stripe';
   reference?: string;
 }
 
@@ -59,7 +59,7 @@ export async function initiateCamerpayPayment(
         'Authorization': `Bearer ${camerpayApiKey}`,
       },
       body: JSON.stringify({
-        payment_method: request.operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+        payment_method: request.operator === 'orange' ? 'orange_money' : request.operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
         amount: request.amount,
         currency: 'XAF',
         customer_phone: request.phone,
@@ -79,7 +79,7 @@ export async function initiateCamerpayPayment(
       if (commandeId) {
         await createPaymentRecord(
           commandeId,
-          request.operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+          request.operator === 'orange' ? 'orange_money' : request.operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
           request.amount,
           reference,
           request.phone,
@@ -96,7 +96,7 @@ export async function initiateCamerpayPayment(
     if (commandeId) {
       const paymentResult = await createPaymentRecord(
         commandeId,
-        request.operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+        request.operator === 'orange' ? 'orange_money' : request.operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
         request.amount,
         reference,
         request.phone,
@@ -124,7 +124,7 @@ export async function initiateCamerpayPayment(
     if (commandeId) {
       await createPaymentRecord(
         commandeId,
-        request.operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+        request.operator === 'orange' ? 'orange_money' : request.operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
         request.amount,
         request.reference,
         request.phone,

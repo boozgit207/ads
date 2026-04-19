@@ -108,8 +108,8 @@ export default function ChatBot() {
     if (lowerMsg.includes('paiement') || lowerMsg.includes('payment') || lowerMsg.includes('payer')) {
       return {
         content: lang === 'fr'
-          ? '💳 Modes de paiement acceptés :\n\n📱 Orange Money\n📱 MTN Mobile Money\n💳 Carte bancaire (Flutterwave)\n🏦 Virement bancaire\n\nTous les paiements sont sécurisés. Un reçu est généré après confirmation.'
-          : '💳 Accepted payment methods:\n\n📱 Orange Money\n📱 MTN Mobile Money\n💳 Bank Card (Flutterwave)\n🏦 Bank Transfer\n\nAll payments are secure. A receipt is generated after confirmation.'
+          ? '💳 Modes de paiement acceptés :\n\n📱 Orange Money\n📱 MTN Mobile Money\n🏦 Virement bancaire\n\nTous les paiements sont sécurisés. Un reçu est généré après confirmation.'
+          : '💳 Accepted payment methods:\n\n📱 Orange Money\n📱 MTN Mobile Money\n🏦 Bank Transfer\n\nAll payments are secure. A receipt is generated after confirmation.'
       };
     }
     

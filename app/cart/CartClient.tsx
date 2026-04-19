@@ -30,6 +30,8 @@ interface CartItem {
 export default function CartClient() {
   const { cart, removeFromCart, updateQuantity: updateQuantityContext, clearCart } = useCart();
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState<string | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
@@ -54,7 +56,10 @@ export default function CartClient() {
       stock: 'Stock disponible',
       minOrder: 'Minimum',
       update: 'Mettre à jour',
-      paymentMethods: 'Paiement par virement bancaire'
+      paymentMethods: 'Paiement par virement bancaire',
+      confirmRemove: 'Êtes-vous sûr de vouloir supprimer cet article du panier ?',
+      cancel: 'Annuler',
+      confirm: 'Supprimer'
     },
     en: {
       title: 'Your Cart',
@@ -73,7 +78,10 @@ export default function CartClient() {
       stock: 'Stock available',
       minOrder: 'Minimum',
       update: 'Update',
-      paymentMethods: 'Payment by bank transfer'
+      paymentMethods: 'Payment by bank transfer',
+      confirmRemove: 'Are you sure you want to remove this item from cart?',
+      cancel: 'Cancel',
+      confirm: 'Remove'
     }
   }[lang];
 
@@ -174,9 +182,8 @@ export default function CartClient() {
 
                           <button
                             onClick={() => {
-                              if (confirm(lang === 'fr' ? 'Êtes-vous sûr de vouloir supprimer cet article du panier ?' : 'Are you sure you want to remove this item from cart?')) {
-                                removeFromCart(item.id);
-                              }
+                              setItemToRemove(item.id);
+                              setShowConfirm(true);
                             }}
                             className="p-2 sm:p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl lg:rounded-2xl border-2 border-transparent hover:border-red-300 dark:hover:border-red-400 transition-all"
                             title={t.remove}
@@ -267,6 +274,43 @@ export default function CartClient() {
       </main>
 
       <Footer />
+
+      {/* Custom Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
+              {lang === 'fr' ? 'Confirmation' : 'Confirmation'}
+            </h3>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+              {t.confirmRemove}
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setShowConfirm(false);
+                  setItemToRemove(null);
+                }}
+                className="flex-1 px-6 py-3 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={() => {
+                  if (itemToRemove) {
+                    removeFromCart(itemToRemove);
+                  }
+                  setShowConfirm(false);
+                  setItemToRemove(null);
+                }}
+                className="flex-1 px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors"
+              >
+                {t.confirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

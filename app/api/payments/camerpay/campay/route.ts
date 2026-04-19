@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
           frais_livraison: deliveryFees,
           total_commande: totalCommande,
           statut: 'en_attente',
-          methode_paiement: operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+          methode_paiement: operator === 'orange' ? 'orange_money' : operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
         })
         .select()
         .single();
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
           client_nom: order.client_nom,
           client_prenom: order.client_prenom,
           total_commande: order.total_commande,
-          methode_paiement: operator === 'orange' ? 'orange_money' : 'mtn_mobile_money',
+          methode_paiement: operator === 'orange' ? 'orange_money' : operator === 'mtn' ? 'mtn_mobile_money' : 'stripe',
         });
       } catch (notifError) {
         console.error('⚠️ Erreur envoi notification:', notifError);

@@ -12,7 +12,6 @@ CREATE TYPE paiement_methode AS ENUM (
   'orange_money',     -- Orange Money
   'mtn_mobile_money', -- MTN Mobile Money
   'virement_bancaire',-- Virement bancaire
-  'flutterwave',      -- Flutterwave (cartes)
   'especes'           -- Espèces (paiement à la livraison)
 );
 

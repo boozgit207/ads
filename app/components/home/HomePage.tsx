@@ -364,7 +364,7 @@ export default function HomePage({ categories }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-white animate-fade-in-up">
-              {t.categories}
+              {lang === 'fr' ? 'Nos Laboratoires' : 'Our Laboratories'}
             </h2>
             <Link 
               href="/products"
@@ -422,26 +422,34 @@ export default function HomePage({ categories }: HomePageProps) {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.slice(0, 6).map((cat, index) => (
-              <Link
-                key={cat.id}
-                href={`/products?category=${encodeURIComponent(cat.id)}`}
-                className="group flex flex-col p-6 rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
-              >
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {cat.nom}
-                  </h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                    {cat.description || t.viewDetails}
-                  </p>
-                  <div className="mt-3 flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {t.viewDetails} <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+            {categories.slice(0, 6).map((cat, index) => {
+              const CategoryIcon = getCategoryIcon(index);
+              return (
+                <Link
+                  key={cat.id}
+                  href={`/products?category=${encodeURIComponent(cat.id)}`}
+                  className="group flex flex-col p-6 rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <CategoryIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {cat.nom}
+                      </h3>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        {cat.description || t.viewDetails}
+                      </p>
+                      <div className="mt-3 flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {t.viewDetails} <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -506,11 +514,6 @@ export default function HomePage({ categories }: HomePageProps) {
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
                       {product.category || product.categories?.nom}
                     </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-lg font-bold text-zinc-900 dark:text-white group-hover:scale-105 transition-transform">
-                        {product.prix ? product.prix.toLocaleString() : '0'} FCFA
-                      </span>
-                    </div>
                     <div className="flex gap-2">
                       <Link
                         href={`/product/${product.id}`}

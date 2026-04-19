@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import FlutterwavePayment from '../components/FlutterwavePayment';
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -42,10 +41,8 @@ export default function CheckoutPage() {
   });
   
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('pickup');
-  const [paymentMethod, setPaymentMethod] = useState<'om' | 'mtn' | 'flutterwave'>('om');
+  const [paymentMethod, setPaymentMethod] = useState<'om' | 'mtn'>('om');
   const [orderComplete, setOrderComplete] = useState(false);
-  const [showFlutterwavePayment, setShowFlutterwavePayment] = useState(false);
-  const [orderId, setOrderId] = useState<string>('');
 
   useEffect(() => {
     const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
@@ -83,7 +80,6 @@ export default function CheckoutPage() {
       payment: 'Mode de paiement',
       om: 'Orange Money',
       mtn: 'MTN Mobile Money',
-      flutterwave: 'Carte bancaire (Visa/Mastercard) - Flutterwave',
       orderSummary: 'Récapitulatif',
       subtotal: 'Sous-total',
       deliveryFee: 'Frais de livraison',
@@ -94,7 +90,6 @@ export default function CheckoutPage() {
       paymentInstructions: {
         om: 'Instructions Orange Money:\n1. Composez #150#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro: 6XX XXX XXX\n4. Montant: {amount}\n5. Validez avec votre code',
         mtn: 'Instructions MTN MoMo:\n1. Composez *126#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro\n4. Montant: {amount}\n5. Confirmez avec votre code',
-        flutterwave: 'Paiement par carte bancaire:\nCliquez sur "Confirmer la commande" pour procéder au paiement sécurisé avec Flutterwave (Visa, Mastercard, Mobile Money).'
       },
       thankYou: 'Merci pour votre commande !',
       orderReceived: 'Votre commande a été reçue et est en cours de traitement.',
@@ -118,10 +113,9 @@ export default function CheckoutPage() {
       delivery: 'Delivery method',
       pickup: 'Pickup (Free)',
       deliveryOption: 'Home delivery (+1 500 FCFA)',
-      payment: 'Payment method',
+      payment: 'Payment Method',
       om: 'Orange Money',
       mtn: 'MTN Mobile Money',
-      flutterwave: 'Credit/Debit Card (Visa/Mastercard) - Flutterwave',
       orderSummary: 'Order summary',
       subtotal: 'Subtotal',
       deliveryFee: 'Delivery fee',
@@ -132,7 +126,6 @@ export default function CheckoutPage() {
       paymentInstructions: {
         om: 'Orange Money instructions:\n1. Dial #150#\n2. Select 1 (Transfer)\n3. Enter number: 6XX XXX XXX\n4. Amount: {amount}\n5. Confirm with PIN',
         mtn: 'MTN MoMo instructions:\n1. Dial *126#\n2. Select 1 (Transfer)\n3. Enter number\n4. Amount: {amount}\n5. Confirm with PIN',
-        flutterwave: 'Credit card payment:\nClick "Confirm order" to proceed with secure Flutterwave payment (Visa, Mastercard, Mobile Money).'
       },
       thankYou: 'Thank you for your order!',
       orderReceived: 'Your order has been received and is being processed.',
@@ -170,51 +163,44 @@ export default function CheckoutPage() {
     } else if (step === 'delivery') {
       setStep('payment');
     } else if (step === 'payment') {
-      if (paymentMethod === 'flutterwave') {
-        // Générer un ID de commande unique pour Flutterwave
-        const newOrderId = `ADS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        setOrderId(newOrderId);
-        setShowFlutterwavePayment(true);
-      } else {
-        // Paiement Campay (OM/MTN)
-        setIsLoading(true);
-        
-        // Générer un ID de commande pour Campay
-        const campayOrderId = `ADS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        
-        try {
-          const response = await fetch('/api/payments/campay', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: user?.id,
-              cart,
-              amount: total,
-              phone: formatPhoneNumber(formData.phone),
-              operator: paymentMethod === 'om' ? 'orange' : 'mtn',
-              reference: campayOrderId,
-            }),
-          });
-          
-          const data = await response.json();
-          
-          if (data.success) {
-            // Vider le panier
-            clearCart();
-            // Mettre à jour le compteur de commandes
-            const currentCount = parseInt(localStorage.getItem('ads-order-count') || '0');
-            localStorage.setItem('ads-order-count', (currentCount + 1).toString());
-            setOrderComplete(true);
-          } else {
-            showToast(data.error || 'Erreur lors du paiement', 'error');
-          }
-        } catch (error) {
-          console.error('Erreur lors de la commande:', error);
-          showToast('Erreur lors de la commande', 'error');
+      // Paiement Camerpay (OM/MTN)
+      setIsLoading(true);
+
+      // Générer un ID de commande pour Camerpay
+      const camerpayOrderId = `ADS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+      try {
+        const response = await fetch('/api/payments/camerpay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user?.id,
+            cart,
+            amount: total,
+            phone: formatPhoneNumber(formData.phone),
+            operator: paymentMethod === 'om' ? 'orange' : 'mtn',
+            reference: camerpayOrderId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Vider le panier
+          clearCart();
+          // Mettre à jour le compteur de commandes
+          const currentCount = parseInt(localStorage.getItem('ads-order-count') || '0');
+          localStorage.setItem('ads-order-count', (currentCount + 1).toString());
+          setOrderComplete(true);
+        } else {
+          showToast(data.error || 'Erreur lors du paiement', 'error');
         }
-        
-        setIsLoading(false);
+      } catch (error) {
+        console.error('Erreur lors de la commande:', error);
+        showToast('Erreur lors de la commande', 'error');
       }
+
+      setIsLoading(false);
     }
   };
 
@@ -232,9 +218,6 @@ export default function CheckoutPage() {
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mb-4">
               {t.orderReceived}
-            </p>
-            <p className="text-sm text-zinc-500 mb-6">
-              {t.orderNumber}: <span className="font-mono font-medium">{orderId}</span>
             </p>
             
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 text-left">
@@ -539,30 +522,6 @@ export default function CheckoutPage() {
                       </div>
                     </label>
 
-                    <label className={`flex items-center p-5 rounded-2xl border-2 cursor-pointer transition-all hover:shadow-md ${
-                      paymentMethod === 'flutterwave' 
-                        ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30 shadow-lg shadow-blue-500/20' 
-                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="flutterwave"
-                        checked={paymentMethod === 'flutterwave'}
-                        onChange={() => setPaymentMethod('flutterwave')}
-                        className="w-5 h-5 text-blue-500"
-                      />
-                      <div className="ml-4 flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
-                          <CreditCard className="w-7 h-7" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-lg text-zinc-900 dark:text-white">{t.flutterwave}</p>
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">Paiement sécurisé par Flutterwave</p>
-                        </div>
-                      </div>
-                    </label>
-
                   </div>
 
                   {/* Payment Instructions */}
@@ -570,7 +529,7 @@ export default function CheckoutPage() {
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                       <p className="text-base text-amber-800 dark:text-amber-200 whitespace-pre-line font-medium">
-                        {t.paymentInstructions[paymentMethod].replace('{amount}', `${total.toLocaleString()} FCFA`).replace('{orderId}', orderId)}
+                        {t.paymentInstructions[paymentMethod].replace('{amount}', `${total.toLocaleString()} FCFA`)}
                       </p>
                     </div>
                   </div>
@@ -672,44 +631,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
-
-      {/* Modal Flutterwave Payment */}
-      {showFlutterwavePayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-                {lang === 'fr' ? 'Paiement par carte' : 'Card Payment'}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowFlutterwavePayment(false);
-                }}
-                className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-              >
-                <AlertCircle className="w-6 h-6 text-zinc-500" />
-              </button>
-            </div>
-            <FlutterwavePayment
-              amount={total}
-              email={formData.email || ''}
-              name={`${formData.firstName} ${formData.lastName}`}
-              phone={formData.phone}
-              orderId={orderId}
-              onSuccess={() => {
-                setShowFlutterwavePayment(false);
-                clearCart();
-                const currentCount = parseInt(localStorage.getItem('ads-order-count') || '0');
-                localStorage.setItem('ads-order-count', (currentCount + 1).toString());
-                setOrderComplete(true);
-              }}
-              onCancel={() => {
-                setShowFlutterwavePayment(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>
