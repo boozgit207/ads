@@ -87,8 +87,8 @@ export const translations = {
     
     // Payment instructions
     paymentInstructions: {
-      om: 'Pour payer par Orange Money :\n1. Composez #150#\n2. Choisissez 1 (Transfert d\'argent)\n3. Entrez le numéro marchand\n4. Entrez le montant\n5. Validez avec votre code secret',
-      mtn: 'Pour payer par MTN MoMo :\n1. Composez *126#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro\n4. Entrez le montant\n5. Confirmez avec votre code',
+      om: 'Pour payer par Orange Money :\n1. Composez #150#\n2. Choisissez 1 (Transfert d\'argent)\n3. Entrez le numéro marchand: 697 12 13 28\n4. Entrez le montant: {amount}\n5. Validez avec votre code secret',
+      mtn: 'Pour payer par MTN MoMo :\n1. Composez *126#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro: 686 09 42 05\n4. Entrez le montant: {amount}\n5. Confirmez avec votre code',
       bank: 'Pour payer par virement :\nBanque : Ecobank\nCompte : ADS SARL\nIBAN : CM21 10003...\nRéférence : Votre N° commande'
     },
     
@@ -221,8 +221,8 @@ export const translations = {
     
     // Payment instructions
     paymentInstructions: {
-      om: 'To pay via Orange Money:\n1. Dial #150#\n2. Select 1 (Money transfer)\n3. Enter merchant number\n4. Enter amount\n5. Confirm with your PIN',
-      mtn: 'To pay via MTN MoMo:\n1. Dial *126#\n2. Select 1 (Transfer)\n3. Enter number\n4. Enter amount\n5. Confirm with PIN',
+      om: 'To pay via Orange Money:\n1. Dial #150#\n2. Select 1 (Money transfer)\n3. Enter merchant number: 697 12 13 28\n4. Enter amount: {amount}\n5. Confirm with your PIN',
+      mtn: 'To pay via MTN MoMo:\n1. Dial *126#\n2. Select 1 (Transfer)\n3. Enter number: 686 09 42 05\n4. Enter amount: {amount}\n5. Confirm with PIN',
       bank: 'For bank transfer:\nBank: Ecobank\nAccount: ADS SARL\nIBAN: CM21 10003...\nReference: Your Order #'
     },
     

@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { showToast } from '../components/Toast';
-import { 
-  ChevronLeft, 
+import {
+  ChevronLeft,
   ChevronRight,
   Truck,
   CreditCard,
@@ -18,7 +18,8 @@ import {
   MapPin,
   Phone,
   Mail,
-  User
+  User,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -43,6 +44,8 @@ export default function CheckoutPage() {
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('pickup');
   const [paymentMethod, setPaymentMethod] = useState<'om' | 'mtn'>('om');
   const [orderComplete, setOrderComplete] = useState(false);
+  const [finalAmount, setFinalAmount] = useState(0);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
@@ -140,6 +143,35 @@ export default function CheckoutPage() {
   const deliveryFee = deliveryOption === 'delivery' ? 1500 : 0;
   const total = subtotal + deliveryFee;
 
+  const handleDownloadReceipt = async () => {
+    if (!orderId) {
+      showToast('Impossible de télécharger le reçu', 'error');
+      return;
+    }
+
+    try {
+      // Récupérer le reçu associé à la commande
+      const response = await fetch(`/api/receipt/${orderId}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement du reçu');
+      }
+
+      // Créer un blob et télécharger
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `recu-ads-${orderId}.html`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Erreur téléchargement reçu:', error);
+      showToast('Erreur lors du téléchargement du reçu', 'error');
+    }
+  };
+
   // Helper function to format phone number with country code
   const formatPhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
@@ -186,6 +218,10 @@ export default function CheckoutPage() {
         const data = await response.json();
 
         if (data.success) {
+          // Stocker le montant avant de vider le panier
+          setFinalAmount(total);
+          // Stocker l'ID de la commande
+          setOrderId(data.orderId);
           // Vider le panier
           clearCart();
           // Mettre à jour le compteur de commandes
@@ -222,15 +258,24 @@ export default function CheckoutPage() {
             
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 text-left">
                 <p className="text-sm text-amber-800 dark:text-amber-200 whitespace-pre-line">
-                  {t.paymentInstructions[paymentMethod].replace('{amount}', `${total.toLocaleString()} FCFA`)}
+                  {t.paymentInstructions[paymentMethod].replace('{amount}', `${finalAmount.toLocaleString()} FCFA`)}
                 </p>
               </div>
-            <Link
-              href="/products"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700"
-            >
-              {t.continueShopping}
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={handleDownloadReceipt}
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Télécharger le reçu
+              </button>
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700"
+              >
+                {t.continueShopping}
+              </Link>
+            </div>
           </div>
         </main>
         <Footer />
@@ -529,7 +574,7 @@ export default function CheckoutPage() {
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                       <p className="text-base text-amber-800 dark:text-amber-200 whitespace-pre-line font-medium">
-                        {t.paymentInstructions[paymentMethod].replace('{amount}', `${total.toLocaleString()} FCFA`)}
+                        {t.paymentInstructions[paymentMethod].replace('{amount}', `${finalAmount.toLocaleString()} FCFA`)}
                       </p>
                     </div>
                   </div>
