@@ -25,7 +25,7 @@ export async function login(email: string, password: string): Promise<AuthResult
         'Email not confirmed': 'Veuillez confirmer votre e-mail avant de vous connecter.',
         'Too many requests': 'Trop de tentatives. Patientez quelques minutes.',
       };
-      return { success: false, error: errorMessages[error.message] || error.message };
+      return { success: false, error: errorMessages[error.message] || 'Erreur de connexion. Veuillez vérifier vos identifiants.' };
     }
 
     // Récupérer le profil pour déterminer la redirection
@@ -56,7 +56,7 @@ export async function login(email: string, password: string): Promise<AuthResult
       redirectTo,
     };
   } catch {
-    return { success: false, error: 'Une erreur est survenue lors de la connexion.' };
+    return { success: false, error: 'Une erreur est survenue lors de la connexion. Veuillez réessayer.' };
   }
 }
 

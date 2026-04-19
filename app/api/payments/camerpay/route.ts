@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!amount || !phone || !operator) {
       return NextResponse.json(
-        { success: false, error: 'Paramètres manquants' },
+        { success: false, error: 'Informations de paiement incomplètes. Veuillez remplir tous les champs obligatoires.' },
         { status: 400 }
       );
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       if (orderError) {
         console.error('Erreur création commande:', orderError);
         return NextResponse.json(
-          { success: false, error: 'Erreur lors de la création de la commande' },
+          { success: false, error: 'Impossible de créer votre commande. Veuillez réessayer ou contacter le support.' },
           { status: 500 }
         );
       }
@@ -100,13 +100,13 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, error: result.error },
+      { success: false, error: result.error || 'Échec de l\'initialisation du paiement. Veuillez réessayer.' },
       { status: 400 }
     );
   } catch (error: any) {
     console.error('Erreur API Camerpay:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Erreur serveur' },
+      { success: false, error: 'Une erreur technique est survenue. Veuillez réessayer ou contacter le support.' },
       { status: 500 }
     );
   }

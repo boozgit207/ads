@@ -116,7 +116,7 @@ export async function getProducts(filters?: CatalogFilters): Promise<{ success: 
         return { success: true, products: [] };
       }
       console.error('Erreur lors de la récupération des produits:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Impossible de charger les produits. Veuillez réessayer.' };
     }
 
     // Transformer les données pour le frontend
@@ -151,11 +151,11 @@ export async function getProductById(id: string): Promise<{ success: boolean; pr
 
     if (error) {
       console.error('Erreur lors de la récupération du produit:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Impossible de charger ce produit. Veuillez réessayer.' };
     }
 
     if (!data) {
-      return { success: false, error: 'Produit non trouvé' };
+      return { success: false, error: 'Ce produit n\'est pas disponible ou a été supprimé.' };
     }
 
     const product: Product = {

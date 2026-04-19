@@ -193,11 +193,11 @@ export default function CheckoutPage() {
           localStorage.setItem('ads-order-count', (currentCount + 1).toString());
           setOrderComplete(true);
         } else {
-          showToast(data.error || 'Erreur lors du paiement', 'error');
+          showToast(data.error || 'Échec du paiement. Veuillez réessayer.', 'error');
         }
       } catch (error) {
         console.error('Erreur lors de la commande:', error);
-        showToast('Erreur lors de la commande', 'error');
+        showToast('Une erreur est survenue lors du traitement de votre commande. Veuillez réessayer ou contacter le support.', 'error');
       }
 
       setIsLoading(false);

@@ -47,7 +47,7 @@ export async function initiateCamerpayPayment(
 
     if (!camerpayApiKey) {
       console.error('CAMERPAY_API_KEY missing');
-      return { success: false, error: 'Configuration Camerpay manquante' };
+      return { success: false, error: 'Configuration du système de paiement incomplète. Veuillez contacter le support.' };
     }
 
     const reference = request.reference || `ADS-${Date.now()}`;
@@ -70,7 +70,16 @@ export async function initiateCamerpayPayment(
       }),
     });
 
-    const data = await response.json();
+    const contentType = response.headers.get('content-type');
+    let data;
+
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Camerpay API returned non-JSON:', text.substring(0, 200));
+      return { success: false, error: 'Le service de paiement est temporairement indisponible. Veuillez réessayer dans quelques minutes.' };
+    }
 
     if (!response.ok) {
       console.error('Erreur Camerpay:', data);
