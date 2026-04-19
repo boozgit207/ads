@@ -527,18 +527,6 @@ export default function ProductDetailClient({
                     <p className="text-lg text-zinc-700 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
                       {getProductDesc() || (lang === 'fr' ? 'Aucune description disponible' : 'No description available')}
                     </p>
-                    {product.indications && (
-                      <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                        <h4 className="font-bold text-xl mb-3 text-zinc-900 dark:text-white">{lang === 'fr' ? 'Indications' : 'Indications'}</h4>
-                        <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">{product.indications}</p>
-                      </div>
-                    )}
-                    {product.composition && (
-                      <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                        <h4 className="font-bold text-xl mb-3 text-zinc-900 dark:text-white">{lang === 'fr' ? 'Composition' : 'Composition'}</h4>
-                        <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">{product.composition}</p>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
