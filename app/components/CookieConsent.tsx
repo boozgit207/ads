@@ -104,7 +104,7 @@ export default function CookieConsent() {
               <Cookie className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">{t.title}</h3>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">{t.description}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">{t.description}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -166,7 +166,7 @@ export default function CookieConsent() {
               />
               <div className="flex-1">
                 <label htmlFor="necessary" className="font-medium text-zinc-900 dark:text-white">{t.necessary}</label>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{t.necessaryDesc}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1">{t.necessaryDesc}</p>
               </div>
             </div>
             
@@ -180,7 +180,7 @@ export default function CookieConsent() {
               />
               <div className="flex-1">
                 <label htmlFor="analytics" className="font-medium text-zinc-900 dark:text-white">{t.analytics}</label>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{t.analyticsDesc}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1">{t.analyticsDesc}</p>
               </div>
             </div>
             
@@ -194,7 +194,7 @@ export default function CookieConsent() {
               />
               <div className="flex-1">
                 <label htmlFor="marketing" className="font-medium text-zinc-900 dark:text-white">{t.marketing}</label>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{t.marketingDesc}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-1">{t.marketingDesc}</p>
               </div>
             </div>
           </div>

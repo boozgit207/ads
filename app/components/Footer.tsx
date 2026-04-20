@@ -47,7 +47,7 @@ export default function Footer() {
               <img src="/logo_1.svg" alt="ADS Logo" className="h-24 w-24" />
               <span className="text-3xl font-bold">{COMPANY.name}</span>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
               Angela Diagnostics et Services (ADS) - Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.
             </p>
             {/* Social Media */}
@@ -56,7 +56,7 @@ export default function Footer() {
                 href="https://facebook.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
+className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-blue-600 hover:text-white transition-all duration-300"
                 aria-label="Facebook"
               >
                 <FacebookIcon />
@@ -96,19 +96,19 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Liens Rapides</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/" className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link href="/" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link href="/products" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                   Nos Produits
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link href="/contact" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                   Contact
                 </Link>
@@ -120,11 +120,11 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Contact</h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+              <li className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-300">
                 <MapPin className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
                 <span>{CONTACT.address}</span>
               </li>
-              <li className="flex flex-col gap-1 text-sm text-zinc-600 dark:text-zinc-400">
+              <li className="flex flex-col gap-1 text-sm text-zinc-600 dark:text-zinc-300">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-orange-500 flex-shrink-0" />
                   <span>Orange: {CONTACT.phoneOrange}</span>
@@ -134,7 +134,7 @@ export default function Footer() {
                   <span>MTN: {CONTACT.phoneMtn}</span>
                 </div>
               </li>
-              <li className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
+              <li className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-300">
                 <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
                 <span>{CONTACT.email}</span>
               </li>
@@ -144,7 +144,7 @@ export default function Footer() {
           {/* Column 4: Payment Methods */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Moyens de Paiement</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm text-zinc-600 dark:text-zinc-300">
               Paiements sécurisés via mobile money et virement bancaire.
             </p>
             <div className="flex flex-wrap gap-3 items-center">

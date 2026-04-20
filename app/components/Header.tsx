@@ -101,28 +101,28 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-1">
           <Link
             href="/"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
           >
             <Home className="w-4 h-4" />
             {nav.home}
           </Link>
           <Link
             href="/products"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
           >
             <Grid3X3 className="w-4 h-4" />
             {nav.catalog}
           </Link>
           <Link
             href="/help"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
           >
             <HelpCircle className="w-4 h-4" />
             {nav.about}
           </Link>
           <Link
             href="/contact"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
           >
             <Mail className="w-4 h-4" />
             {nav.contact}
@@ -134,7 +134,7 @@ export default function Header() {
           {/* Cart Icon */}
           <Link
             href="/cart"
-            className="hidden sm:flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white relative"
+className="hidden sm:flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white relative"
             aria-label={nav.cart}
           >
             <ShoppingCart className="w-5 h-5" />
@@ -154,7 +154,7 @@ export default function Header() {
           <div className="relative">
             <button
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-              className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
               aria-label="Sélectionner la langue"
             >
               <Globe className="w-4 h-4" />
@@ -214,14 +214,14 @@ export default function Header() {
                 <span className="hidden sm:block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   {user.first_name || user.email.split('@')[0]}
                 </span>
-                <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 text-zinc-500 dark:text-zinc-300 transition-transform ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isAccountMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900 py-1">
                   <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
                     <p className="text-sm font-semibold text-zinc-900 dark:text-white">{user.first_name} {user.last_name}</p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{user.email}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-300 truncate">{user.email}</p>
                   </div>
                   <Link
                     href="/account"
@@ -283,7 +283,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -298,7 +298,7 @@ export default function Header() {
             <Link 
               href="/" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
               <Home className="w-5 h-5" />
               {nav.home}
@@ -306,7 +306,7 @@ export default function Header() {
             <Link 
               href="/products" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
               <Grid3X3 className="w-5 h-5" />
               {nav.catalog}
@@ -314,7 +314,7 @@ export default function Header() {
             <Link 
               href="/cart" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
               <div className="relative">
                 <ShoppingCart className="w-5 h-5" />
@@ -329,7 +329,7 @@ export default function Header() {
             <Link 
               href="/help" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
               <HelpCircle className="w-5 h-5" />
               {nav.about}
@@ -337,7 +337,7 @@ export default function Header() {
             <Link 
               href="/contact" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
               <Mail className="w-5 h-5" />
               {nav.contact}
@@ -353,14 +353,14 @@ export default function Header() {
               </button>
               
               <div className="flex items-center gap-3 px-4 py-3">
-                <Globe className="w-5 h-5 text-zinc-400" />
+                <Globe className="w-5 h-5 text-zinc-500 dark:text-zinc-300" />
                 <div className="flex gap-2">
                   <button
                     onClick={() => toggleLang('fr')}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       locale === 'fr'
                         ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
                     }`}
                   >
                     FR
@@ -370,7 +370,7 @@ export default function Header() {
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       locale === 'en'
                         ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
                     }`}
                   >
                     EN
