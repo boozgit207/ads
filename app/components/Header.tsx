@@ -91,8 +91,8 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <img src="/logo_1.svg" alt="ADS Logo" className="h-20 w-20" />
-          <span className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
+          <img src="/logo_1.svg" alt="ADS Logo" className="h-32 w-32" />
+          <span className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
             ADS
           </span>
         </Link>

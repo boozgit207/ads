@@ -44,8 +44,8 @@ export default function Footer() {
           {/* Column 1: About */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src="/logo_1.svg" alt="ADS Logo" className="h-24 w-24" />
-              <span className="text-3xl font-bold">{COMPANY.name}</span>
+              <img src="/logo_1.svg" alt="ADS Logo" className="h-40 w-40" />
+              <span className="text-4xl font-bold">{COMPANY.name}</span>
             </div>
             <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
               Angela Diagnostics et Services (ADS) - Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.
