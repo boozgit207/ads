@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminSupabaseClient } from '../../../actions/payments';
+import { createServerSupabaseClient } from '@/lib/supabase';
 import { jsPDF } from 'jspdf';
 import path from 'path';
 import fs from 'fs';
@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createAdminSupabaseClient();
+    const supabase = await createServerSupabaseClient();
 
     // Récupérer la commande avec ses items
     const { data: commande, error: commandeError } = await supabase
