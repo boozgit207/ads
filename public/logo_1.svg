@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 24.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 841.89 595.28" style="enable-background:new 0 0 841.89 595.28;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#0071BC;}
-	.st1{font-family:'Tahoma-Bold';}
-	.st2{font-size:124.5823px;}
-	.st3{fill:none;}
-	.st4{fill:#3FD6FF;}
-	.st5{font-family:'FranklinGothic-Medium';}
-	.st6{font-size:59.7318px;}
-</style>
+	 viewBox="0 0 3 4" style="enable-background:new 0 0 3 4;" xml:space="preserve">
 <image style="overflow:visible;" width="500" height="500" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAQAElEQVR4Aex9B4AUxbb2V9Vp4uZd
 cs4iCIo5YhZzwohZMWcUMxgxYEBQMYMZFAOKYsJrDiii5ByWzbuTp3PXf3p9vv9eb3hXSQt0M7U9
 3dNVdeqr6vOd0DNwBFuAQIBAgECAQIBAgMAWj0BA6Fv8FAYDCBAIEAgQCBAIEAA2LqEHCAcIBAgE
@@ -2538,9 +2529,9 @@ FjoAAADtSURBVGZAM6AZ0AxoBv6yDGhB/8tOne64ZkAzoBnQDGgG/sWAFvR/caFjmgHNgGZAM6AZ
 +MsyoAX9Lzt1uuOaAc2AZkAzoBn4FwNa0P/FxbqN6do1A5oBzYBmQDOwDhnQgr4OydVVawY0A5oB
 zYBmYH0xoAV9fTG9btvRtWsGNAOaAc3AP5wBLej/8AWgh68Z0AxoBjQDfw8GtKD/PeZx3Y5C164Z
 0AxoBjQDGzwDWtA3+CnSHdQMaAY0A5oBzcB/Z0AL+n/nSOdYtwzo2jUDmgHNgGbgT2BAC/qfQKKu
-QjOgGdAMaAY0A/9rBv4PAAD//1NvRZgAAAAGSURBVAMAyhUC2A9BPPMAAAAASUVORK5CYII=" transform="matrix(0.658 0 0 0.658 31 81)">
+QjOgGdAMaAY0A/9rBv4PAAD//1NvRZgAAAAGSURBVAMAyhUC2A9BPPMAAAAASUVORK5CYII=" transform="matrix(0.658 0 0 0.658 -399 -334)">
 </image>
-<text transform="matrix(0.9538 0 0 1 326.3975 237.5791)" class="st0 st1 st2">ANGELA</text>
-<polygon class="st3" points="123.52,497.29 183.7,497.29 183.7,497.29 123.52,497.29 "/>
-<text transform="matrix(0.6906 0 0 1 326.0405 305.6846)" class="st4 st5 st6">Diagnostics &amp; Services Sarl</text>
+<text transform="matrix(0.9538 0 0 1 -103.6025 -177.4209)" style="fill:#0071BC; font-family:'Tahoma-Bold'; font-size:124.5823px;">ANGELA</text>
+<polygon style="fill:none;" points="-306.48,82.29 -246.3,82.29 -246.3,82.29 -306.48,82.29 "/>
+<text transform="matrix(0.6906 0 0 1 -103.9595 -109.3154)" style="fill:#3FD6FF; font-family:'FranklinGothic-Medium'; font-size:59.7318px;">Diagnostics &amp; Services Sarl</text>
 </svg>
