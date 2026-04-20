@@ -18,5 +18,9 @@ export default async function Home() {
   const catsResult = await getCategories();
   const categories = catsResult.success ? catsResult.categories || [] : [];
 
-  return <HomePage categories={categories} />;
+  return (
+    <main>
+      <HomePage categories={categories} />
+    </main>
+  );
 }

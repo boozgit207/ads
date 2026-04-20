@@ -111,24 +111,28 @@ export default function CookieConsent() {
               <button
                 onClick={() => setShowCustomize(true)}
                 className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                aria-label="Personnaliser les cookies"
               >
                 {t.customize}
               </button>
               <button
                 onClick={handleReject}
                 className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                aria-label="Rejeter les cookies"
               >
                 {t.reject}
               </button>
               <button
                 onClick={handleAccept}
                 className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                aria-label="Accepter les cookies"
               >
                 {t.accept}
               </button>
               <button
                 onClick={handleClose}
                 className="p-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+                aria-label="Fermer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -145,6 +149,7 @@ export default function CookieConsent() {
             <button
               onClick={handleClose}
               className="p-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              aria-label="Fermer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -198,12 +203,14 @@ export default function CookieConsent() {
             <button
               onClick={() => setShowCustomize(false)}
               className="px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
+              aria-label="Fermer la personnalisation"
             >
               {t.close}
             </button>
             <button
               onClick={handleSave}
               className="px-6 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              aria-label="Sauvegarder les préférences"
             >
               {t.save}
             </button>

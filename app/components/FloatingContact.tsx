@@ -94,6 +94,7 @@ export default function FloatingContact() {
           className={`p-4 rounded-full shadow-lg transition-all hover:scale-110 ${
             isOpen ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'
           }`}
+          aria-label={isOpen ? 'Fermer le menu de contact' : 'Ouvrir le menu de contact'}
         >
           {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
         </button>

@@ -119,6 +119,7 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel, amount, errorMessage 
           onClick={onCancel}
           disabled={isProcessing}
           className="flex-1 px-6 py-3 border border-zinc-300 dark:border-zinc-700 rounded-xl font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
+          aria-label="Annuler le paiement"
         >
           Annuler
         </button>
@@ -126,6 +127,7 @@ function CheckoutForm({ clientSecret, onSuccess, onCancel, amount, errorMessage 
           type="submit"
           disabled={!stripe || isProcessing}
           className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          aria-label={isProcessing ? 'Traitement en cours' : `Payer ${amount.toLocaleString()} FCFA`}
         >
           {isProcessing ? (
             <>

@@ -12,6 +12,3 @@ Disallow: /auth/
 
 # Interdire l'accès aux API routes
 Disallow: /api/
-
-# Délai de crawl (Crawl-delay)
-Crawl-delay: 1

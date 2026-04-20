@@ -196,19 +196,43 @@ export default function ChatBot() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI processing
-    setTimeout(() => {
-      const response = generateResponse(input);
+    try {
+      const response = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: input, lang }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.content,
+        content: data.response,
         timestamp: new Date(),
-        action: response.action
       };
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Erreur chatbot:', error);
+      // Fallback to rule-based response if API fails
+      const fallbackResponse = generateResponse(input);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: fallbackResponse.content,
+        timestamp: new Date(),
+        action: fallbackResponse.action
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
       setIsTyping(false);
-    }, 800);
+    }
   };
 
   const handleQuickAction = (action: string) => {
@@ -266,6 +290,7 @@ export default function ChatBot() {
                 setShowSuggestions(true);
               }}
               className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+              aria-label="Fermer le chat"
             >
               <X className="w-5 h-5" />
             </button>
@@ -303,6 +328,7 @@ export default function ChatBot() {
                         }
                       }}
                       className="mt-2 flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      aria-label={message.action.label}
                     >
                       {message.action.type === 'link' && <Search className="w-3 h-3" />}
                       {message.action.type === 'contact' && <Phone className="w-3 h-3" />}
@@ -349,6 +375,7 @@ export default function ChatBot() {
                       handleQuickAction(suggestion.action);
                     }}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                    aria-label={suggestion.label}
                   >
                     <suggestion.icon className="w-3 h-3" />
                     {suggestion.label}
@@ -373,6 +400,7 @@ export default function ChatBot() {
                 onClick={handleSend}
                 disabled={!input.trim()}
                 className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105"
+                aria-label="Envoyer le message"
               >
                 <Send className="w-5 h-5" />
               </button>

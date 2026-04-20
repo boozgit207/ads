@@ -534,6 +534,7 @@ export default function HomePage({ categories }: HomePageProps) {
                           localStorage.setItem('ads-cart', JSON.stringify(cart));
                           window.dispatchEvent(new Event('cartUpdated'));
                         }}
+                        aria-label={`Ajouter ${product.nom} au panier`}
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Panier

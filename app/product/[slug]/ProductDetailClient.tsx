@@ -8,12 +8,10 @@ import Footer from '../../components/Footer';
 import { showToast } from '../../components/Toast';
 import { Product } from '../../actions/catalog';
 import { Review } from '../../actions/reviews';
-import { 
-  ChevronLeft, 
-  ShoppingCart, 
-  Star, 
-  Share2, 
-  Heart,
+import {
+  ChevronLeft,
+  ShoppingCart,
+  Star,
   Check,
   Truck,
   Shield,
@@ -52,7 +50,6 @@ export default function ProductDetailClient({
   const [activeTab, setActiveTab] = useState<'description' | 'reviews' | 'specs'>('description');
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [showPrice, setShowPrice] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [localReviews, setLocalReviews] = useState<Review[]>(reviews);
@@ -461,15 +458,6 @@ export default function ProductDetailClient({
                 >
                   <ShoppingCart className="w-6 h-6" />
                   {t.addToCart}
-                </button>
-                <button
-                  onClick={() => setIsFavorite(!isFavorite)}
-                  className="p-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-red-300 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                >
-                  <Heart className={`w-6 h-6 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-                </button>
-                <button className="p-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all">
-                  <Share2 className="w-6 h-6" />
                 </button>
               </div>
 

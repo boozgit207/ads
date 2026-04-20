@@ -72,6 +72,7 @@ export default function ToastContainer() {
           <button
             onClick={() => removeToast(toast.id)}
             className="p-1 hover:bg-white/20 rounded"
+            aria-label="Fermer la notification"
           >
             <X className="w-4 h-4" />
           </button>

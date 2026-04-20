@@ -9,12 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.5.0",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.103.0",
     "axios": "^1.15.0",
     "cloudinary": "^2.0.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
     "next-intl": "^4.9.1",

@@ -90,11 +90,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-950/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/25">
-            A
-          </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
+        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <img src="/logo_1.svg" alt="ADS Logo" className="h-20 w-20" />
+          <span className="text-3xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
             ADS
           </span>
         </Link>
@@ -157,6 +155,7 @@ export default function Header() {
             <button
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
               className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+              aria-label="Sélectionner la langue"
             >
               <Globe className="w-4 h-4" />
               <span className="uppercase">{locale}</span>
@@ -172,6 +171,7 @@ export default function Header() {
                       ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
                       : 'text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800'
                   }`}
+                  aria-label="Français"
                 >
                   <span className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center text-[8px] text-white font-bold">FR</span>
                   Français
@@ -183,6 +183,7 @@ export default function Header() {
                       ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
                       : 'text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800'
                   }`}
+                  aria-label="English"
                 >
                   <span className="w-5 h-5 rounded-full bg-gradient-to-br from-red-500 to-blue-500 flex items-center justify-center text-[8px] text-white font-bold">EN</span>
                   English
@@ -197,6 +198,7 @@ export default function Header() {
               <button
                 onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
                 className="flex h-10 items-center gap-2 pl-2 pr-3 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+                aria-label="Menu compte"
               >
                 {user.avatar ? (
                   <img 
@@ -259,6 +261,7 @@ export default function Header() {
                         await signOut();
                       }}
                       className="flex w-full items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                      aria-label="Déconnexion"
                     >
                       <LogOut className="w-4 h-4" />
                       {nav.logout}
@@ -281,6 +284,7 @@ export default function Header() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+            aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
