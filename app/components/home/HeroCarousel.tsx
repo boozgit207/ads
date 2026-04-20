@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Microscope, FlaskConical, Truck } from 'lucide-react';
 
 interface HeroTranslations {
@@ -116,9 +117,14 @@ export default function HeroCarousel({ translations, isDark }: HeroCarouselProps
           >
             {/* Background Image */}
             {slide.image && (
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url('${slide.image}')` }}
+              <Image
+                src={slide.image}
+                alt={`Slide ${slide.id}`}
+                fill
+                className="object-cover"
+                priority={index === 0}
+                quality={75}
+                sizes="100vw"
               />
             )}
             {/* Background Gradient Overlay */}
