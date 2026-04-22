@@ -358,10 +358,10 @@ export default function HomePage({ categories }: HomePageProps) {
             {laboratories.map((lab, index) => (
               <div
                 key={lab.id}
-                className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer border border-slate-200 dark:border-slate-700 ${
-                  isLabsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl transition-all duration-700 hover:scale-105 cursor-pointer border border-slate-200 dark:border-slate-700 ${
+                  isLabsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${lab.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
                 <div className="p-6">
@@ -454,10 +454,13 @@ export default function HomePage({ categories }: HomePageProps) {
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
                       {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
                     </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-xl font-bold text-sky-500">
-                        {product.price ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(product.price) : 'Contactez-nous'}
-                      </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <Link
+                        href={`/product/${product.slug || product.id}`}
+                        className="flex-1 text-center py-2 rounded-xl border-2 border-sky-500 text-sky-500 font-semibold hover:bg-sky-500 hover:text-white transition-colors text-sm"
+                      >
+                        Voir détails
+                      </Link>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -465,17 +468,11 @@ export default function HomePage({ categories }: HomePageProps) {
                             addToCart(product);
                           }
                         }}
-                        className="w-10 h-10 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-colors"
+                        className="w-10 h-10 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-colors flex-shrink-0"
                       >
                         <ShoppingCart className="w-5 h-5" />
                       </button>
                     </div>
-                    <Link
-                      href={`/product/${product.slug || product.id}`}
-                      className="block w-full text-center py-2 rounded-xl border-2 border-sky-500 text-sky-500 font-semibold hover:bg-sky-500 hover:text-white transition-colors text-sm"
-                    >
-                      Voir détails
-                    </Link>
                   </div>
                 </div>
               ))}

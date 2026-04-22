@@ -27,6 +27,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (savedLang && (savedLang === 'fr' || savedLang === 'en')) {
       setLocaleState(savedLang);
     }
+    // Set default HTML lang attribute to French
+    document.documentElement.lang = 'fr';
     setMounted(true);
   }, []);
 

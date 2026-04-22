@@ -21,9 +21,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const savedDarkMode = localStorage.getItem('ads-dark-mode');
-      const isDarkMode = savedDarkMode === 'true' || 
-        (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      
+      // Default to light mode (false) if no saved preference
+      const isDarkMode = savedDarkMode === 'true';
+
       setIsDark(isDarkMode);
       if (isDarkMode) {
         document.documentElement.classList.add('dark');
