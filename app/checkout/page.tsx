@@ -23,14 +23,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../context/I18nContext';
 
 export default function CheckoutPage() {
   const { user } = useAuth();
   const { cart, clearCart } = useCart();
+  const { locale } = useI18n();
   const [step, setStep] = useState<'info' | 'delivery' | 'payment' | 'confirm'>('info');
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -40,17 +41,12 @@ export default function CheckoutPage() {
     city: 'Yaoundé',
     notes: ''
   });
-  
+
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('pickup');
   const [paymentMethod, setPaymentMethod] = useState<'om' | 'mtn'>('om');
   const [orderComplete, setOrderComplete] = useState(false);
   const [finalAmount, setFinalAmount] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   useEffect(() => {
     // Pre-fill form data when user is available
@@ -91,7 +87,7 @@ export default function CheckoutPage() {
       confirmOrder: 'Confirmer la commande',
       processing: 'Traitement en cours...',
       paymentInstructions: {
-        om: 'Instructions Orange Money:\n1. Composez #150#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro: 6XX XXX XXX\n4. Montant: {amount}\n5. Validez avec votre code',
+        om: 'Instructions Orange Money:\n1. Composez #150#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro: 697 12 13 28\n4. Montant: {amount}\n5. Validez avec votre code',
         mtn: 'Instructions MTN MoMo:\n1. Composez *126#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro\n4. Montant: {amount}\n5. Confirmez avec votre code',
       },
       thankYou: 'Merci pour votre commande !',
@@ -127,7 +123,7 @@ export default function CheckoutPage() {
       confirmOrder: 'Confirm order',
       processing: 'Processing...',
       paymentInstructions: {
-        om: 'Orange Money instructions:\n1. Dial #150#\n2. Select 1 (Transfer)\n3. Enter number: 6XX XXX XXX\n4. Amount: {amount}\n5. Confirm with PIN',
+        om: 'Orange Money instructions:\n1. Dial #150#\n2. Select 1 (Transfer)\n3. Enter number: 697 12 13 28\n4. Amount: {amount}\n5. Confirm with PIN',
         mtn: 'MTN MoMo instructions:\n1. Dial *126#\n2. Select 1 (Transfer)\n3. Enter number\n4. Amount: {amount}\n5. Confirm with PIN',
       },
       thankYou: 'Thank you for your order!',
@@ -137,7 +133,7 @@ export default function CheckoutPage() {
       required: 'Required field',
       error: 'Please fill in all required fields'
     }
-  }[lang];
+  }[locale];
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = deliveryOption === 'delivery' ? 1500 : 0;
@@ -297,7 +293,7 @@ export default function CheckoutPage() {
                   {t.title}
                 </h1>
                 <p className="text-blue-100 text-lg">
-                  {cart.length} {cart.length === 1 ? (lang === 'fr' ? 'article' : 'item') : (lang === 'fr' ? 'articles' : 'items')}
+                  {cart.length} {cart.length === 1 ? (locale === 'fr' ? 'article' : 'item') : (locale === 'fr' ? 'articles' : 'items')}
                 </p>
               </div>
               <Link
@@ -360,7 +356,7 @@ export default function CheckoutPage() {
                     <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
                       <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
                         <Check className="w-4 h-4" />
-                        {lang === 'fr' ? 'Informations récupérées depuis votre profil (modifiables)' : 'Information retrieved from your profile (editable)'}
+                        {locale === 'fr' ? 'Informations récupérées depuis votre profil (modifiables)' : 'Information retrieved from your profile (editable)'}
                       </p>
                     </div>
                   )}
@@ -399,7 +395,7 @@ export default function CheckoutPage() {
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="w-full px-5 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                        placeholder="+237 6XX XXX XXX"
+                        placeholder="+237 697 12 13 28"
                         required
                       />
                     </div>
@@ -592,7 +588,7 @@ export default function CheckoutPage() {
                     }}
                     className="px-8 py-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
                   >
-                    {lang === 'fr' ? 'Retour' : 'Back'}
+                    {locale === 'fr' ? 'Retour' : 'Back'}
                   </button>
                 )}
                 <button
@@ -607,7 +603,7 @@ export default function CheckoutPage() {
                     </>
                   ) : (
                     <>
-                      {step === 'payment' ? t.confirmOrder : (lang === 'fr' ? 'Continuer' : 'Continue')}
+                      {step === 'payment' ? t.confirmOrder : (locale === 'fr' ? 'Continuer' : 'Continue')}
                       <ChevronRight className="w-6 h-6" />
                     </>
                   )}

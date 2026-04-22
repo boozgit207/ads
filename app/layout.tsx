@@ -5,6 +5,7 @@ import ChatBot from "./components/chatbot/ChatBot";
 import ToastContainer from "./components/Toast";
 import StructuredData from "./components/StructuredData";
 import CookieConsent from "./components/CookieConsent";
+import LoadingScreen from "./components/LoadingScreen";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { ThemeProvider } from "./components/ThemeProvider";
@@ -135,6 +136,8 @@ export default async function RootLayout({
     >
       <head>
         <DarkModeScript />
+        <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo_1.svg" />
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
@@ -153,6 +156,7 @@ export default async function RootLayout({
         )}
       </head>
       <body className="min-h-full flex flex-col">
+        <LoadingScreen />
         <StructuredData />
         <I18nProvider>
           <ThemeProvider>

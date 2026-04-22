@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useI18n } from '../../context/I18nContext';
 import { addReview, deleteReview, updateReview } from '../../actions/reviews';
 
 interface ProductDetailClientProps {
@@ -38,28 +39,23 @@ interface ProductDetailClientProps {
   similarProducts: Product[];
 }
 
-export default function ProductDetailClient({ 
-  product, 
-  reviews, 
-  similarProducts 
+export default function ProductDetailClient({
+  product,
+  reviews,
+  similarProducts
 }: ProductDetailClientProps) {
   const { user } = useAuth();
   const { addToCart: addToCartContext } = useCart();
+  const { locale } = useI18n();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState<'description' | 'reviews' | 'specs'>('description');
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [showPrice, setShowPrice] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [localReviews, setLocalReviews] = useState<Review[]>(reviews);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [editReviewForm, setEditReviewForm] = useState({ rating: 5, title: '', comment: '' });
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   const t = {
     fr: {
@@ -148,10 +144,10 @@ export default function ProductDetailClient({
       addedToCart: 'Product added to cart!',
       mustBeLogged: 'You must be logged in to add a review'
     }
-  }[lang];
+  }[locale];
 
-  const getProductName = () => lang === 'fr' ? product.nom : (product.nom_en || product.nom);
-  const getProductDesc = () => lang === 'fr' ? product.description : (product.description_en || product.description);
+  const getProductName = () => locale === 'fr' ? product.nom : (product.nom_en || product.nom);
+  const getProductDesc = () => locale === 'fr' ? product.description : (product.description_en || product.description);
   const getConservation = () => product.conditions_conservation;
 
   const getStockStatus = () => {
@@ -169,7 +165,7 @@ export default function ProductDetailClient({
   const handleAddToCart = () => {
     const cartItem = {
       id: product.id,
-      name: lang === 'fr' ? product.nom : (product.nom_en || product.nom),
+      name: locale === 'fr' ? product.nom : (product.nom_en || product.nom),
       price: product.prix,
       quantity,
       image: product.image_principale_url,
@@ -180,7 +176,7 @@ export default function ProductDetailClient({
     
     addToCartContext(cartItem);
     
-    showToast(lang === 'fr' ? 'Produit ajouté au panier !' : 'Product added to cart!', 'success');
+    showToast(locale === 'fr' ? 'Produit ajouté au panier !' : 'Product added to cart!', 'success');
   };
 
   const submitReview = async () => {
@@ -192,7 +188,7 @@ export default function ProductDetailClient({
     const result = await addReview(product.id, user.id, reviewForm.rating, reviewForm.title, reviewForm.comment);
     
     if (result.success) {
-      showToast(lang === 'fr' ? 'Avis soumis avec succès !' : 'Review submitted successfully!', 'success');
+      showToast(locale === 'fr' ? 'Avis soumis avec succès !' : 'Review submitted successfully!', 'success');
       setShowReviewForm(false);
       setReviewForm({ rating: 5, title: '', comment: '' });
       
@@ -214,23 +210,23 @@ export default function ProductDetailClient({
       };
       setLocalReviews([newReview, ...localReviews]);
     } else {
-      showToast(result.error || (lang === 'fr' ? 'Erreur lors de la soumission' : 'Error submitting review'), 'error');
+      showToast(result.error || (locale === 'fr' ? 'Erreur lors de la soumission' : 'Error submitting review'), 'error');
     }
   };
 
   const handleDeleteReview = async (reviewId: string) => {
     if (!user) {
-      showToast(lang === 'fr' ? 'Vous devez être connecté' : 'You must be logged in', 'error');
+      showToast(locale === 'fr' ? 'Vous devez être connecté' : 'You must be logged in', 'error');
       return;
     }
 
-    if (confirm(lang === 'fr' ? 'Êtes-vous sûr de vouloir supprimer cet avis ?' : 'Are you sure you want to delete this review?')) {
+    if (confirm(locale === 'fr' ? 'Êtes-vous sûr de vouloir supprimer cet avis ?' : 'Are you sure you want to delete this review?')) {
       const result = await deleteReview(reviewId, user.id);
       if (result.success) {
-        showToast(lang === 'fr' ? 'Avis supprimé avec succès !' : 'Review deleted successfully!', 'success');
+        showToast(locale === 'fr' ? 'Avis supprimé avec succès !' : 'Review deleted successfully!', 'success');
         setLocalReviews(localReviews.filter(r => r.id !== reviewId));
       } else {
-        showToast(result.error || (lang === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting review'), 'error');
+        showToast(result.error || (locale === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting review'), 'error');
       }
     }
   };
@@ -246,13 +242,13 @@ export default function ProductDetailClient({
 
   const handleUpdateReview = async () => {
     if (!user || !editingReviewId) {
-      showToast(lang === 'fr' ? 'Erreur lors de la modification' : 'Error updating review', 'error');
+      showToast(locale === 'fr' ? 'Erreur lors de la modification' : 'Error updating review', 'error');
       return;
     }
 
     const result = await updateReview(editingReviewId, user.id, editReviewForm.rating, editReviewForm.title, editReviewForm.comment);
     if (result.success) {
-      showToast(lang === 'fr' ? 'Avis modifié avec succès !' : 'Review updated successfully!', 'success');
+      showToast(locale === 'fr' ? 'Avis modifié avec succès !' : 'Review updated successfully!', 'success');
       setLocalReviews(localReviews.map(r => 
         r.id === editingReviewId 
           ? { ...r, note: editReviewForm.rating, titre: editReviewForm.title, commentaire: editReviewForm.comment }
@@ -261,7 +257,7 @@ export default function ProductDetailClient({
       setEditingReviewId(null);
       setEditReviewForm({ rating: 5, title: '', comment: '' });
     } else {
-      showToast(result.error || (lang === 'fr' ? 'Erreur lors de la modification' : 'Error updating review'), 'error');
+      showToast(result.error || (locale === 'fr' ? 'Erreur lors de la modification' : 'Error updating review'), 'error');
     }
   };
 
@@ -375,7 +371,7 @@ export default function ProductDetailClient({
                       ))}
                     </div>
                     <span className="text-base font-medium text-zinc-600 dark:text-zinc-400">
-                      {averageRating.toFixed(1)} ({reviews.length} {lang === 'fr' ? 'avis' : 'reviews'})
+                      {averageRating.toFixed(1)} ({reviews.length} {locale === 'fr' ? 'avis' : 'reviews'})
                     </span>
                   </div>
                 )}
@@ -513,7 +509,7 @@ export default function ProductDetailClient({
                 <div className="prose dark:prose-invert max-w-none">
                   <div className="p-8 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
                     <p className="text-lg text-zinc-700 dark:text-zinc-300 whitespace-pre-line leading-relaxed">
-                      {getProductDesc() || (lang === 'fr' ? 'Aucune description disponible' : 'No description available')}
+                      {getProductDesc() || (locale === 'fr' ? 'Aucune description disponible' : 'No description available')}
                     </p>
                   </div>
                 </div>
@@ -551,7 +547,7 @@ export default function ProductDetailClient({
                       <div>
                         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{t.expiration}</p>
                         <p className="font-semibold text-zinc-900 dark:text-white text-lg">
-                          {new Date(product.date_peremption).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                          {new Date(product.date_peremption).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}
                         </p>
                       </div>
                     </div>
@@ -595,7 +591,7 @@ export default function ProductDetailClient({
                         <Calendar className="w-6 h-6 text-red-600 dark:text-red-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{lang === 'fr' ? 'Date de péremption' : 'Expiry Date'}</p>
+                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{locale === 'fr' ? 'Date de péremption' : 'Expiry Date'}</p>
                         <p className="font-semibold text-zinc-900 dark:text-white text-lg">
                           {new Date(product.date_peremption).toLocaleDateString('fr-FR')}
                         </p>
@@ -668,7 +664,7 @@ export default function ProductDetailClient({
                             value={reviewForm.title}
                             onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
                             className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                            placeholder={lang === 'fr' ? 'Résumé de votre avis' : 'Summary of your review'}
+                            placeholder={locale === 'fr' ? 'Résumé de votre avis' : 'Summary of your review'}
                           />
                         </div>
                         <div>
@@ -678,7 +674,7 @@ export default function ProductDetailClient({
                             onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
                             rows={4}
                             className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                            placeholder={lang === 'fr' ? 'Détaillez votre expérience...' : 'Detail your experience...'}
+                            placeholder={locale === 'fr' ? 'Détaillez votre expérience...' : 'Detail your experience...'}
                           />
                         </div>
                         <button
@@ -714,21 +710,21 @@ export default function ProductDetailClient({
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-zinc-500">
-                                {new Date(review.created_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                                {new Date(review.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}
                               </span>
                               {user && user.id === review.user_id && (
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => handleEditReview(review)}
                                     className="p-1 text-zinc-500 hover:text-blue-600 transition-colors"
-                                    title={lang === 'fr' ? 'Modifier' : 'Edit'}
+                                    title={locale === 'fr' ? 'Modifier' : 'Edit'}
                                   >
                                     <Edit className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteReview(review.id)}
                                     className="p-1 text-zinc-500 hover:text-red-600 transition-colors"
-                                    title={lang === 'fr' ? 'Supprimer' : 'Delete'}
+                                    title={locale === 'fr' ? 'Supprimer' : 'Delete'}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -788,19 +784,19 @@ export default function ProductDetailClient({
                                     value={editReviewForm.title}
                                     onChange={(e) => setEditReviewForm({ ...editReviewForm, title: e.target.value })}
                                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
-                                    placeholder={lang === 'fr' ? 'Titre de votre avis (optionnel)' : 'Review title (optional)'}
+                                    placeholder={locale === 'fr' ? 'Titre de votre avis (optionnel)' : 'Review title (optional)'}
                                   />
                                 </div>
                                 <div>
                                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                                    {lang === 'fr' ? 'Commentaire' : 'Comment'}
+                                    {locale === 'fr' ? 'Commentaire' : 'Comment'}
                                   </label>
                                   <textarea
                                     value={editReviewForm.comment}
                                     onChange={(e) => setEditReviewForm({ ...editReviewForm, comment: e.target.value })}
                                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
                                     rows={3}
-                                    placeholder={lang === 'fr' ? 'Partagez votre expérience...' : 'Share your experience...'}
+                                    placeholder={locale === 'fr' ? 'Partagez votre expérience...' : 'Share your experience...'}
                                   />
                                 </div>
                                 <div className="flex gap-2">
@@ -808,7 +804,7 @@ export default function ProductDetailClient({
                                     onClick={handleUpdateReview}
                                     className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700"
                                   >
-                                    {lang === 'fr' ? 'Enregistrer' : 'Save'}
+                                    {locale === 'fr' ? 'Enregistrer' : 'Save'}
                                   </button>
                                   <button
                                     onClick={() => {
@@ -817,7 +813,7 @@ export default function ProductDetailClient({
                                     }}
                                     className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600"
                                   >
-                                    {lang === 'fr' ? 'Annuler' : 'Cancel'}
+                                    {locale === 'fr' ? 'Annuler' : 'Cancel'}
                                   </button>
                                 </div>
                               </div>
@@ -849,7 +845,7 @@ export default function ProductDetailClient({
                       {similarProduct.image_principale_url ? (
                         <Image
                           src={similarProduct.image_principale_url}
-                          alt={lang === 'fr' ? similarProduct.nom : (similarProduct.nom_en || similarProduct.nom)}
+                          alt={locale === 'fr' ? similarProduct.nom : (similarProduct.nom_en || similarProduct.nom)}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                           unoptimized={similarProduct.image_principale_url?.includes('cloudinary.com')}
@@ -868,7 +864,7 @@ export default function ProductDetailClient({
                     <div className="p-5">
                       <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">{similarProduct.laboratoire?.nom}</p>
                       <h3 className="font-bold text-zinc-900 dark:text-white mb-3 line-clamp-2 text-lg leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {lang === 'fr' ? similarProduct.nom : (similarProduct.nom_en || similarProduct.nom)}
+                        {locale === 'fr' ? similarProduct.nom : (similarProduct.nom_en || similarProduct.nom)}
                       </h3>
                       <p className="font-bold text-2xl text-zinc-900 dark:text-white">
                         {similarProduct.prix.toLocaleString()} FCFA

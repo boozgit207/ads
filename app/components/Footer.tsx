@@ -36,26 +36,30 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white transition-colors duration-300">
+    <footer className="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white transition-colors duration-300">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           
           {/* Column 1: About */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <img src="/logo_1.svg" alt="ADS Logo" className="h-48 w-48" />
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <img src="/logo_1.svg" alt="ADS Logo" className="h-20 w-20" />
+              <div>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">ADS</span>
+                <span className="block text-sm font-semibold text-slate-500 dark:text-slate-400">Angela Diagnostics</span>
+              </div>
             </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               Angela Diagnostics et Services (ADS) - Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.
             </p>
             {/* Social Media */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3">
               <a 
                 href="https://facebook.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-blue-600 hover:text-white transition-all duration-300"
+                className="h-11 w-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-300 hover:scale-110"
                 aria-label="Facebook"
               >
                 <FacebookIcon />
@@ -64,7 +68,7 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-sky-500 hover:text-white transition-all duration-300"
+                className="h-11 w-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all duration-300 hover:scale-110"
                 aria-label="Twitter"
               >
                 <TwitterIcon />
@@ -73,7 +77,7 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-pink-600 hover:text-white transition-all duration-300"
+                className="h-11 w-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-600 transition-all duration-300 hover:scale-110"
                 aria-label="Instagram"
               >
                 <InstagramIcon />
@@ -82,7 +86,7 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
                 href="https://linkedin.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-blue-700 hover:text-white transition-all duration-300"
+                className="h-11 w-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-blue-700 hover:text-white hover:border-blue-700 transition-all duration-300 hover:scale-110"
                 aria-label="LinkedIn"
               >
                 <LinkedinIcon />
@@ -91,64 +95,72 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
           </div>
 
           {/* Column 2: Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Liens Rapides</h3>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Liens Rapides</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <Link href="/" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
+                  <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <Link href="/products" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
+                  <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
                   Nos Produits
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                <Link href="/contact" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
+                  <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
                   Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/help" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
+                  <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
+                  À propos
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Column 3: Contact */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Contact</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-300">
-                <MapPin className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span>{CONTACT.address}</span>
-              </li>
-              <li className="flex flex-col gap-1 text-sm text-zinc-600 dark:text-zinc-300">
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                  <span>Orange: {CONTACT.phoneOrange}</span>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Contact</h3>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                 </div>
-                <div className="flex items-center gap-3 pl-8">
-                  <span className="text-yellow-400 text-xs">●</span>
-                  <span>MTN: {CONTACT.phoneMtn}</span>
+                <span className="pt-1">{CONTACT.address}</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                  <Phone className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <div className="flex flex-col">
+                  <span>{CONTACT.phoneOrange}</span>
+                  <span>{CONTACT.phoneMtn}</span>
                 </div>
               </li>
-              <li className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-300">
-                <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
+              <li className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                  <Mail className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                </div>
                 <span>{CONTACT.email}</span>
               </li>
             </ul>
           </div>
 
           {/* Column 4: Payment Methods */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Moyens de Paiement</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300">
-              Paiements sécurisés via mobile money et virement bancaire.
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Moyens de Paiement</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Paiements sécurisés via mobile money.
             </p>
-            <div className="flex flex-wrap gap-3 items-center">
-              {/* Orange Money Logo */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Image
                   src="/images/logo_orange_money.png"
                   alt="Orange Money"
@@ -156,9 +168,9 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
                   height={40}
                   className="h-8 w-auto object-contain"
                 />
+                <span className="text-sm text-slate-600 dark:text-slate-400">Orange Money</span>
               </div>
-              {/* MTN Mobile Money Logo */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-zinc-200 dark:border-zinc-700">
+              <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Image
                   src="/images/logo_mtn_money.png"
                   alt="MTN Mobile Money"
@@ -166,35 +178,32 @@ className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center
                   height={40}
                   className="h-8 w-auto object-contain"
                 />
+                <span className="text-sm text-slate-600 dark:text-slate-400">MTN Mobile Money</span>
               </div>
             </div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-500 text-center">
-              Paiement par virement bancaire<br />
-              sur présentation de la facture proforma
-            </p>
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-zinc-300 dark:border-zinc-800">
+      <div className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-zinc-600 dark:text-zinc-500">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               © 2026 ADS - Angela Diagnostics et Services. Tous droits réservés.
             </p>
-            <div className="flex items-center gap-6 text-sm text-zinc-600 dark:text-zinc-500">
-              <Link href="/privacy" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+            <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400">
+              <Link href="/privacy" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                 Politique de confidentialité
               </Link>
-              <Link href="/terms" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <Link href="/terms" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                 Conditions d'utilisation
               </Link>
             </div>
             {/* Back to Top */}
             <button
               onClick={scrollToTop}
-              className="h-10 w-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
+              className="h-11 w-11 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all duration-300 hover:scale-110"
               aria-label="Retour en haut"
             >
               <ArrowUp className="h-5 w-5" />

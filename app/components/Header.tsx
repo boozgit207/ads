@@ -87,39 +87,42 @@ export default function Header() {
   const common = t.common;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 shadow-sm">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <img src="/logo_1.svg" alt="ADS Logo" className="h-40 w-40" />
+        <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity group">
+          <img src="/logo_1.svg" alt="ADS Logo" className="h-16 w-16 group-hover:scale-110 transition-transform" />
+          <div className="hidden sm:block">
+            <span className="text-2xl font-bold text-slate-900 dark:text-white">ADS</span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1">
           <Link
             href="/"
-className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
           >
             <Home className="w-4 h-4" />
             {nav.home}
           </Link>
           <Link
             href="/products"
-className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
           >
             <Grid3X3 className="w-4 h-4" />
             {nav.catalog}
           </Link>
           <Link
             href="/help"
-className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
           >
             <HelpCircle className="w-4 h-4" />
             {nav.about}
           </Link>
           <Link
             href="/contact"
-className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
           >
             <Mail className="w-4 h-4" />
             {nav.contact}
@@ -127,16 +130,16 @@ className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text
         </nav>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Cart Icon */}
           <Link
             href="/cart"
-className="hidden sm:flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white relative"
+            className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400 relative"
             aria-label={nav.cart}
           >
             <ShoppingCart className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center justify-center shadow-lg shadow-sky-500/30">
                 {cartCount > 9 ? '9+' : cartCount}
               </span>
             )}
@@ -151,38 +154,42 @@ className="hidden sm:flex h-10 w-10 items-center justify-center rounded-lg text-
           <div className="relative">
             <button
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="hidden sm:flex h-11 items-center gap-2 px-4 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
               aria-label="Sélectionner la langue"
             >
-              <Globe className="w-4 h-4" />
+              <img 
+                src={locale === 'fr' ? '/france-flag-icon-256.png' : '/united-kingdom-flag-icon-256.png'} 
+                alt={locale} 
+                className="w-5 h-5 rounded-full object-cover" 
+              />
               <span className="uppercase">{locale}</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
             </button>
             
             {isLangMenuOpen && (
-              <div className="absolute right-0 mt-2 w-32 rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900 py-1">
+              <div className="absolute right-0 mt-2 w-40 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2">
                 <button
                   onClick={() => toggleLang('fr')}
-                  className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     locale === 'fr'
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                      ? 'bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400'
+                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                   }`}
                   aria-label="Français"
                 >
-                  <span className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center text-[8px] text-white font-bold">FR</span>
+                  <img src="/france-flag-icon-256.png" alt="FR" className="w-6 h-6 rounded-full object-cover" />
                   Français
                 </button>
                 <button
                   onClick={() => toggleLang('en')}
-                  className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     locale === 'en'
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                      : 'text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                      ? 'bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400'
+                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                   }`}
                   aria-label="English"
                 >
-                  <span className="w-5 h-5 rounded-full bg-gradient-to-br from-red-500 to-blue-500 flex items-center justify-center text-[8px] text-white font-bold">EN</span>
+                  <img src="/united-kingdom-flag-icon-256.png" alt="EN" className="w-6 h-6 rounded-full object-cover" />
                   English
                 </button>
               </div>
@@ -194,36 +201,36 @@ className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font
             <div className="relative">
               <button
                 onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                className="flex h-10 items-center gap-2 pl-2 pr-3 rounded-lg border border-zinc-200 transition-all hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+                className="flex h-11 items-center gap-3 pl-3 pr-4 rounded-xl border border-slate-200 transition-all hover:border-sky-300 hover:bg-slate-50 dark:border-slate-700 dark:hover:border-sky-600 dark:hover:bg-slate-800"
                 aria-label="Menu compte"
               >
                 {user.avatar ? (
                   <img 
                     src={user.avatar} 
                     alt={user.first_name || ''}
-                    className="w-7 h-7 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-700"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-slate-100 dark:ring-slate-700">
                     {getInitials()}
                   </div>
                 )}
-                <span className="hidden sm:block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <span className="hidden sm:block text-sm font-medium text-slate-700 dark:text-slate-300">
                   {user.first_name || user.email.split('@')[0]}
                 </span>
-                <ChevronDown className={`w-3 h-3 text-zinc-500 dark:text-zinc-300 transition-transform ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 text-slate-500 dark:text-slate-300 transition-transform ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isAccountMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900 py-1">
-                  <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">{user.first_name} {user.last_name}</p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-300 truncate">{user.email}</p>
+                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2">
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{user.first_name} {user.last_name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-300 truncate">{user.email}</p>
                   </div>
                   <Link
                     href="/account"
                     onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
                   >
                     <User className="w-4 h-4" />
                     {nav.account}
@@ -231,14 +238,14 @@ className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font
                   <Link
                     href="/account?tab=orders"
                     onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex w-full items-center justify-between px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                    className="flex w-full items-center justify-between px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <ShoppingBag className="w-4 h-4" />
                       {locale === 'fr' ? 'Mes commandes' : 'My orders'}
                     </div>
                     {orderCount > 0 && (
-                      <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                      <span className="bg-sky-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
                         {orderCount}
                       </span>
                     )}
@@ -246,12 +253,12 @@ className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font
                   <Link
                     href="/account?tab=settings"
                     onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
                   >
                     <Settings className="w-4 h-4" />
                     Paramètres
                   </Link>
-                  <div className="border-t border-zinc-100 dark:border-zinc-800 mt-1 pt-1">
+                  <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
                     <button
                       onClick={async () => {
                         setIsAccountMenuOpen(false);
@@ -270,7 +277,7 @@ className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font
           ) : (
             <Link
               href="/auth"
-              className="hidden sm:flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25"
+              className="hidden sm:flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white transition-all hover:shadow-lg hover:shadow-sky-500/25 hover:scale-105"
             >
               <User className="w-4 h-4" />
               {locale === 'fr' ? 'Connexion' : 'Login'}
@@ -280,7 +287,7 @@ className="hidden sm:flex h-10 items-center gap-1.5 px-3 rounded-lg text-sm font
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+            className="md:hidden flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -290,12 +297,12 @@ className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="md:hidden border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
           <nav className="flex flex-col p-4 space-y-1">
             <Link 
               href="/" 
               onClick={() => setIsMobileMenuOpen(false)}
-className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Home className="w-5 h-5" />
               {nav.home}
@@ -303,7 +310,7 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text
             <Link 
               href="/products" 
               onClick={() => setIsMobileMenuOpen(false)}
-className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Grid3X3 className="w-5 h-5" />
               {nav.catalog}
@@ -311,12 +318,12 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text
             <Link 
               href="/cart" 
               onClick={() => setIsMobileMenuOpen(false)}
-className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <div className="relative">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center justify-center">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>
                 )}
@@ -326,7 +333,7 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text
             <Link 
               href="/help" 
               onClick={() => setIsMobileMenuOpen(false)}
-className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <HelpCircle className="w-5 h-5" />
               {nav.about}
@@ -334,42 +341,44 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text
             <Link 
               href="/contact" 
               onClick={() => setIsMobileMenuOpen(false)}
-className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Mail className="w-5 h-5" />
               {nav.contact}
             </Link>
             
-            <div className="border-t border-zinc-200 dark:border-zinc-800 my-2 pt-2">
+            <div className="border-t border-slate-200 dark:border-slate-800 my-2 pt-2">
               <button
                 onClick={toggleDarkMode}
-                className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-sky-400"
               >
                 {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 {isDark ? 'Mode clair' : 'Mode sombre'}
               </button>
               
               <div className="flex items-center gap-3 px-4 py-3">
-                <Globe className="w-5 h-5 text-zinc-500 dark:text-zinc-300" />
+                <Globe className="w-5 h-5 text-slate-500 dark:text-slate-300" />
                 <div className="flex gap-2">
                   <button
                     onClick={() => toggleLang('fr')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                       locale === 'fr'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
                     }`}
                   >
+                    <img src="/france-flag-icon-256.png" alt="FR" className="w-5 h-5 rounded-full object-cover" />
                     FR
                   </button>
                   <button
                     onClick={() => toggleLang('en')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                       locale === 'en'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
                     }`}
                   >
+                    <img src="/united-kingdom-flag-icon-256.png" alt="EN" className="w-5 h-5 rounded-full object-cover" />
                     EN
                   </button>
                 </div>
@@ -380,7 +389,7 @@ className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text
               <Link
                 href="/auth"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-blue-700"
+                className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-3 text-sm font-medium text-white transition-all hover:shadow-lg"
               >
                 <User className="w-5 h-5" />
                 {locale === 'fr' ? 'Connexion' : 'Login'}

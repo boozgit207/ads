@@ -6,39 +6,55 @@ import Image from 'next/image';
 import Header from '../Header';
 import Footer from '../Footer';
 import HeroCarousel from './HeroCarousel';
-import { 
-  ChevronRight, 
-  FlaskConical, 
-  TestTube, 
-  ArrowRight,
-  TrendingUp,
-  Users,
+import {
+  FlaskConical,
+  TestTube,
+  Activity,
   Package,
-  Zap,
   Heart,
-  ShoppingCart,
-  Sparkles,
   Shield,
   Truck,
   Headphones,
-  Search,
-  Activity,
-  BadgeCheck
+  ShoppingCart,
+  Star,
+  ArrowRight,
+  CheckCircle2,
+  Award,
+  Users,
+  TrendingUp,
+  BarChart3,
+  LineChart,
+  Beaker,
+  Droplets
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useI18n } from '../../context/I18nContext';
+import { useCart } from '../../context/CartContext';
 
 interface HomePageProps {
   categories: { id: string; nom: string; description?: string | null }[];
 }
 
-// Données des laboratoires
+// Palette de couleurs professionnelles médicales
+const colors = {
+  primary: '#0EA5E9', // Sky blue
+  secondary: '#0284C7', // Darker blue
+  accent: '#38BDF8', // Light blue
+  success: '#10B981', // Green
+  warning: '#F59E0B', // Amber
+  danger: '#EF4444', // Red
+  dark: '#1E293B', // Slate dark
+  light: '#F8FAFC', // Slate light
+  white: '#FFFFFF',
+};
+
 const laboratories = [
   {
     id: 'fortress',
     name: 'Fortress Diagnostics',
     description: 'Tests diagnostiques de pointe',
     image: '/images/labs/fortress.jpg',
-    color: 'from-blue-600 to-blue-800',
+    color: 'from-sky-500 to-blue-600',
     icon: FlaskConical
   },
   {
@@ -46,7 +62,7 @@ const laboratories = [
     name: 'Bioline',
     description: 'Solutions de sérologie',
     image: '/images/labs/bioline.jpg',
-    color: 'from-green-600 to-green-800',
+    color: 'from-emerald-500 to-green-600',
     icon: TestTube
   },
   {
@@ -54,7 +70,7 @@ const laboratories = [
     name: 'Hightop',
     description: 'Tests rapides et ELISA',
     image: '/images/labs/hightop.jpg',
-    color: 'from-purple-600 to-purple-800',
+    color: 'from-violet-500 to-purple-600',
     icon: Activity
   },
   {
@@ -62,70 +78,62 @@ const laboratories = [
     name: 'Consommables',
     description: 'Matériel de laboratoire',
     image: '/images/labs/consommables.jpg',
-    color: 'from-orange-600 to-orange-800',
+    color: 'from-orange-500 to-red-600',
     icon: Package
   }
 ];
 
-// Icônes simples pour les catégories
-const getCategoryIcon = (index: number) => {
-  const icons = [
-    Package,
-    Shield,
-    Activity,
-    Heart,
-    Truck,
-    Headphones
-  ];
-  return icons[index % icons.length];
-};
-
-// Produits vedettes
-const featuredProducts = [
+const features = [
   {
-    id: 1,
-    name: 'COVID-19 Ag Test',
-    laboratory: 'Fortress Diagnostics',
-    category: 'Tests Rapides',
-    price: 12500,
-    image: '/images/products/covid-test.jpg'
+    icon: Shield,
+    title: 'Qualité Certifiée',
+    description: 'Tous nos produits sont certifiés et conformes aux normes internationales',
+    color: 'text-sky-500',
+    bgColor: 'bg-sky-50'
   },
   {
-    id: 2,
-    name: 'HIV 1/2 Rapid Test',
-    laboratory: 'Bioline',
-    category: 'Sérologie',
-    price: 8500,
-    image: '/images/products/hiv-test.jpg'
+    icon: Truck,
+    title: 'Livraison Rapide',
+    description: 'Livraison express dans toute l\'Afrique centrale',
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-50'
   },
   {
-    id: 3,
-    name: 'Malaria Pf/Pv Ag',
-    laboratory: 'Hightop',
-    category: 'Tests Rapides',
-    price: 6200,
-    image: '/images/products/malaria-test.jpg'
+    icon: Headphones,
+    title: 'Support 24/7',
+    description: 'Équipe technique disponible à tout moment',
+    color: 'text-violet-500',
+    bgColor: 'bg-violet-50'
   },
   {
-    id: 4,
-    name: 'Glucose Kit',
-    laboratory: 'Fortress Diagnostics',
-    category: 'Biochimie',
-    price: 45000,
-    image: '/images/products/glucose-kit.jpg'
+    icon: Award,
+    title: 'Prix Compétitifs',
+    description: 'Tarifs adaptés aux professionnels de santé',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50'
   }
 ];
 
 export default function HomePage({ categories }: HomePageProps) {
   const { user } = useAuth();
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
-  const [isVisible, setIsVisible] = useState(false);
-  const [counters, setCounters] = useState({ products: 0, labs: 0, satisfiedClients: 0, orders: 0 });
+  const { locale } = useI18n();
+  const { addToCart } = useCart();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [isDark, setIsDark] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isStatsVisible, setIsStatsVisible] = useState(false);
+  const [animatedStats, setAnimatedStats] = useState([0, 0, 0, 0]);
+  const [isLabsVisible, setIsLabsVisible] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const labsRef = useRef<HTMLDivElement>(null);
+
+  const statsData = [
+    { icon: Package, value: 500, suffix: '+', label: 'Produits' },
+    { icon: Award, value: 20, suffix: '+', label: 'Laboratoires' },
+    { icon: Users, value: 150, suffix: '+', label: 'Clients' },
+    { icon: TrendingUp, value: 300, suffix: '+', label: 'Commandes' }
+  ];
 
   useEffect(() => {
     setIsMounted(true);
@@ -133,15 +141,62 @@ export default function HomePage({ categories }: HomePageProps) {
 
   useEffect(() => {
     if (!isMounted) return;
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const savedDarkMode = localStorage.getItem('ads-dark-mode');
     const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
     setIsDark(isDarkMode);
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted || !statsRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsStatsVisible(true);
+          // Animate the numbers
+          statsData.forEach((stat, index) => {
+            const duration = 2000;
+            const steps = 60;
+            const increment = stat.value / steps;
+            let current = 0;
+            const timer = setInterval(() => {
+              current += increment;
+              if (current >= stat.value) {
+                current = stat.value;
+                clearInterval(timer);
+              }
+              setAnimatedStats(prev => {
+                const newStats = [...prev];
+                newStats[index] = Math.floor(current);
+                return newStats;
+              });
+            }, duration / steps);
+          });
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(statsRef.current);
+
+    return () => observer.disconnect();
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted || !labsRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLabsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(labsRef.current);
+
+    return () => observer.disconnect();
   }, [isMounted]);
 
   useEffect(() => {
@@ -162,172 +217,83 @@ export default function HomePage({ categories }: HomePageProps) {
     loadFeaturedProducts();
   }, [isMounted]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          animateCounters();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const animateCounters = () => {
-    const targets = { products: 500, labs: 20, satisfiedClients: 150, orders: 300 };
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-
-    let current = { products: 0, labs: 0, satisfiedClients: 0, orders: 0 };
-    const increment = {
-      products: targets.products / steps,
-      labs: targets.labs / steps,
-      satisfiedClients: targets.satisfiedClients / steps,
-      orders: targets.orders / steps
-    };
-
-    const timer = setInterval(() => {
-      current = {
-        products: Math.min(current.products + increment.products, targets.products),
-        labs: Math.min(current.labs + increment.labs, targets.labs),
-        satisfiedClients: Math.min(current.satisfiedClients + increment.satisfiedClients, targets.satisfiedClients),
-        orders: Math.min(current.orders + increment.orders, targets.orders)
-      };
-
-      setCounters({
-        products: Math.floor(current.products),
-        labs: Math.floor(current.labs),
-        satisfiedClients: Math.floor(current.satisfiedClients),
-        orders: Math.floor(current.orders)
-      });
-
-      if (current.products >= targets.products && 
-          current.labs >= targets.labs && 
-          current.satisfiedClients >= targets.satisfiedClients && 
-          current.orders >= targets.orders) {
-        clearInterval(timer);
-      }
-    }, interval);
-
-    return () => clearInterval(timer);
-  };
-
   const t = {
     fr: {
-      hero: {
-        title1: 'Réactifs de Laboratoire',
-        subtitle1: 'Solutions diagnostiques de haute qualité',
-        cta1: 'Voir les produits',
-        title2: 'Livraison Rapide',
-        subtitle2: 'Stock disponible et livraison express',
-        cta2: 'Commander maintenant',
-        title3: 'Service Client',
-        subtitle3: 'Support technique disponible 7j/7',
-        cta3: 'Nous contacter'
-      },
-      laboratories: 'Nos Laboratoires - Produits de Qualité',
-      categories: 'Nos Catégories de Réactifs',
-      featured: 'Produits Vedettes - Les Plus Demandés',
+      heroTitle: 'Solutions Diagnostiques de Pointe',
+      heroSubtitle: 'Votre partenaire de confiance pour les réactifs de laboratoire et équipements médicaux en Afrique',
+      heroCTA: 'Explorer nos produits',
+      heroSecondary: 'Contacter nos experts',
+      laboratories: 'Nos Laboratoires Partenaires',
+      categories: 'Nos Catégories',
+      featured: 'Produits Vedettes',
       viewAll: 'Voir tout',
-      viewDetails: 'Voir détails',
       addToCart: 'Ajouter au panier',
-      stats: {
-        products: '+500 Produits',
-        labs: '+20 Laboratoires',
-        satisfiedClients: '+150 Clients Satisfaits',
-        orders: '+300 Commandes'
-      },
-      features: {
-        quality: 'Qualité Garantie',
-        delivery: 'Livraison Express',
-        support: 'Support 24/7',
-        price: 'Prix Compétitifs'
-      },
-      categoryDescriptions: {
-        latex: 'Tests de précision pour diagnostics rapides',
-        biochimie: 'Analyse sanguine complète et enzymes',
-        hormones: 'Dosage hormonal et endocrinologie',
-        serologie: 'Tests d\'anticorps et maladies infectieuses',
-        elisa: 'Tests enzymatiques de haute sensibilité',
-        tdr: 'Résultats en minutes pour diagnostics immédiats'
-      }
+      viewDetails: 'Voir détails',
+      features: 'Pourquoi nous choisir ?',
+      stats: 'Nos réalisations',
+      trust: 'Ils nous font confiance'
     },
     en: {
-      hero: {
-        title1: 'Laboratory Reagents',
-        subtitle1: 'High-quality diagnostic solutions',
-        cta1: 'View products',
-        title2: 'Fast Delivery',
-        subtitle2: 'Available stock and express delivery',
-        cta2: 'Order now',
-        title3: 'Customer Service',
-        subtitle3: 'Technical support available 24/7',
-        cta3: 'Contact us'
-      },
-      laboratories: 'Our Laboratories - Quality Products',
-      categories: 'Our Reagent Categories',
-      featured: 'Featured Products - Most Popular',
+      heroTitle: 'Cutting-Edge Diagnostic Solutions',
+      heroSubtitle: 'Your trusted partner for laboratory reagents and medical equipment in Africa',
+      heroCTA: 'Explore our products',
+      heroSecondary: 'Contact our experts',
+      laboratories: 'Our Partner Laboratories',
+      categories: 'Our Categories',
+      featured: 'Featured Products',
       viewAll: 'View all',
-      viewDetails: 'View details',
       addToCart: 'Add to cart',
-      stats: {
-        products: '+500 Products',
-        labs: '+20 Laboratories',
-        satisfiedClients: '+150 Satisfied Clients',
-        orders: '+300 Orders'
-      },
-      features: {
-        quality: 'Quality Guaranteed',
-        delivery: 'Express Delivery',
-        support: '24/7 Support',
-        price: 'Competitive Prices'
-      },
-      categoryDescriptions: {
-        latex: 'Precision tests for rapid diagnostics',
-        biochimie: 'Complete blood analysis and enzymes',
-        hormones: 'Hormonal dosage and endocrinology',
-        serologie: 'Antibody tests and infectious diseases',
-        elisa: 'High-sensitivity enzymatic tests',
-        tdr: 'Results in minutes for immediate diagnostics'
-      }
+      viewDetails: 'View details',
+      features: 'Why choose us?',
+      stats: 'Our achievements',
+      trust: 'They trust us'
     }
-  }[lang];
+  };
+
+  const content = t[locale];
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
       <Header />
-      
-      {/* Hero Carousel */}
-      <HeroCarousel translations={t.hero} isDark={isDark} />
 
-      {/* Statistics Section */}
-      <section ref={sectionRef} className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Package, value: counters.products, label: t.stats.products },
-              { icon: BadgeCheck, value: counters.labs, label: t.stats.labs },
-              { icon: Users, value: counters.satisfiedClients, label: t.stats.satisfiedClients },
-              { icon: TrendingUp, value: counters.orders, label: t.stats.orders }
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center text-center transition-all duration-500 hover:scale-105 animate-fade-in-up"
-                style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
-              >
-                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm transform hover:rotate-12 transition-transform duration-300">
+      {/* Hero Carousel */}
+      <HeroCarousel
+        translations={{
+          title1: locale === 'fr' ? 'Solutions Diagnostiques de Pointe' : 'Cutting-Edge Diagnostic Solutions',
+          subtitle1: locale === 'fr' ? 'Votre partenaire de confiance pour les réactifs de laboratoire et équipements médicaux en Afrique' : 'Your trusted partner for laboratory reagents and medical equipment in Africa',
+          cta1: locale === 'fr' ? 'Explorer nos produits' : 'Explore our products',
+          title2: locale === 'fr' ? 'Qualité et Précision Garanties' : 'Quality and Precision Guaranteed',
+          subtitle2: locale === 'fr' ? 'Tests COVID-19, HIV, Malaria, Biochimie et plus - Certifié ISO 9001' : 'COVID-19, HIV, Malaria, Biochemistry tests and more - ISO 9001 Certified',
+          cta2: locale === 'fr' ? 'En savoir plus' : 'Learn more',
+          title3: locale === 'fr' ? 'Livraison Rapide et Fiable' : 'Fast and Reliable Delivery',
+          subtitle3: locale === 'fr' ? 'Service de livraison à travers tout le pays avec suivi en temps réel' : 'Nationwide delivery service with real-time tracking',
+          cta3: locale === 'fr' ? 'Commander maintenant' : 'Order now'
+        }}
+        isDark={isDark}
+      />
+
+      {/* Stats Section */}
+      <section className="py-16 bg-gradient-to-br from-sky-500 to-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              {content.stats}
+            </h2>
+            <p className="text-lg text-sky-100 max-w-2xl mx-auto">
+              Des chiffres qui parlent d'eux-mêmes
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8" ref={statsRef}>
+            {statsData.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                   <stat.icon className="w-8 h-8" />
                 </div>
-                <div className="text-4xl font-bold mb-1">{stat.value}+</div>
-                <div className="text-sm text-blue-100">{stat.label}</div>
+                <div className="text-4xl font-bold mb-2">
+                  {isStatsVisible ? `${animatedStats[index]}${stat.suffix}` : `0${stat.suffix}`}
+                </div>
+                <div className="text-sky-100">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -335,24 +301,32 @@ export default function HomePage({ categories }: HomePageProps) {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-zinc-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: BadgeCheck, title: t.features.quality, color: 'from-green-500 to-green-600' },
-              { icon: Zap, title: t.features.delivery, color: 'from-orange-500 to-orange-600' },
-              { icon: Heart, title: t.features.support, color: 'from-blue-500 to-blue-600' },
-              { icon: ShoppingCart, title: t.features.price, color: 'from-purple-500 to-purple-600' }
-            ].map((feature, index) => (
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              {content.features}
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Des solutions adaptées aux besoins des professionnels de santé
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
               <div
                 key={index}
-                className="group p-6 rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
+                className="group p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 transition-all hover:shadow-xl border border-slate-200 dark:border-slate-700"
               >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-6 h-6 text-white" />
+                <div className={`w-14 h-14 rounded-xl ${feature.bgColor} dark:bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className={`w-7 h-7 ${feature.color}`} />
                 </div>
-                <h3 className="font-semibold text-zinc-900 dark:text-white">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
@@ -360,184 +334,135 @@ export default function HomePage({ categories }: HomePageProps) {
       </section>
 
       {/* Laboratories Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white animate-fade-in-up">
-              {lang === 'fr' ? 'Nos Laboratoires' : 'Our Laboratories'}
-            </h2>
-            <Link 
+      <section className="py-20 bg-slate-50 dark:bg-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                {content.laboratories}
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                Partenaires de confiance pour des produits de qualité
+              </p>
+            </div>
+            <Link
               href="/products"
-              className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors animate-fade-in-up"
-              style={{ animationDelay: '0.2s' }}
+              className="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-semibold mt-4 md:mt-0"
             >
-              {t.viewAll} <ChevronRight className="w-4 h-4" />
+              {content.viewAll}
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {laboratories.map((lab, index) => {
-              const LabIcon = lab.icon;
-              return (
-                <Link
-                  key={lab.id}
-                  href={`/products?lab=${encodeURIComponent(lab.id)}`}
-                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-br shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 animate-slide-in-left"
-                  style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${lab.color} opacity-90 group-hover:opacity-100 transition-opacity duration-300`} />
-                  <div className="relative p-6 h-48 flex flex-col justify-between text-white">
-                    <div className="transform group-hover:translate-x-2 transition-transform duration-300">
-                      <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3">
-                        <LabIcon className="w-6 h-6" />
-                      </div>
-                      <h3 className="text-xl font-bold mb-2">{lab.name}</h3>
-                      <p className="text-sm text-white/80">{lab.description}</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      {t.viewDetails} <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                    </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6" ref={labsRef}>
+            {laboratories.map((lab, index) => (
+              <div
+                key={lab.id}
+                className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer border border-slate-200 dark:border-slate-700 ${
+                  isLabsVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${lab.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                <div className="p-6">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <lab.icon className="w-8 h-8 text-sky-500" />
                   </div>
-                </Link>
-              );
-            })}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                    {lab.name}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {lab.description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-zinc-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white animate-fade-in-up">
-              {t.categories}
-            </h2>
-            <Link 
+      {/* Featured Products Section */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                {content.featured}
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                Les produits les plus demandés par nos clients
+              </p>
+            </div>
+            <Link
               href="/products"
-              className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors animate-fade-in-up"
-              style={{ animationDelay: '0.2s' }}
+              className="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-semibold mt-4 md:mt-0"
             >
-              {t.viewAll} <ChevronRight className="w-4 h-4" />
+              {content.viewAll}
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.slice(0, 6).map((cat, index) => {
-              const CategoryIcon = getCategoryIcon(index);
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/products?category=${encodeURIComponent(cat.id)}`}
-                  className="group flex flex-col p-6 rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                      <CategoryIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {cat.nom}
-                      </h3>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        {cat.description || t.viewDetails}
-                      </p>
-                      <div className="mt-3 flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        {t.viewDetails} <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
-      {/* Featured Products */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white animate-fade-in-up">
-              {t.featured}
-            </h2>
-            <Link 
-              href="/products" 
-              className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors animate-fade-in-up"
-              style={{ animationDelay: '0.2s' }}
-            >
-              {t.viewAll} <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          
           {isLoadingProducts ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <div className="h-48 bg-zinc-200 dark:bg-zinc-700 rounded-t-2xl"></div>
-                  <div className="p-4 bg-white dark:bg-zinc-900 rounded-b-2xl border border-zinc-200 dark:border-zinc-800">
-                    <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded mb-2"></div>
-                    <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded mb-3"></div>
-                    <div className="h-5 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2"></div>
-                  </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-slate-200 dark:bg-slate-700 h-64 rounded-2xl" />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.slice(0, 8).map((product, index) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.slice(0, 8).map((product) => (
                 <div
                   key={product.id}
-                  className="group rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
+                  className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
                 >
-                  <Link href={`/product/${product.id}`} className="block relative h-48 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700 overflow-hidden">
+                  {/* Image */}
+                  <Link href={`/product/${product.id}`} className="block relative h-48 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
                     {product.image ? (
                       <img
                         src={product.image}
                         alt={product.nom}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-zinc-400 group-hover:scale-110 transition-transform duration-300">
-                        <FlaskConical className="w-16 h-16" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Package className="w-16 h-16 text-zinc-300 dark:text-zinc-700" />
                       </div>
                     )}
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      <div className="px-3 py-1.5 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        En stock
+                      </div>
+                    </div>
+                    {/* Quick actions overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                      <span className="text-white text-sm font-medium bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Voir détails
+                      </span>
+                    </div>
                   </Link>
                   <div className="p-4">
-                    <p className="text-xs text-blue-600 font-medium mb-1 group-hover:text-blue-700 transition-colors">
-                      {product.laboratory || product.laboratoires?.nom}
-                    </p>
-                    <h3 className="font-semibold text-zinc-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <div className="text-xs font-medium text-sky-500 mb-1">
+                      {product.laboratory}
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
                       {product.nom}
                     </h3>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
-                      {product.category || product.categories?.nom}
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
+                      {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
                     </p>
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/product/${product.id}`}
-                        className="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all duration-300 hover:scale-105"
-                      >
-                        Détails
-                      </Link>
+                    <div className="flex items-center justify-end">
                       <button
-                        className="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-all duration-300 hover:scale-105"
-                        onClick={() => {
-                          const cart = JSON.parse(localStorage.getItem('ads-cart') || '[]');
-                          const existingItem = cart.find((item: any) => item.id === product.id);
-                          if (existingItem) {
-                            existingItem.quantity += 1;
-                          } else {
-                            cart.push({ id: product.id, nom: product.nom, prix: product.prix, quantity: 1 });
-                          }
-                          localStorage.setItem('ads-cart', JSON.stringify(cart));
-                          window.dispatchEvent(new Event('cartUpdated'));
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart(product);
                         }}
-                        aria-label={`Ajouter ${product.nom} au panier`}
+                        className="w-10 h-10 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-colors"
                       >
-                        <ShoppingCart className="w-4 h-4" />
-                        Panier
+                        <ShoppingCart className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
@@ -548,6 +473,58 @@ export default function HomePage({ categories }: HomePageProps) {
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-12 lg:p-16">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }} />
+            </div>
+
+            <div className="relative grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                  Prêt à commander ?
+                </h2>
+                <p className="text-lg text-sky-100 mb-8">
+                  Contactez notre équipe d'experts pour une consultation personnalisée
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-sky-600 font-semibold hover:bg-sky-50 transition-all"
+                  >
+                    {content.heroSecondary}
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-all"
+                  >
+                    {content.heroCTA}
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: CheckCircle2, text: 'Qualité certifiée' },
+                  { icon: Truck, text: 'Livraison rapide' },
+                  { icon: Headphones, text: 'Support 24/7' },
+                  { icon: Shield, text: 'Garantie satisfait' }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                    <item.icon className="w-6 h-6 flex-shrink-0" />
+                    <span className="text-white font-medium">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>

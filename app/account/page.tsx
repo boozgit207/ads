@@ -26,9 +26,11 @@ import {
   EyeOff
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../context/I18nContext';
 
 export default function AccountPage() {
   const { user, signOut } = useAuth();
+  const { locale, setLocale } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'settings'>('profile');
@@ -45,9 +47,8 @@ export default function AccountPage() {
       router.push('/auth');
     }
   }, [user, router]);
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -66,11 +67,6 @@ export default function AccountPage() {
   const [passwordMessage, setPasswordMessage] = useState('');
 
   const [orders, setOrders] = useState<any[]>([]);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -195,7 +191,7 @@ export default function AccountPage() {
         passwordError: 'Error updating password'
       }
     }
-  }[lang];
+  }[locale];
 
   const handleSaveProfile = async () => {
     setIsLoading(true);
@@ -220,11 +216,11 @@ export default function AccountPage() {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordMessage(lang === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match');
+      setPasswordMessage(locale === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match');
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      setPasswordMessage(lang === 'fr' ? 'Le mot de passe doit faire au moins 6 caractères' : 'Password must be at least 6 characters');
+      setPasswordMessage(locale === 'fr' ? 'Le mot de passe doit faire au moins 6 caractères' : 'Password must be at least 6 characters');
       return;
     }
     
@@ -260,10 +256,10 @@ export default function AccountPage() {
     if (confirm(t.settings.logoutConfirm)) {
       try {
         await signOut();
-        showToast(lang === 'fr' ? 'Déconnexion réussie' : 'Logout successful', 'success');
+        showToast(locale === 'fr' ? 'Déconnexion réussie' : 'Logout successful', 'success');
         router.push('/');
       } catch (error) {
-        showToast(lang === 'fr' ? 'Erreur lors de la déconnexion' : 'Error during logout', 'error');
+        showToast(locale === 'fr' ? 'Erreur lors de la déconnexion' : 'Error during logout', 'error');
       }
     }
   };
@@ -331,7 +327,7 @@ export default function AccountPage() {
                   </p>
                   <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 flex items-center justify-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {t.profile.memberSince}: {user.created_at ? new Date(user.created_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : '-'}
+                    {t.profile.memberSince}: {user.created_at ? new Date(user.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US') : '-'}
                   </p>
                 </div>
 
@@ -500,7 +496,7 @@ export default function AccountPage() {
                                 {t.orders.orderId} {order.reference}
                               </p>
                               <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                {new Date(order.created_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                                {new Date(order.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}
                               </p>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getStatusColor(order.statut)}`}>
@@ -510,7 +506,7 @@ export default function AccountPage() {
                           </div>
                           <div className="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
                             <p className="text-base text-zinc-600 dark:text-zinc-400">
-                              {order.items?.length || 0} {lang === 'fr' ? 'article(s)' : 'item(s)'}
+                              {order.items?.length || 0} {locale === 'fr' ? 'article(s)' : 'item(s)'}
                             </p>
                             <p className="text-lg font-bold text-zinc-900 dark:text-white">
                               {order.total?.toLocaleString()} FCFA
@@ -540,14 +536,13 @@ export default function AccountPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-zinc-900 dark:text-white">{t.settings.language}</p>
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{lang === 'fr' ? 'Français' : 'English'}</p>
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Français' : 'English'}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => {
-                          const newLang = lang === 'fr' ? 'en' : 'fr';
-                          setLang(newLang);
-                          localStorage.setItem('ads-language', newLang);
+                          const newLang = locale === 'fr' ? 'en' : 'fr';
+                          setLocale(newLang);
                         }}
                         className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                       >
@@ -583,7 +578,7 @@ export default function AccountPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-zinc-900 dark:text-white">{t.settings.notifications}</p>
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}</p>
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Bientôt disponible' : 'Coming soon'}</p>
                         </div>
                       </div>
                       <ChevronRight className="w-5 h-5 text-zinc-500" />

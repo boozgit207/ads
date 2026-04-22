@@ -3,19 +3,20 @@
 import { useState } from 'react';
 import { MessageCircle, X, Phone, Mail, MessageSquare } from 'lucide-react';
 import { CONTACT } from '@/lib/config';
+import { useI18n } from '../context/I18nContext';
 
 export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
-  const lang = typeof window !== 'undefined' ? (localStorage.getItem('ads-language') as 'fr' | 'en') || 'fr' : 'fr';
+  const { locale } = useI18n();
 
-  const message = lang === 'fr' 
+  const message = locale === 'fr'
     ? 'Bonjour ADS, je souhaite avoir des informations sur vos produits. Pouvez-vous m\'aider ?'
     : 'Hello ADS, I would like information about your products. Can you help me?';
 
   const whatsappUrl = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(message)}`;
   const messengerUrl = 'https://m.me/ADScameroun';
-  const emailSubject = lang === 'fr' ? 'Demande d\'information' : 'Information request';
-  const emailBody = lang === 'fr'
+  const emailSubject = locale === 'fr' ? 'Demande d\'information' : 'Information request';
+  const emailBody = locale === 'fr'
     ? 'Bonjour,\n\nJe souhaiterais obtenir des informations sur vos produits et services.\n\nCordialement.'
     : 'Hello,\n\nI would like to get information about your products and services.\n\nBest regards.';
   const emailUrl = `mailto:${CONTACT.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
@@ -34,7 +35,7 @@ export default function FloatingContact() {
               className="flex items-center gap-3 bg-green-500 text-white px-4 py-3 rounded-full shadow-lg hover:bg-green-600 transition-all"
             >
               <span className="text-sm font-medium">
-                {lang === 'fr' ? 'WhatsApp' : 'WhatsApp'}
+                {locale === 'fr' ? 'WhatsApp' : 'WhatsApp'}
               </span>
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -66,7 +67,7 @@ export default function FloatingContact() {
               className="flex items-center gap-3 bg-zinc-700 text-white px-4 py-3 rounded-full shadow-lg hover:bg-zinc-800 transition-all"
             >
               <span className="text-sm font-medium">
-                {lang === 'fr' ? 'Email' : 'Email'}
+                {locale === 'fr' ? 'Email' : 'Email'}
               </span>
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <Mail className="w-5 h-5" />
@@ -79,7 +80,7 @@ export default function FloatingContact() {
               className="flex items-center gap-3 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-all"
             >
               <span className="text-sm font-medium">
-                {lang === 'fr' ? 'Appeler' : 'Call'}
+                {locale === 'fr' ? 'Appeler' : 'Call'}
               </span>
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <Phone className="w-5 h-5" />

@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { showToast } from '../components/Toast';
 import { CONTACT } from '@/lib/config';
+import { useI18n } from '../context/I18nContext';
 import {
   Mail,
   Phone,
@@ -17,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function ContactPage() {
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const { locale } = useI18n();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,10 +36,10 @@ export default function ContactPage() {
       // Simuler l'envoi du formulaire
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      showToast(lang === 'fr' ? 'Message envoyé avec succès !' : 'Message sent successfully!', 'success');
+      showToast(locale === 'fr' ? 'Message envoyé avec succès !' : 'Message sent successfully!', 'success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {
-      showToast(lang === 'fr' ? 'Erreur lors de l\'envoi du message' : 'Error sending message', 'error');
+      showToast(locale === 'fr' ? 'Erreur lors de l\'envoi du message' : 'Error sending message', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +92,7 @@ export default function ContactPage() {
       messenger: 'Messenger',
       social: 'Follow us'
     }
-  }[lang];
+  }[locale];
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -123,7 +124,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={lang === 'fr' ? 'Votre nom' : 'Your name'}
+                    placeholder={locale === 'fr' ? 'Votre nom' : 'Your name'}
                   />
                 </div>
 
@@ -137,7 +138,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={lang === 'fr' ? 'votre@email.com' : 'your@email.com'}
+                    placeholder={locale === 'fr' ? 'votre@email.com' : 'your@email.com'}
                   />
                 </div>
 
@@ -150,7 +151,7 @@ export default function ContactPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={lang === 'fr' ? '+237 697 12 13 28' : '+237 697 12 13 28'}
+                    placeholder={locale === 'fr' ? '+237 697 12 13 28' : '+237 697 12 13 28'}
                   />
                 </div>
 
@@ -164,7 +165,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={lang === 'fr' ? 'Sujet de votre message' : 'Subject of your message'}
+                    placeholder={locale === 'fr' ? 'Sujet de votre message' : 'Subject of your message'}
                   />
                 </div>
 
@@ -178,7 +179,7 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    placeholder={lang === 'fr' ? 'Écrivez votre message ici...' : 'Write your message here...'}
+                    placeholder={locale === 'fr' ? 'Écrivez votre message ici...' : 'Write your message here...'}
                   />
                 </div>
 
@@ -241,11 +242,9 @@ export default function ContactPage() {
                       <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">{t.phone}</h3>
                       <div className="space-y-1">
                         <p className="text-zinc-600 dark:text-zinc-400">
-                          <span className="inline-block w-16 text-xs font-medium text-orange-500">Orange:</span>
                           {CONTACT.phoneOrange}
                         </p>
                         <p className="text-zinc-600 dark:text-zinc-400">
-                          <span className="inline-block w-16 text-xs font-medium text-yellow-400">MTN:</span>
                           {CONTACT.phoneMtn}
                         </p>
                       </div>
@@ -270,7 +269,7 @@ export default function ContactPage() {
               <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-8 text-white">
                 <h3 className="text-xl font-bold mb-4">{t.quickContact}</h3>
                 <p className="text-green-100 mb-6">
-                  {lang === 'fr' 
+                  {locale === 'fr' 
                     ? 'Réponse rapide garantie via WhatsApp' 
                     : 'Quick response guaranteed via WhatsApp'}
                 </p>

@@ -21,6 +21,7 @@ import {
 import { CONTACT } from '@/lib/config';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useI18n } from '../../context/I18nContext';
 
 interface Message {
   id: string;
@@ -37,28 +38,25 @@ interface Message {
 export default function ChatBot() {
   const { user } = useAuth();
   const { cart } = useCart();
+  const { locale } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [isTyping, setIsTyping] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-    
     // Welcome message (no localStorage persistence)
     setMessages([{
       id: 'welcome',
       role: 'assistant',
-      content: lang === 'fr' 
-        ? '👋 Bonjour ! Je suis l\'assistant ADS.\n\nJe peux vous aider avec :\n🔍 Recherche de produits\n🛒 Commande et panier\n💳 Paiement (Carte, OM, MTN, Virement)\n🚚 Livraison\n📞 Contact\n\nComment puis-je vous aider ?'
-        : '👋 Hello! I\'m the ADS assistant.\n\nI can help you with:\n🔍 Product search\n🛒 Orders and cart\n💳 Payment (Card, OM, MTN, Bank Transfer)\n🚚 Delivery\n📞 Contact\n\nHow can I help you?',
+      content: locale === 'fr'
+        ? '👋 Bonjour ! Je suis l\'assistant ADS.\n\nJe peux vous aider avec :\n🔍 Recherche de produits\n🛒 Commande et panier\n💳 Paiement (Orange Money, MTN Mobile Money)\n🚚 Livraison\n📞 Contact\n\nComment puis-je vous aider ?'
+        : '👋 Hello! I\'m the ADS assistant.\n\nI can help you with:\n🔍 Product search\n🛒 Orders and cart\n💳 Payment (Orange Money, MTN Mobile Money)\n🚚 Delivery\n📞 Contact\n\nHow can I help you?',
       timestamp: new Date()
     }]);
-  }, []);
+  }, [locale]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -70,76 +68,95 @@ export default function ChatBot() {
 
   const generateResponse = (userMessage: string): { content: string; action?: any } => {
     const lowerMsg = userMessage.toLowerCase();
-    
-    // Product search
-    if (lowerMsg.includes('covid') || lowerMsg.includes('test')) {
+
+    // Product search - broader matching
+    if (lowerMsg.includes('produit') || lowerMsg.includes('product') || lowerMsg.includes('catalogue') || lowerMsg.includes('avoir') || lowerMsg.includes('disponible')) {
       return {
-        content: lang === 'fr'
+        content: locale === 'fr'
+          ? '🧪 Nous proposons une large gamme de produits :\n\n• Tests COVID-19, HIV, Malaria\n• Tests de grossesse, Syphilis, Hépatite\n• Réactifs de biochimie et hématologie\n• Kits de diagnostic\n\nConsultez notre catalogue complet pour voir tous les produits avec leurs prix.'
+          : '🧪 We offer a wide range of products:\n\n• COVID-19, HIV, Malaria tests\n• Pregnancy, Syphilis, Hepatitis tests\n• Biochemistry and hematology reagents\n• Diagnostic kits\n\nCheck our full catalog to see all products with prices.',
+        action: {
+          type: 'link',
+          label: locale === 'fr' ? 'Voir le catalogue' : 'View catalog',
+          href: '/products'
+        }
+      };
+    }
+
+    // COVID specific
+    if (lowerMsg.includes('covid') || lowerMsg.includes('corona')) {
+      return {
+        content: locale === 'fr'
           ? '🧪 Tests COVID-19 disponibles :\n\n• Test Antigénique - 12 500 FCFA\n• Résultats en 15 minutes\n• Sensibilité 96.7%\n\nVoulez-vous voir tous nos tests rapides ?'
           : '🧪 COVID-19 tests available:\n\n• Rapid Antigen Test - 12,500 FCFA\n• Results in 15 minutes\n• Sensitivity 96.7%\n\nWould you like to see all our rapid tests?',
         action: {
           type: 'link',
-          label: lang === 'fr' ? 'Voir les tests' : 'View tests',
+          label: locale === 'fr' ? 'Voir les tests' : 'View tests',
           href: '/products?category=tests-rapides'
         }
       };
     }
-    
+
     // Cart/Panier
     if (lowerMsg.includes('panier') || lowerMsg.includes('cart')) {
       const itemCount = cart.length;
       return {
-        content: lang === 'fr'
+        content: locale === 'fr'
           ? `🛒 Votre panier contient ${itemCount} article${itemCount > 1 ? 's' : ''}.\n\n${itemCount === 0 ? 'Ajoutez des produits pour commencer votre commande.' : 'Prêt à passer commande ?'}`
           : `🛒 Your cart has ${itemCount} item${itemCount > 1 ? 's' : ''}.\n\n${itemCount === 0 ? 'Add products to start your order.' : 'Ready to checkout?'}`,
         action: itemCount > 0 ? {
           type: 'link',
-          label: lang === 'fr' ? 'Voir le panier' : 'View cart',
+          label: locale === 'fr' ? 'Voir le panier' : 'View cart',
           href: '/cart'
         } : {
           type: 'link',
-          label: lang === 'fr' ? 'Voir les produits' : 'View products',
+          label: locale === 'fr' ? 'Voir les produits' : 'View products',
           href: '/products'
         }
       };
     }
-    
+
     // Payment/Paiement
-    if (lowerMsg.includes('paiement') || lowerMsg.includes('payment') || lowerMsg.includes('payer')) {
+    if (lowerMsg.includes('paiement') || lowerMsg.includes('payment') || lowerMsg.includes('payer') || lowerMsg.includes('prix')) {
       return {
-        content: lang === 'fr'
-          ? '💳 Modes de paiement acceptés :\n\n📱 Orange Money\n📱 MTN Mobile Money\n🏦 Virement bancaire\n\nTous les paiements sont sécurisés. Un reçu est généré après confirmation.'
-          : '💳 Accepted payment methods:\n\n📱 Orange Money\n📱 MTN Mobile Money\n🏦 Bank Transfer\n\nAll payments are secure. A receipt is generated after confirmation.'
-      };
-    }
-    
-    // Order/Commande
-    if (lowerMsg.includes('commande') || lowerMsg.includes('order') || lowerMsg.includes('acheter')) {
-      return {
-        content: lang === 'fr'
-          ? '🛒 Pour passer une commande :\n\n1. Ajoutez des produits au panier\n2. Validez votre commande\n3. Choisissez le mode de paiement\n4. Recevez votre confirmation\n\nBesoin d\'aide pour un produit spécifique ?'
-          : '🛒 To place an order:\n\n1. Add products to cart\n2. Checkout\n3. Choose payment method\n4. Receive confirmation\n\nNeed help with a specific product?',
+        content: locale === 'fr'
+          ? '💳 Modes de paiement acceptés :\n\n📱 Orange Money (#150#)\n📱 MTN Mobile Money (*126#)\n\nPour les prix, consultez notre page produits où chaque article affiche son tarif.'
+          : '💳 Accepted payment methods:\n\n📱 Orange Money (#150#)\n📱 MTN Mobile Money (*126#)\n\nFor prices, check our products page where each item displays its price.',
         action: {
           type: 'link',
-          label: lang === 'fr' ? 'Voir les produits' : 'View products',
+          label: locale === 'fr' ? 'Voir les produits' : 'View products',
           href: '/products'
         }
       };
     }
-    
-    // Delivery/Livraison
-    if (lowerMsg.includes('livraison') || lowerMsg.includes('delivery')) {
+
+    // Order/Commande
+    if (lowerMsg.includes('commande') || lowerMsg.includes('order') || lowerMsg.includes('acheter') || lowerMsg.includes('achet')) {
       return {
-        content: lang === 'fr'
+        content: locale === 'fr'
+          ? '🛒 Pour passer une commande :\n\n1. Sélectionnez vos produits\n2. Ajoutez-les au panier\n3. Validez votre commande\n4. Choisissez le mode de paiement\n5. Recevez votre confirmation\n\nCommencez par parcourir notre catalogue.'
+          : '🛒 To place an order:\n\n1. Select your products\n2. Add to cart\n3. Checkout\n4. Choose payment method\n5. Receive confirmation\n\nStart by browsing our catalog.',
+        action: {
+          type: 'link',
+          label: locale === 'fr' ? 'Voir les produits' : 'View products',
+          href: '/products'
+        }
+      };
+    }
+
+    // Delivery/Livraison
+    if (lowerMsg.includes('livraison') || lowerMsg.includes('delivery') || lowerMsg.includes('expedition') || lowerMsg.includes('envoi')) {
+      return {
+        content: locale === 'fr'
           ? '🚚 Options de livraison :\n\n📍 Retrait gratuit - Yaoundé\n🚛 Livraison express - 1 500 FCFA (24-48h)\n🆓 Gratuit - Commandes > 500 000 FCFA\n\nLivraison dans toute l\'Afrique Centrale !'
           : '🚚 Delivery options:\n\n📍 Free pickup - Yaoundé\n🚛 Express delivery - 1,500 FCFA (24-48h)\n🆓 Free - Orders > 500,000 FCFA\n\nDelivery across Central Africa!'
       };
     }
-    
+
     // Contact
-    if (lowerMsg.includes('contact') || lowerMsg.includes('appeler') || lowerMsg.includes('whatsapp')) {
+    if (lowerMsg.includes('contact') || lowerMsg.includes('appeler') || lowerMsg.includes('whatsapp') || lowerMsg.includes('telephone') || lowerMsg.includes('tel')) {
       return {
-        content: lang === 'fr'
+        content: locale === 'fr'
           ? `📞 Contactez-nous :\n\n📱 WhatsApp: ${CONTACT.whatsapp}\n📧 Email: ${CONTACT.email}\n📍 ${CONTACT.address}\n\n⏰ Horaires: Lun-Ven 8h-18h, Sam 9h-13h`
           : `📞 Contact us:\n\n📱 WhatsApp: ${CONTACT.whatsapp}\n📧 Email: ${CONTACT.email}\n📍 ${CONTACT.address}\n\n⏰ Hours: Mon-Fri 8am-6pm, Sat 9am-1pm`,
         action: {
@@ -149,35 +166,54 @@ export default function ChatBot() {
         }
       };
     }
-    
+
     // Help/Aide
-    if (lowerMsg.includes('aide') || lowerMsg.includes('help')) {
+    if (lowerMsg.includes('aide') || lowerMsg.includes('help') || lowerMsg.includes('assistance') || lowerMsg.includes('support')) {
       return {
-        content: lang === 'fr'
-          ? '❓ Comment puis-je vous aider ?\n\n🔍 Rechercher un produit\n🛒 Vérifier le panier\n💳 Informations de paiement\n🚚 Options de livraison\n📞 Nous contacter\n\nChoisissez une option ci-dessus ou posez votre question.'
-          : '❓ How can I help you?\n\n🔍 Search for a product\n🛒 Check cart\n💳 Payment information\n🚚 Delivery options\n📞 Contact us\n\nChoose an option above or ask your question.'
+        content: locale === 'fr'
+          ? '❓ Comment puis-je vous aider ?\n\n🔍 Rechercher un produit\n🛒 Vérifier le panier\n💳 Informations de paiement\n🚚 Options de livraison\n📞 Nous contacter\n\nUtilisez les suggestions ci-dessus ou posez votre question.'
+          : '❓ How can I help you?\n\n🔍 Search for a product\n🛒 Check cart\n💳 Payment information\n🚚 Delivery options\n📞 Contact us\n\nUse the suggestions above or ask your question.'
       };
     }
-    
+
     // Stock inquiry
-    if (lowerMsg.includes('stock') || lowerMsg.includes('disponible')) {
+    if (lowerMsg.includes('stock') || lowerMsg.includes('quantite') || lowerMsg.includes('quantité')) {
       return {
-        content: lang === 'fr'
-          ? '📦 Pour vérifier la disponibilité d\'un produit, utilisez notre page de recherche.\n\nLes stocks sont mis à jour en temps réel.\n\nQuel produit recherchez-vous ?'
-          : '📦 To check product availability, use our search page.\n\nStock is updated in real-time.\n\nWhich product are you looking for?',
+        content: locale === 'fr'
+          ? '📦 Les stocks sont mis à jour en temps réel sur notre site.\n\nChaque produit affiche sa disponibilité. Consultez notre page produits pour vérifier la disponibilité en direct.'
+          : '📦 Stock is updated in real-time on our site.\n\nEach product displays its availability. Check our products page to verify real-time availability.',
         action: {
           type: 'link',
-          label: lang === 'fr' ? 'Rechercher' : 'Search',
+          label: locale === 'fr' ? 'Voir les produits' : 'View products',
           href: '/products'
         }
       };
     }
-    
-    // Default response
+
+    // HIV/Malaria specific
+    if (lowerMsg.includes('hiv') || lowerMsg.includes('sida') || lowerMsg.includes('malaria') || lowerMsg.includes('paludisme')) {
+      return {
+        content: locale === 'fr'
+          ? '🧪 Tests de dépistage disponibles :\n\n• HIV (Elisa, Rapide)\n• Malaria (RDT, Microscopie)\n• Sensibilité élevée\n• Certifiés OMS\n\nVoir tous nos tests de dépistage.'
+          : '🧪 Screening tests available:\n\n• HIV (Elisa, Rapid)\n• Malaria (RDT, Microscopy)\n• High sensitivity\n• WHO certified\n\nSee all our screening tests.',
+        action: {
+          type: 'link',
+          label: locale === 'fr' ? 'Voir les tests' : 'View tests',
+          href: '/products'
+        }
+      };
+    }
+
+    // Default response - more helpful
     return {
-      content: lang === 'fr'
-        ? `Je suis là pour vous aider !\n\nJe peux répondre à vos questions sur :\n• Nos produits\n• Le panier et les commandes\n• Les modes de paiement\n• La livraison\n• Le contact\n\nQue souhaitez-vous savoir ?`
-        : `I'm here to help!\n\nI can answer questions about:\n• Our products\n• Cart and orders\n• Payment methods\n• Delivery\n• Contact\n\nWhat would you like to know?`
+      content: locale === 'fr'
+        ? `Je suis l'assistant ADS et je suis là pour vous aider !\n\nJe peux vous informer sur :\n• 🧪 Nos produits et tests diagnostiques\n• 🛒 Votre panier et les commandes\n• 💳 Les modes de paiement (Orange Money, MTN Mobile Money)\n• 🚚 La livraison et les délais\n• 📞 Nos coordonnées\n\nPosez-moi une question précise ou utilisez les suggestions ci-dessus.`
+        : `I'm the ADS assistant and I'm here to help!\n\nI can inform you about:\n• 🧪 Our products and diagnostic tests\n• 🛒 Your cart and orders\n• 💳 Payment methods (Orange Money, MTN Mobile Money)\n• 🚚 Delivery and timelines\n• 📞 Our contact information\n\nAsk me a specific question or use the suggestions above.`,
+      action: {
+        type: 'link',
+        label: locale === 'fr' ? 'Voir les produits' : 'View products',
+        href: '/products'
+      }
     };
   };
 
@@ -202,12 +238,13 @@ export default function ChatBot() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input, lang }),
+        body: JSON.stringify({ message: input, lang: locale }),
       });
 
       const data = await response.json();
 
       if (data.error) {
+        console.error('API Error:', data.error);
         throw new Error(data.error);
       }
 
@@ -241,12 +278,12 @@ export default function ChatBot() {
   };
 
   const suggestions = [
-    { icon: Package, label: lang === 'fr' ? 'Produits' : 'Products', action: lang === 'fr' ? 'Quels produits avez-vous ?' : 'What products do you have?' },
-    { icon: ShoppingCart, label: lang === 'fr' ? 'Mon panier' : 'My cart', action: lang === 'fr' ? 'Mon panier' : 'My cart' },
-    { icon: CreditCard, label: lang === 'fr' ? 'Paiement' : 'Payment', action: lang === 'fr' ? 'Modes de paiement' : 'Payment methods' },
-    { icon: Truck, label: lang === 'fr' ? 'Livraison' : 'Delivery', action: lang === 'fr' ? 'Livraison' : 'Delivery' },
-    { icon: Phone, label: lang === 'fr' ? 'Contact' : 'Contact', action: lang === 'fr' ? 'Contact' : 'Contact' },
-    { icon: HelpCircle, label: lang === 'fr' ? 'Aide' : 'Help', action: lang === 'fr' ? 'Aide' : 'Help' }
+    { icon: Package, label: locale === 'fr' ? 'Produits' : 'Products', action: locale === 'fr' ? 'Quels produits avez-vous ?' : 'What products do you have?' },
+    { icon: ShoppingCart, label: locale === 'fr' ? 'Mon panier' : 'My cart', action: locale === 'fr' ? 'Mon panier' : 'My cart' },
+    { icon: CreditCard, label: locale === 'fr' ? 'Paiement' : 'Payment', action: locale === 'fr' ? 'Modes de paiement' : 'Payment methods' },
+    { icon: Truck, label: locale === 'fr' ? 'Livraison' : 'Delivery', action: locale === 'fr' ? 'Livraison' : 'Delivery' },
+    { icon: Phone, label: locale === 'fr' ? 'Contact' : 'Contact', action: locale === 'fr' ? 'Contact' : 'Contact' },
+    { icon: HelpCircle, label: locale === 'fr' ? 'Aide' : 'Help', action: locale === 'fr' ? 'Aide' : 'Help' }
   ];
 
   return (
@@ -279,7 +316,7 @@ export default function ChatBot() {
                 <h3 className="font-bold text-lg">ADS Assistant</h3>
                 <p className="text-xs text-blue-100 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  {lang === 'fr' ? 'En ligne' : 'Online'}
+                  {locale === 'fr' ? 'En ligne' : 'Online'}
                 </p>
               </div>
             </div>
@@ -365,7 +402,7 @@ export default function ChatBot() {
           {showSuggestions && messages.length === 1 && (
             <div className="px-4 py-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2 font-medium">
-                {lang === 'fr' ? 'Suggestions rapides :' : 'Quick suggestions :'}
+                {locale === 'fr' ? 'Suggestions rapides :' : 'Quick suggestions :'}
               </p>
               <div className="flex flex-wrap gap-2">
                 {suggestions.slice(0, 4).map((suggestion) => (
@@ -393,7 +430,7 @@ export default function ChatBot() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={lang === 'fr' ? 'Posez votre question...' : 'Ask your question...'}
+                placeholder={locale === 'fr' ? 'Posez votre question...' : 'Ask your question...'}
                 className="flex-1 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               <button

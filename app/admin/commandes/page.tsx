@@ -73,6 +73,11 @@ export default function CommandesPage() {
 
   useEffect(() => {
     loadOrders();
+    // Auto-refresh every 10 seconds without loading indicator
+    const interval = setInterval(() => {
+      loadOrdersSilent();
+    }, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadOrders = async () => {
@@ -103,6 +108,25 @@ export default function CommandesPage() {
     }
 
     setLoading(false);
+  };
+
+  const loadOrdersSilent = async () => {
+    try {
+      const [ordersResult, statsResult] = await Promise.all([
+        getAllOrders(),
+        getOrderStats(),
+      ]);
+
+      if (ordersResult.success && ordersResult.orders) {
+        setOrders(ordersResult.orders);
+      }
+
+      if (statsResult.success && statsResult.stats) {
+        setStats(statsResult.stats);
+      }
+    } catch (err: any) {
+      console.error('Erreur loadOrdersSilent:', err);
+    }
   };
 
   const filteredOrders = orders.filter((o: Order) => {

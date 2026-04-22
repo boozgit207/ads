@@ -377,7 +377,7 @@ export default function AuthPage() {
                       type="tel"
                       value={signupPhone}
                       onChange={(e) => setSignupPhone(e.target.value)}
-                      placeholder="+237 6XX XXX XXX"
+                      placeholder="+237 697 12 13 28"
                       className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                     />
                   </div>

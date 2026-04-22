@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../context/I18nContext';
 
 interface CartItem {
   id: string;
@@ -29,14 +30,9 @@ interface CartItem {
 
 export default function CartClient() {
   const { cart, removeFromCart, updateQuantity: updateQuantityContext, clearCart } = useCart();
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const { locale } = useI18n();
   const [showConfirm, setShowConfirm] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   const t = {
     fr: {
@@ -56,7 +52,7 @@ export default function CartClient() {
       stock: 'Stock disponible',
       minOrder: 'Minimum',
       update: 'Mettre à jour',
-      paymentMethods: 'Paiement par virement bancaire',
+      paymentMethods: 'Paiement par Orange Money ou MTN Mobile Money',
       confirmRemove: 'Êtes-vous sûr de vouloir supprimer cet article du panier ?',
       cancel: 'Annuler',
       confirm: 'Supprimer'
@@ -78,12 +74,12 @@ export default function CartClient() {
       stock: 'Stock available',
       minOrder: 'Minimum',
       update: 'Update',
-      paymentMethods: 'Payment by bank transfer',
+      paymentMethods: 'Payment by Orange Money or MTN Mobile Money',
       confirmRemove: 'Are you sure you want to remove this item from cart?',
       cancel: 'Cancel',
       confirm: 'Remove'
     }
-  }[lang];
+  }[locale];
 
   const subtotal = cart.reduce((sum: number, item: any) => sum + (item.price || 0) * item.quantity, 0);
   const deliveryFee = subtotal > 500000 ? 0 : 1500;
@@ -101,7 +97,7 @@ export default function CartClient() {
               {t.title}
             </h1>
             <p className="text-blue-100 text-lg">
-              {cart.length} {cart.length === 1 ? (lang === 'fr' ? 'article' : 'item') : (lang === 'fr' ? 'articles' : 'items')}
+              {cart.length} {cart.length === 1 ? (locale === 'fr' ? 'article' : 'item') : (locale === 'fr' ? 'articles' : 'items')}
             </p>
           </div>
         </div>
@@ -258,6 +254,17 @@ export default function CartClient() {
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center">
                       {t.paymentMethods}
                     </p>
+                    <button
+                      onClick={() => {
+                        if (window.confirm(locale === 'fr' ? 'Voulez-vous vraiment vider le panier ?' : 'Do you really want to clear the cart?')) {
+                          clearCart();
+                        }
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border-2 border-red-300 dark:border-red-400 text-red-600 dark:text-red-400 font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {locale === 'fr' ? 'Vider le panier' : 'Clear cart'}
+                    </button>
                     <Link
                       href="/checkout"
                       className="w-full flex items-center justify-center gap-3 py-3 lg:py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all text-sm lg:text-base"
@@ -280,7 +287,7 @@ export default function CartClient() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-              {lang === 'fr' ? 'Confirmation' : 'Confirmation'}
+              {locale === 'fr' ? 'Confirmation' : 'Confirmation'}
             </h3>
             <p className="text-zinc-600 dark:text-zinc-400 mb-6">
               {t.confirmRemove}

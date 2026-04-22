@@ -9,6 +9,7 @@ import { showToast } from '../components/Toast';
 import { Product, Laboratory, Category } from '../actions/catalog';
 import { Search, ChevronDown, ShoppingCart, Eye, FlaskConical, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../context/I18nContext';
 
 interface ProductsClientProps {
   products: Product[];
@@ -18,24 +19,19 @@ interface ProductsClientProps {
   initialCategory?: string;
 }
 
-export default function ProductsClient({ 
-  products, 
-  laboratories, 
+export default function ProductsClient({
+  products,
+  laboratories,
   categories,
   initialLab,
-  initialCategory 
+  initialCategory
 }: ProductsClientProps) {
   const { addToCart: addToCartToContext } = useCart();
+  const { locale } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLab, setSelectedLab] = useState(initialLab || 'Tous');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'Tous');
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   // Filtrer les produits quand les filtres changent
   useEffect(() => {
@@ -105,12 +101,12 @@ export default function ProductsClient({
       priceOnRequest: 'Price on request',
       stockAvailable: 'available'
     }
-  }[lang];
+  }[locale];
 
   const addToCart = (product: Product) => {
     const cartItem = {
       id: product.id,
-      name: lang === 'fr' ? product.nom : (product.nom_en || product.nom),
+      name: locale === 'fr' ? product.nom : (product.nom_en || product.nom),
       price: product.prix,
       quantity: 1,
       image: product.image_principale_url,
@@ -118,10 +114,10 @@ export default function ProductsClient({
       laboratory: product.laboratoire?.nom || product.categorie?.laboratoire?.nom,
       stock: product.quantite_stock
     };
-    
+
     addToCartToContext(cartItem);
-    
-    showToast(lang === 'fr' ? 'Produit ajouté au panier !' : 'Product added to cart!', 'success');
+
+    showToast(locale === 'fr' ? 'Produit ajouté au panier !' : 'Product added to cart!', 'success');
   };
 
   // Préparer les options de filtres - éliminer les doublons
@@ -130,7 +126,7 @@ export default function ProductsClient({
   const catOptions = [{ id: 'Tous', nom: t.all }, ...categories.map(c => ({ id: c.id, nom: c.nom }))];
 
   // Helper pour obtenir le nom du produit selon la langue
-  const getProductName = (p: Product) => lang === 'fr' ? p.nom : (p.nom_en || p.nom);
+  const getProductName = (p: Product) => locale === 'fr' ? p.nom : (p.nom_en || p.nom);
   
   // Helper pour obtenir le prix (avec promo si applicable)
   const getProductPrice = (p: Product) => {

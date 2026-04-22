@@ -81,7 +81,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const apiKey = process.env.GEMINI_API_KEY;
+    console.log('GEMINI_API_KEY exists:', !!apiKey);
+    console.log('GEMINI_API_KEY length:', apiKey?.length);
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Clé API Gemini non configurée' },
+        { status: 500 }
+      );
+    }
+
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const chat = model.startChat({
       history: [
@@ -103,8 +114,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ response: text });
   } catch (error: any) {
     console.error('Erreur chatbot Gemini:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     return NextResponse.json(
-      { error: 'Erreur lors de la génération de la réponse' },
+      { error: `Erreur lors de la génération de la réponse: ${error.message}` },
       { status: 500 }
     );
   }

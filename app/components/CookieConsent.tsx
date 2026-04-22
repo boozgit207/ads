@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Cookie } from 'lucide-react';
+import { useI18n } from '../context/I18nContext';
 
 const translations = {
   fr: {
@@ -37,9 +38,9 @@ const translations = {
 };
 
 export default function CookieConsent() {
+  const { locale } = useI18n();
   const [show, setShow] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
   const [preferences, setPreferences] = useState({
     necessary: true,
     analytics: false,
@@ -51,12 +52,6 @@ export default function CookieConsent() {
     const consent = localStorage.getItem('cookie-consent');
     if (!consent) {
       setShow(true);
-    }
-
-    // Get language preference
-    const savedLang = localStorage.getItem('ads-language');
-    if (savedLang === 'en' || savedLang === 'fr') {
-      setLang(savedLang);
     }
   }, []);
 
@@ -91,7 +86,7 @@ export default function CookieConsent() {
     setShow(false);
   };
 
-  const t = translations[lang];
+  const t = translations[locale];
 
   if (!show) return null;
 

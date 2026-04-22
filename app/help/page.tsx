@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { CONTACT } from '@/lib/config';
+import { useI18n } from '../context/I18nContext';
 import {
   ChevronDown,
   ChevronUp,
@@ -26,14 +27,9 @@ interface FAQItem {
 }
 
 export default function HelpPage() {
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const { locale } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('ads-language') as 'fr' | 'en';
-    if (savedLang) setLang(savedLang);
-  }, []);
 
   const content = {
     fr: {
@@ -73,12 +69,12 @@ export default function HelpPage() {
           faqs: [
             {
               question: 'Quels modes de paiement acceptez-vous ?',
-              answer: 'Nous acceptons :\n• Orange Money (#150#)\n• MTN Mobile Money (*126#)\n• Virement bancaire\n\nTous les paiements sont sécurisés et un reçu est généré après confirmation.',
+              answer: 'Nous acceptons :\n• Orange Money (#150#)\n• MTN Mobile Money (*126#)\n\nTous les paiements sont sécurisés et un reçu est généré après confirmation.',
               icon: CreditCard
             },
             {
               question: 'Comment payer par Orange Money ?',
-              answer: 'Pour payer par Orange Money :\n1. Composez #150#\n2. Choisissez 1 (Transfert d\'argent)\n3. Entrez le numéro marchand : 6XX XXX XXX\n4. Entrez le montant de votre commande\n5. Validez avec votre code secret\n6. Conservez la confirmation de paiement',
+              answer: 'Pour payer par Orange Money :\n1. Composez #150#\n2. Choisissez 1 (Transfert d\'argent)\n3. Entrez le numéro marchand : 697 12 13 28\n4. Entrez le montant de votre commande\n5. Validez avec votre code secret\n6. Conservez la confirmation de paiement',
               icon: Phone
             },
             {
@@ -169,12 +165,12 @@ export default function HelpPage() {
           faqs: [
             {
               question: 'What payment methods do you accept?',
-              answer: 'We accept:\n• Orange Money (#150#)\n• MTN Mobile Money (*126#)\n• Bank transfer\n\nAll payments are secure and a receipt is generated after confirmation.',
+              answer: 'We accept:\n• Orange Money (#150#)\n• MTN Mobile Money (*126#)\n\nAll payments are secure and a receipt is generated after confirmation.',
               icon: CreditCard
             },
             {
               question: 'How do I pay with Orange Money?',
-              answer: 'To pay with Orange Money:\n1. Dial #150#\n2. Select 1 (Money transfer)\n3. Enter merchant number: 6XX XXX XXX\n4. Enter your order amount\n5. Confirm with your PIN\n6. Keep the payment confirmation',
+              answer: 'To pay with Orange Money:\n1. Dial #150#\n2. Select 1 (Money transfer)\n3. Enter merchant number: 697 12 13 28\n4. Enter your order amount\n5. Confirm with your PIN\n6. Keep the payment confirmation',
               icon: Phone
             },
             {
@@ -228,12 +224,12 @@ export default function HelpPage() {
         }
       ]
     }
-  }[lang];
+  }[locale];
 
-  const allFaqs = content.categories.flatMap(cat => cat.faqs);
+  const allFaqs = content.categories.flatMap((cat: any) => cat.faqs);
   
-  const filteredFaqs = searchTerm 
-    ? allFaqs.filter(faq => 
+  const filteredFaqs = searchTerm
+    ? allFaqs.filter((faq: any) =>
         faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
       )
@@ -278,7 +274,7 @@ export default function HelpPage() {
                 Aucun résultat trouvé. Essayez avec d\'autres termes.
               </p>
             ) : (
-              filteredFaqs.map((faq, index) => (
+              filteredFaqs.map((faq: any, index: number) => (
                 <div
                   key={index}
                   className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
@@ -315,7 +311,7 @@ export default function HelpPage() {
         ) : (
           // Categories
           <div className="grid md:grid-cols-2 gap-8">
-            {content.categories.map((category, catIndex) => (
+            {content.categories.map((category: any, catIndex: number) => (
               <div key={catIndex} className="space-y-4">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -326,7 +322,7 @@ export default function HelpPage() {
                   </h2>
                 </div>
                 
-                {category.faqs.map((faq, faqIndex) => {
+                {category.faqs.map((faq: any, faqIndex: number) => {
                   const globalIndex = catIndex * 100 + faqIndex;
                   return (
                     <div
