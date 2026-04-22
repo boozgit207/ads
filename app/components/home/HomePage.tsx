@@ -449,22 +449,33 @@ export default function HomePage({ categories }: HomePageProps) {
                       {product.laboratory}
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
-                      {product.nom}
+                      {product.name || product.nom}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
                       {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
                     </p>
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-xl font-bold text-sky-500">
+                        {product.price ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(product.price) : 'Contactez-nous'}
+                      </div>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
-                          addToCart(product);
+                          if (product.price && product.price > 0) {
+                            addToCart(product);
+                          }
                         }}
                         className="w-10 h-10 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-colors"
                       >
                         <ShoppingCart className="w-5 h-5" />
                       </button>
                     </div>
+                    <Link
+                      href={`/product/${product.slug || product.id}`}
+                      className="block w-full text-center py-2 rounded-xl border-2 border-sky-500 text-sky-500 font-semibold hover:bg-sky-500 hover:text-white transition-colors text-sm"
+                    >
+                      Voir détails
+                    </Link>
                   </div>
                 </div>
               ))}

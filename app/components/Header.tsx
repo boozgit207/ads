@@ -91,10 +91,7 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity group">
-          <img src="/logo_1.svg" alt="ADS Logo" className="h-16 w-16 group-hover:scale-110 transition-transform" />
-          <div className="hidden sm:block">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">ADS</span>
-          </div>
+          <img src="/logo_1.svg" alt="Logo" className="h-16 w-16 group-hover:scale-110 transition-transform" />
         </Link>
 
         {/* Desktop Navigation */}

@@ -19,20 +19,23 @@ export async function GET() {
       .limit(8);
 
     console.log('Produits récupérés:', products?.length, 'Erreur:', error);
+    console.log('Sample product:', products?.[0]);
 
     if (error) throw error;
 
     // Transformer les données pour inclure l'image principale ou la première image
     const transformedProducts = products?.map(product => ({
       id: product.id,
-      nom: product.nom,
-      prix: product.prix,
+      name: product.nom,
+      price: product.prix,
+      quantity: 1,
       stock: product.quantite_stock,
       image: product.image_principale_url ||
         (product.images && product.images.length > 0 ? product.images[0].url : null),
+      slug: product.slug || product.id,
       category: product.categorie?.nom,
       laboratory: product.categorie?.laboratoire?.nom
-    })) || [];
+    })).filter(p => p.price && p.price > 0) || [];
 
     console.log('Produits transformés:', transformedProducts.length);
 

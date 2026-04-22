@@ -92,22 +92,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
-    const chat = model.startChat({
-      history: [
-        {
-          role: 'user',
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        {
-          role: 'model',
-          parts: [{ text: 'Compris. Je suis prêt à aider les clients d\'ADS.' }],
-        },
-      ],
-    });
-
-    const result = await chat.sendMessage(message);
+    // Try using generateContent directly without chat history
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const prompt = `${SYSTEM_PROMPT}\n\nUser message: ${message}`;
+    
+    const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
