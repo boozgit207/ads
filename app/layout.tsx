@@ -21,7 +21,8 @@ function DarkModeScript() {
           (function() {
             try {
               const savedDarkMode = localStorage.getItem('ads-dark-mode');
-              const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+              // Default to light mode (false) if no saved preference
+              const isDarkMode = savedDarkMode === 'true';
               if (isDarkMode) {
                 document.documentElement.classList.add('dark');
               } else {
