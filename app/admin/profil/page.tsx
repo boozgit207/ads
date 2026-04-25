@@ -17,22 +17,16 @@ export default function ProfilPage() {
     // Wait for auth context to be ready
     if (authLoading) return;
 
-    if (!authUser) {
-      // Rediriger vers la page de connexion si non authentifié
-      router.push('/auth');
-      return;
-    }
-
-    // Use auth context user data
+    // Use auth context user data even if null (will show empty state)
     setUser({
-      first_name: authUser.first_name || '',
-      last_name: authUser.last_name || '',
-      email: authUser.email || '',
-      phone: authUser.phone || '',
-      created_at: authUser.created_at || new Date().toISOString()
+      first_name: authUser?.first_name || '',
+      last_name: authUser?.last_name || '',
+      email: authUser?.email || '',
+      phone: authUser?.phone || '',
+      created_at: authUser?.created_at || new Date().toISOString()
     });
     setLoading(false);
-  }, [authUser, authLoading, router]);
+  }, [authUser, authLoading]);
 
   if (loading) {
     return (

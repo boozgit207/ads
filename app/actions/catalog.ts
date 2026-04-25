@@ -32,6 +32,8 @@ export interface Product {
   categorie?: Category;
   laboratoire?: Laboratory;
   images?: ProductImage[];
+  averageRating?: number;
+  reviewCount?: number;
 }
 
 export interface Category {
@@ -119,11 +121,38 @@ export async function getProducts(filters?: CatalogFilters): Promise<{ success: 
       return { success: false, error: 'Impossible de charger les produits. Veuillez réessayer.' };
     }
 
+    // Récupérer les avis pour calculer la moyenne
+    const productIds = (data || []).map(p => p.id);
+    const { data: reviews } = await supabase
+      .from('avis_produits')
+      .select('produit_id, note')
+      .in('produit_id', productIds);
+
+    // Calculer la moyenne des avis par produit
+    const ratingsMap = new Map<string, { average: number; count: number }>();
+    
+    if (reviews) {
+      reviews.forEach(review => {
+        const productId = review.produit_id;
+        if (!ratingsMap.has(productId)) {
+          ratingsMap.set(productId, { average: 0, count: 0 });
+        }
+        const current = ratingsMap.get(productId)!;
+        current.count++;
+        current.average = (current.average * (current.count - 1) + review.note) / current.count;
+      });
+    }
+
     // Transformer les données pour le frontend
-    const products: Product[] = (data || []).map((item: any) => ({
-      ...item,
-      laboratoire: item.categorie?.laboratoire,
-    }));
+    const products: Product[] = (data || []).map((item: any) => {
+      const rating = ratingsMap.get(item.id) || { average: 0, count: 0 };
+      return {
+        ...item,
+        laboratoire: item.categorie?.laboratoire,
+        averageRating: rating.average,
+        reviewCount: rating.count
+      };
+    });
 
     return { success: true, products };
   } catch (error: any) {

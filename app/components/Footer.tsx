@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin, ArrowUp } from "lucide-react";
 import { CONTACT, COMPANY } from "@/lib/config";
+import { useI18n } from "@/app/context/I18nContext";
 
 // Icônes réseaux sociaux en SVG inline (lucide-react n'a pas les icônes de marques)
 const FacebookIcon = () => (
@@ -31,6 +32,7 @@ const LinkedinIcon = () => (
 );
 
 export default function Footer() {
+  const { t } = useI18n();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -51,7 +53,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Angela Diagnostics et Services (ADS) - Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.
+              {t.footer.description}
             </p>
             {/* Social Media */}
             <div className="flex gap-3">
@@ -96,30 +98,30 @@ export default function Footer() {
 
           {/* Column 2: Quick Links */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Liens Rapides</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t.footer.quick_links}</h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
                   <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
-                  Accueil
+                  {t.footer.home}
                 </Link>
               </li>
               <li>
                 <Link href="/products" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
                   <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
-                  Nos Produits
+                  {t.footer.products}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
                   <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
-                  Contact
+                  {t.footer.contact}
                 </Link>
               </li>
               <li>
                 <Link href="/help" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
                   <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
-                  À propos
+                  {t.footer.about_link}
                 </Link>
               </li>
             </ul>
@@ -127,7 +129,7 @@ export default function Footer() {
 
           {/* Column 3: Contact */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Contact</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t.footer.contact}</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
@@ -155,20 +157,20 @@ export default function Footer() {
 
           {/* Column 4: Payment Methods */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Moyens de Paiement</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t.footer.payment_methods}</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300">
-              Paiements sécurisés via mobile money.
+              {t.footer.payment_desc}
             </p>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Image
-                  src="/images/logo_orange_money.png"
+                  src="/images/logo_orange_money.jpg"
                   alt="Orange Money"
                   width={80}
                   height={40}
                   className="h-8 w-auto object-contain"
                 />
-                <span className="text-sm text-slate-600 dark:text-slate-400">Orange Money</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">{t.footer.orange_money}</span>
               </div>
               <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Image
@@ -178,7 +180,7 @@ export default function Footer() {
                   height={40}
                   className="h-8 w-auto object-contain"
                 />
-                <span className="text-sm text-slate-600 dark:text-slate-400">MTN Mobile Money</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">{t.footer.mtn_money}</span>
               </div>
             </div>
           </div>
@@ -190,21 +192,21 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              © 2026 ADS - Angela Diagnostics et Services. Tous droits réservés.
+              {t.footer.copyright}
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400">
               <Link href="/privacy" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                Politique de confidentialité
+                {t.footer.privacy}
               </Link>
               <Link href="/terms" className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
-                Conditions d'utilisation
+                {t.footer.terms}
               </Link>
             </div>
             {/* Back to Top */}
             <button
               onClick={scrollToTop}
               className="h-11 w-11 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all duration-300 hover:scale-110"
-              aria-label="Retour en haut"
+              aria-label={t.footer.back_to_top}
             >
               <ArrowUp className="h-5 w-5" />
             </button>

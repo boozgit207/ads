@@ -4,18 +4,19 @@ import { useState, FormEvent, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { login, signup, resetPassword } from '../actions/auth';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Mail, 
-  Lock, 
-  User, 
-  Phone, 
-  UserCircle, 
-  Eye, 
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  UserCircle,
+  Eye,
   EyeOff,
   Shield,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Home
 } from 'lucide-react';
 import { showToast } from '../components/Toast';
 
@@ -153,9 +154,7 @@ export default function AuthPage() {
           {/* Left side - Brand info */}
           <div className="hidden lg:block">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-blue-500/30">
-                A
-              </div>
+              <img src="/logo_1.svg" alt="Logo ADS" className="w-16 h-16" />
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
                   ADS
@@ -198,11 +197,18 @@ export default function AuthPage() {
           {/* Right side - Auth card */}
           <div className="w-full max-w-md mx-auto">
             <div className="bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl p-8 border border-zinc-200/50 dark:border-zinc-800/50 shadow-2xl">
+              {/* Home button */}
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-6"
+              >
+                <Home className="w-4 h-4" />
+                Accueil
+              </button>
+
               {/* Mobile brand */}
               <div className="lg:hidden text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white text-3xl font-bold shadow-xl shadow-blue-500/30 mb-4">
-                  A
-                </div>
+                <img src="/logo_1.svg" alt="Logo ADS" className="w-16 h-16 mx-auto mb-4" />
                 <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">ADS</h1>
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm">Angela Diagnostics & Services</p>
               </div>

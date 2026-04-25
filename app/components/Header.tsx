@@ -32,7 +32,12 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
+  const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
+  const [laboratories, setLaboratories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [expandedLabs, setExpandedLabs] = useState<Set<string>>(new Set());
 
   // Load order count on mount
   useEffect(() => {
@@ -42,6 +47,25 @@ export default function Header() {
         setOrderCount(parseInt(savedOrderCount));
       }
     }
+  }, []);
+
+  // Load laboratories and categories
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [labsRes, catsRes] = await Promise.all([
+          fetch('/api/laboratories'),
+          fetch('/api/categories')
+        ]);
+        const labsData = await labsRes.json();
+        const catsData = await catsRes.json();
+        setLaboratories(labsData.laboratories || []);
+        setCategories(catsData.categories || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
   }, []);
 
   const toggleDarkMode = () => {
@@ -103,20 +127,102 @@ export default function Header() {
             <Home className="w-4 h-4" />
             {nav.home}
           </Link>
-          <Link
-            href="/products"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-          >
-            <Grid3X3 className="w-4 h-4" />
-            {nav.catalog}
-          </Link>
-          <Link
-            href="/help"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-          >
-            <HelpCircle className="w-4 h-4" />
-            {nav.about}
-          </Link>
+
+          {/* Catalog Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsCatalogMenuOpen(!isCatalogMenuOpen)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+            >
+              <Grid3X3 className="w-4 h-4" />
+              {nav.catalog}
+              <ChevronDown className={`w-3 h-3 transition-transform ${isCatalogMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isCatalogMenuOpen && (
+              <div className="absolute left-0 mt-2 w-96 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2 z-50 max-h-96 overflow-y-auto">
+                {laboratories.map((lab) => {
+                  const labCategories = categories.filter(cat => cat.laboratoire_id === lab.id);
+                  const isExpanded = expandedLabs.has(lab.id);
+                  return (
+                    <div key={lab.id}>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const newExpanded = new Set(expandedLabs);
+                          if (newExpanded.has(lab.id)) {
+                            newExpanded.delete(lab.id);
+                          } else {
+                            newExpanded.add(lab.id);
+                          }
+                          setExpandedLabs(newExpanded);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <span>{lab.nom}</span>
+                        {labCategories.length > 0 && (
+                          <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                        )}
+                      </button>
+                      {isExpanded && labCategories.length > 0 && (
+                        <div className="pl-8 pr-4 py-1">
+                          {labCategories.map((cat) => (
+                            <Link
+                              key={cat.id}
+                              href={`/products?lab=${lab.id}&category=${cat.id}`}
+                              className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                              onClick={() => setIsCatalogMenuOpen(false)}
+                            >
+                              {cat.nom}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* About Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsAboutMenuOpen(!isAboutMenuOpen)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+            >
+              <HelpCircle className="w-4 h-4" />
+              {nav.about}
+              <ChevronDown className={`w-3 h-3 transition-transform ${isAboutMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isAboutMenuOpen && (
+              <div className="absolute left-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2 z-50">
+                <Link
+                  href="/help"
+                  className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                  onClick={() => setIsAboutMenuOpen(false)}
+                >
+                  {locale === 'fr' ? 'Aide' : 'Help'}
+                </Link>
+                <Link
+                  href="/help#payment"
+                  className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                  onClick={() => setIsAboutMenuOpen(false)}
+                >
+                  {locale === 'fr' ? 'Paiement' : 'Payment'}
+                </Link>
+                <Link
+                  href="/help#details"
+                  className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                  onClick={() => setIsAboutMenuOpen(false)}
+                >
+                  {locale === 'fr' ? 'Détails' : 'Details'}
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link
             href="/contact"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
@@ -296,24 +402,78 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
           <nav className="flex flex-col p-4 space-y-1">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Home className="w-5 h-5" />
               {nav.home}
             </Link>
-            <Link 
-              href="/products" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-            >
-              <Grid3X3 className="w-5 h-5" />
-              {nav.catalog}
-            </Link>
-            <Link 
-              href="/cart" 
+
+            {/* Catalog Dropdown Mobile */}
+            <div>
+              <button
+                onClick={() => setIsCatalogMenuOpen(!isCatalogMenuOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+              >
+                <span className="flex items-center gap-3">
+                  <Grid3X3 className="w-5 h-5" />
+                  {nav.catalog}
+                </span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isCatalogMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isCatalogMenuOpen && (
+                <div className="pl-8 pr-4 py-2 space-y-1">
+                  {laboratories.map((lab) => {
+                    const labCategories = categories.filter(cat => cat.laboratoire_id === lab.id);
+                    const isExpanded = expandedLabs.has(lab.id);
+                    return (
+                      <div key={lab.id}>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const newExpanded = new Set(expandedLabs);
+                            if (newExpanded.has(lab.id)) {
+                              newExpanded.delete(lab.id);
+                            } else {
+                              newExpanded.add(lab.id);
+                            }
+                            setExpandedLabs(newExpanded);
+                          }}
+                          className="w-full flex items-center justify-between px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                        >
+                          <span>{lab.nom}</span>
+                          {labCategories.length > 0 && (
+                            <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          )}
+                        </button>
+                        {isExpanded && labCategories.length > 0 && (
+                          <div className="pl-4 py-1 space-y-1">
+                            {labCategories.map((cat) => (
+                              <Link
+                                key={cat.id}
+                                href={`/products?lab=${lab.id}&category=${cat.id}`}
+                                onClick={() => {
+                                  setIsMobileMenuOpen(false);
+                                  setIsCatalogMenuOpen(false);
+                                }}
+                                className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                              >
+                                {cat.nom}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Link
+              href="/cart"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
@@ -327,16 +487,57 @@ export default function Header() {
               </div>
               {nav.cart}
             </Link>
-            <Link 
-              href="/help" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-            >
-              <HelpCircle className="w-5 h-5" />
-              {nav.about}
-            </Link>
-            <Link 
-              href="/contact" 
+
+            {/* About Dropdown Mobile */}
+            <div>
+              <button
+                onClick={() => setIsAboutMenuOpen(!isAboutMenuOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+              >
+                <span className="flex items-center gap-3">
+                  <HelpCircle className="w-5 h-5" />
+                  {nav.about}
+                </span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isAboutMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isAboutMenuOpen && (
+                <div className="pl-8 pr-4 py-2 space-y-1">
+                  <Link
+                    href="/help"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsAboutMenuOpen(false);
+                    }}
+                    className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                  >
+                    {locale === 'fr' ? 'Aide' : 'Help'}
+                  </Link>
+                  <Link
+                    href="/help#payment"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsAboutMenuOpen(false);
+                    }}
+                    className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                  >
+                    {locale === 'fr' ? 'Paiement' : 'Payment'}
+                  </Link>
+                  <Link
+                    href="/help#details"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsAboutMenuOpen(false);
+                    }}
+                    className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                  >
+                    {locale === 'fr' ? 'Détails' : 'Details'}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link
+              href="/contact"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >

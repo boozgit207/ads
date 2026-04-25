@@ -7,9 +7,10 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { showToast } from '../components/Toast';
 import { Product, Laboratory, Category } from '../actions/catalog';
-import { Search, ChevronDown, ShoppingCart, Eye, FlaskConical, Check } from 'lucide-react';
+import { Search, ChevronDown, ShoppingCart, Eye, FlaskConical, Check, ArrowUpDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
+import StarRating from '../components/StarRating';
 
 interface ProductsClientProps {
   products: Product[];
@@ -32,6 +33,10 @@ export default function ProductsClient({
   const [selectedLab, setSelectedLab] = useState(initialLab || 'Tous');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'Tous');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, price-asc, price-desc
+
+  // Convertir le nom du laboratoire en ID si nécessaire
+  const selectedLabId = selectedLab === 'Tous' ? 'Tous' : (laboratories.find(l => l.nom === selectedLab)?.id || selectedLab);
 
   // Filtrer les produits quand les filtres changent
   useEffect(() => {
@@ -50,8 +55,8 @@ export default function ProductsClient({
 
     // Filtre par laboratoire (par ID ou par nom)
     if (selectedLab !== 'Tous') {
-      filtered = filtered.filter(p => 
-        p.laboratoire?.id === selectedLab || 
+      filtered = filtered.filter(p =>
+        p.laboratoire?.id === selectedLab ||
         p.laboratoire?.nom === selectedLab
       );
     }
@@ -61,8 +66,24 @@ export default function ProductsClient({
       filtered = filtered.filter(p => p.categorie_id === selectedCategory);
     }
 
+    // Tri des produits
+    filtered = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return getProductName(a).localeCompare(getProductName(b));
+        case 'name-desc':
+          return getProductName(b).localeCompare(getProductName(a));
+        case 'price-asc':
+          return getProductPrice(a) - getProductPrice(b);
+        case 'price-desc':
+          return getProductPrice(b) - getProductPrice(a);
+        default:
+          return 0;
+      }
+    });
+
     setFilteredProducts(filtered);
-  }, [searchTerm, selectedLab, selectedCategory, products]);
+  }, [searchTerm, selectedLab, selectedCategory, sortBy, products]);
 
   const t = {
     fr: {
@@ -81,7 +102,12 @@ export default function ProductsClient({
       seeAllProducts: 'Voir tous les produits',
       results: 'produits trouvés',
       priceOnRequest: 'Prix sur demande',
-      stockAvailable: 'disponible'
+      stockAvailable: 'disponible',
+      sortBy: 'Trier par',
+      nameAsc: 'Nom (A-Z)',
+      nameDesc: 'Nom (Z-A)',
+      priceAsc: 'Prix (croissant)',
+      priceDesc: 'Prix (décroissant)'
     },
     en: {
       title: 'Our Products',
@@ -99,7 +125,12 @@ export default function ProductsClient({
       seeAllProducts: 'See all products',
       results: 'products found',
       priceOnRequest: 'Price on request',
-      stockAvailable: 'available'
+      stockAvailable: 'available',
+      sortBy: 'Sort by',
+      nameAsc: 'Name (A-Z)',
+      nameDesc: 'Name (Z-A)',
+      priceAsc: 'Price (low to high)',
+      priceDesc: 'Price (high to low)'
     }
   }[locale];
 
@@ -122,8 +153,12 @@ export default function ProductsClient({
 
   // Préparer les options de filtres - éliminer les doublons
   const labOptions = ['Tous', ...Array.from(new Set(laboratories.map(l => l.nom)))];
+  // Filtrer les catégories selon le laboratoire sélectionné
+  const filteredCategories = selectedLabId === 'Tous'
+    ? categories
+    : categories.filter(c => c.laboratoire_id === selectedLabId);
   // Utiliser les IDs pour les catégories pour correspondre à l'URL
-  const catOptions = [{ id: 'Tous', nom: t.all }, ...categories.map(c => ({ id: c.id, nom: c.nom }))];
+  const catOptions = [{ id: 'Tous', nom: t.all }, ...filteredCategories.map(c => ({ id: c.id, nom: c.nom }))];
 
   // Helper pour obtenir le nom du produit selon la langue
   const getProductName = (p: Product) => locale === 'fr' ? p.nom : (p.nom_en || p.nom);
@@ -175,7 +210,10 @@ export default function ProductsClient({
             <div className="relative min-w-[180px]">
               <select
                 value={selectedLab}
-                onChange={(e) => setSelectedLab(e.target.value)}
+                onChange={(e) => {
+                  setSelectedLab(e.target.value);
+                  setSelectedCategory('Tous'); // Reset category when lab changes
+                }}
                 className="appearance-none pl-4 pr-10 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
               >
                 {labOptions.map(lab => (
@@ -197,6 +235,21 @@ export default function ProductsClient({
                 ))}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 pointer-events-none" />
+            </div>
+
+            {/* Sort Filter */}
+            <div className="relative min-w-[180px]">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
+              >
+                <option value="name-asc">{t.nameAsc}</option>
+                <option value="name-desc">{t.nameDesc}</option>
+                <option value="price-asc">{t.priceAsc}</option>
+                <option value="price-desc">{t.priceDesc}</option>
+              </select>
+              <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -230,8 +283,41 @@ export default function ProductsClient({
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
-            {filteredProducts.map((product) => (
+          <div className="space-y-12">
+            {/* Group products by laboratory and category */}
+            {laboratories.map((lab) => {
+              const labProducts = filteredProducts.filter(p => p.laboratoire?.id === lab.id);
+              if (labProducts.length === 0) return null;
+
+              // Get unique categories for this laboratory
+              const labCategories = Array.from(new Set(labProducts.map(p => p.categorie_id)))
+                .map(catId => categories.find(c => c.id === catId))
+                .filter(Boolean) as Category[];
+
+              return (
+                <div key={lab.id} className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                  {/* Laboratory Header */}
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 px-6 py-4">
+                    <h2 className="text-2xl font-bold text-white">{lab.nom}</h2>
+                    <p className="text-blue-100 text-sm mt-1">{labProducts.length} {locale === 'fr' ? 'produits' : 'products'}</p>
+                  </div>
+
+                  {/* Categories */}
+                  <div className="p-6 space-y-8">
+                    {labCategories.map((cat) => {
+                      const catProducts = labProducts.filter(p => p.categorie_id === cat.id);
+                      if (catProducts.length === 0) return null;
+
+                      return (
+                        <div key={cat.id}>
+                          {/* Category Header */}
+                          <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-4 pb-2 border-b-2 border-blue-500">
+                            {cat.nom}
+                          </h3>
+
+                          {/* Products Grid */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {catProducts.map((product) => (
               <div
                 key={product.id}
                 className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
@@ -296,6 +382,9 @@ export default function ProductsClient({
                       {product.categorie?.nom || ''}
                     </span>
                   </div>
+                  <div className="mb-4">
+                    <StarRating rating={product.averageRating || 0} size={14} />
+                  </div>
 
                   {/* Actions */}
                   <div className="flex gap-3">
@@ -316,7 +405,15 @@ export default function ProductsClient({
                   </div>
                 </div>
               </div>
-            ))}
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </main>

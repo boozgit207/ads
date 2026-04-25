@@ -103,7 +103,18 @@
     "privacy": "Politique de confidentialité",
     "newsletter": "Newsletter",
     "subscribe": "S'abonner",
-    "rights": "Tous droits réservés"
+    "rights": "Tous droits réservés",
+    "description": "Angela Diagnostics et Services (ADS) - Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.",
+    "quick_links": "Liens Rapides",
+    "home": "Accueil",
+    "products": "Nos Produits",
+    "payment_methods": "Moyens de Paiement",
+    "payment_desc": "Paiements sécurisés via mobile money.",
+    "orange_money": "Orange Money",
+    "mtn_money": "MTN Mobile Money",
+    "copyright": "© 2026 ADS - Angela Diagnostics et Services. Tous droits réservés.",
+    "back_to_top": "Retour en haut",
+    "about_link": "À propos"
   },
   "common": {
     "loading": "Chargement...",

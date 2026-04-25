@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Header from '../Header';
 import Footer from '../Footer';
 import HeroCarousel from './HeroCarousel';
+import StarRating from '../StarRating';
 import {
   FlaskConical,
   TestTube,
@@ -272,6 +273,157 @@ export default function HomePage({ categories }: HomePageProps) {
         isDark={isDark}
       />
 
+      {/* À propos de nous */}
+      <section className="py-20 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                {locale === 'fr' ? 'À propos de nous' : 'About Us'}
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'Angela Diagnostics et Services (ADS) est une entreprise spécialisée dans la distribution de réactifs de laboratoire et de solutions diagnostiques de haute qualité au Cameroun. Depuis notre création, nous nous engageons à fournir aux professionnels de santé des produits fiables et précis pour améliorer les soins médicaux.'
+                  : 'Angela Diagnostics and Services (ADS) is a company specialized in the distribution of high-quality laboratory reagents and diagnostic solutions in Cameroon. Since our creation, we are committed to providing healthcare professionals with reliable and precise products to improve medical care.'}
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'Nous travaillons en partenariat avec les plus grands laboratoires internationaux pour garantir l\'excellence de nos produits et la satisfaction de nos clients.'
+                  : 'We work in partnership with the largest international laboratories to guarantee the excellence of our products and the satisfaction of our customers.'}
+              </p>
+              <div className="flex gap-4 pt-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-6 h-6 text-sky-500" />
+                  <span className="text-slate-700 dark:text-slate-300">{locale === 'fr' ? 'Certifié ISO 9001' : 'ISO 9001 Certified'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-6 h-6 text-sky-500" />
+                  <span className="text-slate-700 dark:text-slate-300">{locale === 'fr' ? 'Partenaires internationaux' : 'International partners'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-500 rounded-3xl transform rotate-3 opacity-20"></div>
+              <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+                <div className="w-full aspect-square bg-gradient-to-br from-sky-100 to-blue-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
+                  <Image
+                    src="/images/img1.png"
+                    alt={locale === 'fr' ? 'Qui sommes nous' : 'Who are we'}
+                    width={400}
+                    height={400}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Notre Mission */}
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative order-2 lg:order-1">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl transform -rotate-3 opacity-20"></div>
+              <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+                <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-green-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
+                  <Image
+                    src="/images/img2.png"
+                    alt={locale === 'fr' ? 'Notre Mission' : 'Our Mission'}
+                    width={400}
+                    height={400}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-6 order-1 lg:order-2">
+              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                {locale === 'fr' ? 'Notre Mission' : 'Our Mission'}
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'Notre rôle est de fournir des réactifs de laboratoire de qualité à tous les établissements de santé au Cameroun. Nous nous assurons que chaque produit que nous distribuons répond aux normes les plus strictes de qualité et de sécurité.'
+                  : 'Our role is to provide quality laboratory reagents to all healthcare facilities in Cameroon. We ensure that every product we distribute meets the strictest quality and safety standards.'}
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'Nous offrons un accompagnement personnalisé, une formation continue et un support technique pour garantir l\'utilisation optimale de nos produits.'
+                  : 'We offer personalized support, continuous training and technical assistance to ensure optimal use of our products.'}
+              </p>
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="bg-sky-50 dark:bg-slate-800 p-4 rounded-xl">
+                  <Shield className="w-8 h-8 text-sky-500 mb-2" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">{locale === 'fr' ? 'Qualité garantie' : 'Quality guaranteed'}</h3>
+                </div>
+                <div className="bg-emerald-50 dark:bg-slate-800 p-4 rounded-xl">
+                  <Headphones className="w-8 h-8 text-emerald-500 mb-2" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">{locale === 'fr' ? 'Support 24/7' : '24/7 Support'}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Nos Solutions */}
+      <section className="py-20 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-slate-800 dark:to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                {locale === 'fr' ? 'Nos Solutions' : 'Our Solutions'}
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'Au Cameroun, l\'accès aux réactifs de laboratoire de qualité reste un défi majeur. De nombreux établissements de santé font face à des pénuries de réactifs, des coûts élevés et des délais de livraison importants.'
+                  : 'In Cameroon, access to quality laboratory reagents remains a major challenge. Many healthcare facilities face reagent shortages, high costs and long delivery times.'}
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                {locale === 'fr'
+                  ? 'ADS répond à ce problème en offrant une gamme complète de réactifs de laboratoire de qualité à des prix compétitifs, avec une livraison rapide et un support technique de proximité.'
+                  : 'ADS addresses this problem by offering a complete range of quality laboratory reagents at competitive prices, with fast delivery and local technical support.'}
+              </p>
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg mt-6">
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{locale === 'fr' ? 'Nos solutions :' : 'Our solutions:'}</h3>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
+                    {locale === 'fr' ? 'Stock local pour livraison rapide' : 'Local stock for fast delivery'}
+                  </li>
+                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
+                    {locale === 'fr' ? 'Prix adaptés au marché africain' : 'Prices adapted to African market'}
+                  </li>
+                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
+                    {locale === 'fr' ? 'Formation et support technique' : 'Training and technical support'}
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-400 to-purple-500 rounded-3xl transform rotate-3 opacity-20"></div>
+              <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+                <div className="w-full aspect-square bg-gradient-to-br from-violet-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
+                  <Image
+                    src="/images/img3.jpg"
+                    alt={locale === 'fr' ? 'Nos Solutions' : 'Our Solutions'}
+                    width={400}
+                    height={400}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 bg-gradient-to-br from-sky-500 to-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -451,9 +603,12 @@ export default function HomePage({ categories }: HomePageProps) {
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
                       {product.name || product.nom}
                     </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 line-clamp-2">
                       {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
                     </p>
+                    <div className="mb-3">
+                      <StarRating rating={product.averageRating || 0} size={14} />
+                    </div>
                     <div className="flex items-center justify-between gap-2">
                       <Link
                         href={`/product/${product.slug || product.id}`}

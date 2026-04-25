@@ -31,34 +31,23 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   const supabase = createBrowserClient();
 
   const refreshUser = async () => {
-    console.log('AuthContext: refreshUser called');
     try {
       const { data: { user: authUser }, error } = await supabase.auth.getUser();
-      
-      console.log('AuthContext: authUser:', authUser);
-      console.log('AuthContext: error:', error);
-      
+
       if (error || !authUser) {
-        console.log('AuthContext: No auth user, setting user to null');
         setUser(null);
       } else {
         // Get profile data
-        console.log('AuthContext: Fetching profile for user:', authUser.id);
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', authUser.id)
           .maybeSingle();
-        
-        console.log('AuthContext: profile:', profile);
-        console.log('AuthContext: profileError:', profileError);
-        
+
         if (profile) {
-          console.log('AuthContext: Setting user from profile');
           setUser(profile as User | null);
         } else {
           // Fallback to auth user data if profile not accessible
-          console.log('AuthContext: Profile not accessible, using auth metadata');
           const fallbackUser = {
             id: authUser.id,
             email: authUser.email || '',
@@ -67,7 +56,6 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
             avatar: authUser.user_metadata?.avatar_url || null,
             role: authUser.user_metadata?.role || 'user'
           };
-          console.log('AuthContext: fallbackUser:', fallbackUser);
           setUser(fallbackUser);
         }
       }
@@ -99,32 +87,23 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: string, session: any) => {
-        console.log('AuthContext: Auth state change - event:', event, 'session:', session);
-        
         // Don't override initialUser on INITIAL_SESSION if session is null
         if (event === 'INITIAL_SESSION' && !session && initialUser) {
-          console.log('AuthContext: Keeping initialUser, ignoring INITIAL_SESSION with null session');
           setLoading(false);
           return;
         }
-        
+
         if (session?.user) {
-          console.log('AuthContext: Session user found:', session.user.id);
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
-          
-          console.log('AuthContext: Profile from state change:', profile);
-          console.log('AuthContext: Profile error from state change:', profileError);
-          
+
           if (profile) {
-            console.log('AuthContext: Setting user from profile (state change)');
             setUser(profile as User | null);
           } else {
             // Fallback to auth user data if profile not accessible
-            console.log('AuthContext: Profile not accessible (state change), using auth metadata');
             const fallbackUser = {
               id: session.user.id,
               email: session.user.email || '',
@@ -133,11 +112,9 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
               avatar: session.user.user_metadata?.avatar_url || null,
               role: session.user.user_metadata?.role || 'user'
             };
-            console.log('AuthContext: fallbackUser (state change):', fallbackUser);
             setUser(fallbackUser);
           }
         } else {
-          console.log('AuthContext: No session user, setting user to null (state change)');
           setUser(null);
         }
         setLoading(false);

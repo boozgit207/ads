@@ -82,32 +82,24 @@ export default function CommandesPage() {
 
   const loadOrders = async () => {
     setLoading(true);
-    setError(null);
-    
     try {
       const [ordersResult, statsResult] = await Promise.all([
         getAllOrders(),
         getOrderStats(),
       ]);
 
-      console.log('Résultat commandes:', ordersResult);
-      console.log('Résultat stats:', statsResult);
-
       if (ordersResult.success && ordersResult.orders) {
         setOrders(ordersResult.orders);
+        setStats(statsResult.stats || stats);
       } else {
         setError(ordersResult.error || 'Erreur lors du chargement des commandes');
       }
-
-      if (statsResult.success && statsResult.stats) {
-        setStats(statsResult.stats);
-      }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erreur loadOrders:', err);
-      setError(err.message || 'Erreur inattendue');
+      setError('Erreur lors du chargement des commandes');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const loadOrdersSilent = async () => {
@@ -491,7 +483,7 @@ export default function CommandesPage() {
 
           {/* Modal Order Details */}
           {showModal && selectedOrder && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
               <div className="bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-200/50 dark:border-zinc-800/50">
                 <div className="sticky top-0 bg-white dark:bg-zinc-900 border-b border-zinc-200/50 dark:border-zinc-800/50 px-6 py-5 flex items-center justify-between">
                   <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">

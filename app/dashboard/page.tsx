@@ -1,11 +1,22 @@
 import Link from 'next/link';
 import { requireAuth, logout } from '../actions/auth';
+import { createServerSupabaseClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 import { Home, ShoppingBag, Package, Heart, LogOut, PlusCircle, Search, User, FileText, Star, MessageSquare, Mail, Phone, Calendar } from 'lucide-react';
 
 export default async function DashboardPage() {
   const user = await requireAuth();
+  const supabase = await createServerSupabaseClient();
+
+  // Fetch user orders
+  const { data: orders } = await supabase
+    .from('commandes')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const orderCount = orders?.length || 0;
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -56,7 +67,7 @@ export default async function DashboardPage() {
             { label: 'Mes annonces', value: '0', Icon: FileText },
             { label: 'Favoris', value: '0', Icon: Heart },
             { label: 'Messages', value: '0', Icon: MessageSquare },
-            { label: 'Commandes', value: '0', Icon: Package },
+            { label: 'Commandes', value: orderCount.toString(), Icon: Package },
           ].map(({ label, value, Icon }) => (
             <div 
               key={label}

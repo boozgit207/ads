@@ -23,19 +23,46 @@ export async function GET() {
 
     if (error) throw error;
 
-    // Transformer les données pour inclure l'image principale ou la première image
-    const transformedProducts = products?.map(product => ({
-      id: product.id,
-      name: product.nom,
-      price: product.prix,
-      quantity: 1,
-      stock: product.quantite_stock,
-      image: product.image_principale_url ||
-        (product.images && product.images.length > 0 ? product.images[0].url : null),
-      slug: product.slug || product.id,
-      category: product.categorie?.nom,
-      laboratory: product.categorie?.laboratoire?.nom
-    })).filter(p => p.price && p.price > 0) || [];
+    // Récupérer les avis pour calculer la moyenne
+    const productIds = products?.map(p => p.id) || [];
+    const { data: reviews } = await supabase
+      .from('avis_produits')
+      .select('produit_id, note')
+      .in('produit_id', productIds);
+
+    // Calculer la moyenne des avis par produit
+    const ratingsMap = new Map<string, { average: number; count: number }>();
+    
+    if (reviews) {
+      reviews.forEach(review => {
+        const productId = review.produit_id;
+        if (!ratingsMap.has(productId)) {
+          ratingsMap.set(productId, { average: 0, count: 0 });
+        }
+        const current = ratingsMap.get(productId)!;
+        current.count++;
+        current.average = (current.average * (current.count - 1) + review.note) / current.count;
+      });
+    }
+
+    // Transformer les données pour inclure l'image principale ou la première image et la moyenne des avis
+    const transformedProducts = products?.map(product => {
+      const rating = ratingsMap.get(product.id) || { average: 0, count: 0 };
+      return {
+        id: product.id,
+        name: product.nom,
+        price: product.prix,
+        quantity: 1,
+        stock: product.quantite_stock,
+        image: product.image_principale_url ||
+          (product.images && product.images.length > 0 ? product.images[0].url : null),
+        slug: product.slug || product.id,
+        category: product.categorie?.nom,
+        laboratory: product.categorie?.laboratoire?.nom,
+        averageRating: rating.average,
+        reviewCount: rating.count
+      };
+    }).filter(p => p.price && p.price > 0) || [];
 
     console.log('Produits transformés:', transformedProducts.length);
 

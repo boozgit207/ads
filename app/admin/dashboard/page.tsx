@@ -104,11 +104,11 @@ export default async function AdminDashboardPage() {
           {/* Main content */}
           <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-8 pt-20 lg:pt-8">
             {/* Welcome banner */}
-            <div className="relative overflow-hidden rounded-3xl p-8 mb-8 bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-700 shadow-2xl shadow-blue-500/30">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-700"></div>
+            <div className="relative overflow-hidden rounded-3xl p-8 mb-8 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-2xl shadow-blue-500/30">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC02LjYyNy01LjM3My0xMi0xMi0xMnMtMTIgNS4zNzMtMTIgMTJjMCA2LjYyNyA1LjM3MyAxMiAxMiAxMnMxMi01LjM3MyAxMi0xMnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-2">
                   <Sparkles className="w-7 h-7 text-yellow-300" />
@@ -133,10 +133,10 @@ export default async function AdminDashboardPage() {
             {/* Stats cards */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
               {[
-                { label: 'Utilisateurs', value: stats.users, Icon: Users, gradient: 'from-blue-500 to-cyan-500', color: 'blue', trend: '+12%' },
-                { label: 'Produits', value: stats.products, Icon: FileText, gradient: 'from-purple-500 to-pink-500', color: 'purple', trend: '+5%' },
-                { label: 'Commandes', value: stats.orders, Icon: Package, gradient: 'from-orange-500 to-red-500', color: 'orange', trend: '+8%' },
-                { label: 'Revenus', value: formattedRevenue, Icon: DollarSign, gradient: 'from-green-500 to-emerald-500', color: 'green', trend: '+15%' },
+                { label: 'Utilisateurs', value: stats.users, Icon: Users, gradient: 'from-blue-500 to-blue-600', color: 'blue', trend: '+12%' },
+                { label: 'Produits', value: stats.products, Icon: FileText, gradient: 'from-indigo-500 to-indigo-600', color: 'indigo', trend: '+5%' },
+                { label: 'Commandes', value: stats.orders, Icon: Package, gradient: 'from-sky-500 to-sky-600', color: 'sky', trend: '+8%' },
+                { label: 'Revenus', value: formattedRevenue, Icon: DollarSign, gradient: 'from-cyan-500 to-cyan-600', color: 'cyan', trend: '+15%' },
               ].map(({ label, value, Icon, gradient, color, trend }) => (
                 <div 
                   key={label}
@@ -185,13 +185,13 @@ export default async function AdminDashboardPage() {
               </Link>
 
               <Link href="/admin/commandes" className="group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 transition-colors"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 to-indigo-500/0 group-hover:from-indigo-500/5 group-hover:to-blue-500/5 transition-colors"></div>
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-xl shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-xl shadow-indigo-500/30 group-hover:scale-110 transition-transform">
                       <ShoppingCart className="w-8 h-8 text-white" />
                     </div>
-                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Commandes</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-4">Validez ou annulez les commandes clients avec notifications en temps réel</p>
@@ -205,13 +205,13 @@ export default async function AdminDashboardPage() {
               </Link>
 
               <Link href="/admin/clients" className="group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:to-emerald-500/5 transition-colors"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500/0 to-sky-500/0 group-hover:from-sky-500/5 group-hover:to-blue-500/5 transition-colors"></div>
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl shadow-green-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-xl shadow-sky-500/30 group-hover:scale-110 transition-transform">
                       <Users className="w-8 h-8 text-white" />
                     </div>
-                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Clients</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-4">Gérez les comptes clients et consultez leurs informations</p>
@@ -225,45 +225,18 @@ export default async function AdminDashboardPage() {
               </Link>
 
               <Link href="/admin/parametres" className="group relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-red-500/5 transition-colors"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/5 group-hover:to-sky-500/5 transition-colors"></div>
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-xl shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center shadow-xl shadow-cyan-500/30 group-hover:scale-110 transition-transform">
                       <Settings className="w-8 h-8 text-white" />
                     </div>
-                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-6 h-6 text-zinc-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Paramètres</h2>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-4">Configurez la plateforme, prix livraison et Google Analytics</p>
                 </div>
               </Link>
-            </div>
-
-            {/* Recent activity */}
-            <div className="bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Activité récente</h2>
-                <Link href="/admin/commandes" className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                  Voir tout
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {[
-                  { icon: Package, title: 'Nouvelle commande #1234', time: 'Il y a 5 minutes', color: 'blue' },
-                  { icon: Users, title: 'Nouvel utilisateur inscrit', time: 'Il y a 15 minutes', color: 'green' },
-                  { icon: FileText, title: 'Produit modifié', time: 'Il y a 1 heure', color: 'purple' },
-                ].map((activity, index) => (
-                  <div key={index} className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                    <div className={`p-2 rounded-lg bg-${activity.color}-100 dark:bg-${activity.color}-900/30`}>
-                      <activity.icon className={`w-5 h-5 text-${activity.color}-600 dark:text-${activity.color}-400`} />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-zinc-900 dark:text-white">{activity.title}</p>
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </main>
         </div>

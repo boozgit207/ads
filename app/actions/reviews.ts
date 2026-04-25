@@ -214,3 +214,30 @@ export async function hasUserReviewed(productId: string, userId: string): Promis
     return false;
   }
 }
+
+// Récupérer la moyenne des avis d'un produit
+export async function getProductAverageRating(productId: string): Promise<{ success: boolean; average?: number; count?: number; error?: string }> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    
+    const { data, error } = await supabase
+      .from('avis_produits')
+      .select('note')
+      .eq('produit_id', productId);
+
+    if (error) {
+      return { success: true, average: 0, count: 0 };
+    }
+
+    if (!data || data.length === 0) {
+      return { success: true, average: 0, count: 0 };
+    }
+
+    const total = data.reduce((sum: number, review: any) => sum + review.note, 0);
+    const average = total / data.length;
+
+    return { success: true, average, count: data.length };
+  } catch (error: any) {
+    return { success: true, average: 0, count: 0 };
+  }
+}
