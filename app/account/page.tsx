@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../context/I18nContext';
+import Link from 'next/link';
 
 export default function AccountPage() {
   const { user, signOut } = useAuth();
@@ -518,42 +519,69 @@ export default function AccountPage() {
                       <p className="text-xl text-zinc-500">{t.orders.noOrders}</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {orders.map((order) => (
-                        <div key={order.id} className="p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:shadow-md transition-all">
-                          <div className="flex items-start justify-between mb-4">
-                            <div>
-                              <p className="font-bold text-zinc-900 dark:text-white">
-                                {t.orders.orderId} {order.reference}
-                              </p>
-                              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                                {new Date(order.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}
-                              </p>
+                        <div key={order.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm hover:shadow-md transition-shadow">
+                          {/* Header */}
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                <Package className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Commande' : 'Order'}</span>
+                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">#{order.numero || order.reference || order.id?.substring(0, 8)}</h3>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getStatusColor(order.statut)}`}>
+                            <div className="flex flex-wrap gap-4 items-center">
+                              <div className="text-right">
+                                <p className="text-xs text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Date' : 'Date'}</p>
+                                <p className="font-medium text-zinc-900 dark:text-white">{new Date(order.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                              </div>
+                              <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${
+                                order.statut === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                                order.statut === 'shipped' || order.statut === 'processing' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
+                                order.statut === 'delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                                'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                              }`}>
                                 {getStatusIcon(order.statut)}
                                 {t.orders[order.statut as keyof typeof t.orders] || order.statut}
-                              </span>
-                              {order.statut === 'pending' && (
-                                <button
-                                  onClick={() => handleDeleteOrder(order.id)}
-                                  disabled={isLoading}
-                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                  title={t.orders.deleteOrder}
-                                >
-                                  <XCircle className="w-4 h-4" />
-                                </button>
-                              )}
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                            <p className="text-base text-zinc-600 dark:text-zinc-400">
-                              {order.items?.length || 0} {locale === 'fr' ? 'article(s)' : 'item(s)'}
-                            </p>
-                            <p className="text-lg font-bold text-zinc-900 dark:text-white">
-                              {order.total?.toLocaleString()} FCFA
-                            </p>
+
+                          {/* Items Info */}
+                          <div className="flex flex-col md:flex-row gap-6 mb-6">
+                            <div className="flex-1 space-y-2">
+                              {order.items && Array.isArray(order.items) && order.items.length > 0 ? (
+                                order.items.slice(0, 2).map((item: any, idx: number) => (
+                                  <div key={idx} className="flex justify-between items-center text-sm border-b border-dashed border-zinc-200 dark:border-zinc-700 pb-2">
+                                    <span className="text-zinc-600 dark:text-zinc-400">{item.name || item.product_name}</span>
+                                    <span className="font-medium text-zinc-900 dark:text-white">x{item.quantity}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="text-sm text-zinc-600 dark:text-zinc-400">{locale === 'fr' ? 'Articles chargement...' : 'Loading items...'}</div>
+                              )}
+                              {order.items && Array.isArray(order.items) && order.items.length > 2 && (
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400">+{order.items.length - 2} {locale === 'fr' ? 'autres articles' : 'more items'}</p>
+                              )}
+                            </div>
+                            <div className="md:w-48 bg-zinc-50 dark:bg-zinc-800 rounded-lg p-4 flex flex-col justify-center items-center">
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">{locale === 'fr' ? 'Total' : 'Total'} TTC</p>
+                              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{(order.total || 0).toLocaleString()} FCFA</p>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex justify-end gap-3 flex-wrap">
+                            <Link href={`/orders/${order.id}`} className="px-6 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                              {locale === 'fr' ? 'Détails' : 'Details'}
+                            </Link>
+                            <Link href={`/orders/${order.id}`} className="px-6 py-2 text-sm font-bold bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+                              <Truck className="w-4 h-4" />
+                              {locale === 'fr' ? 'Suivre le colis' : 'Track Order'}
+                            </Link>
                           </div>
                         </div>
                       ))}
