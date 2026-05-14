@@ -18,4 +18,4 @@ Disallow: /checkout/
 Disallow: /account/
 Disallow: /dashboard/
 
-Sitemap: https://ads-str7.vercel.app/sitemap.xml
+Sitemap: https://ads-diagnostics.com/sitemap.xml

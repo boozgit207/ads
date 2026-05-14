@@ -7,7 +7,7 @@ export const CONTACT = {
   phoneOrange: '+237 697 12 13 28',
   phoneMtn: '+237 686 09 42 05',
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || '+237 697 12 13 28',
-  address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || 'Yaoundé, Carrefour Intendance, Cameroun',
+  address: process.env.NEXT_PUBLIC_CONTACT_ADDRESS || 'Yaoundé, Carrefour Intendance\nAu-dessus de SCB bank\nCameroun',
 } as const;
 
 export const COMPANY = {

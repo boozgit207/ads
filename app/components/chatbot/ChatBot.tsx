@@ -143,8 +143,8 @@ export default function ChatBot() {
       case 'contact':
         response = {
           content: locale === 'fr'
-            ? `📞 Contactez-nous :\n\n📍 Adresse: Yaoundé, Carrefour Intendance, Cameroun\n📞 Orange: +237 697 12 13 28\n📞 MTN: +237 686 09 42 05\n📧 Email: angeladiagnostics8@gmail.com\n\nComment pouvons-nous vous aider ?`
-            : `📞 Contact us:\n\n📍 Address: Yaoundé, Carrefour Intendance, Cameroon\n📞 Orange: +237 697 12 13 28\n📞 MTN: +237 686 09 42 05\n📧 Email: angeladiagnostics8@gmail.com\n\nHow can we help you?`,
+            ? `📞 Contactez-nous :\n\n📍 Adresse: Yaoundé, Carrefour Intendance\nAu-dessus de SCB bank\nCameroun\n📞 Orange: +237 697 12 13 28\n📞 MTN: +237 686 09 42 05\n📧 Email: angeladiagnostics8@gmail.com\n\nComment pouvons-nous vous aider ?`
+            : `📞 Contact us:\n\n📍 Address: Yaoundé, Carrefour Intendance\nAbove SCB bank\nCameroon\n📞 Orange: +237 697 12 13 28\n📞 MTN: +237 686 09 42 05\n📧 Email: angeladiagnostics8@gmail.com\n\nHow can we help you?`,
           options: [
             { id: '1', label: locale === 'fr' ? '📧 Envoyer un email' : '📧 Send email', action: 'send_email' },
             { id: '2', label: locale === 'fr' ? '📱 Appeler' : '📱 Call', action: 'call' },

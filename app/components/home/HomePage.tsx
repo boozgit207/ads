@@ -3,31 +3,33 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import Header from '../Header';
 import Footer from '../Footer';
-import HeroCarousel from './HeroCarousel';
 import StarRating from '../StarRating';
+import AuthRedirect from '../AuthRedirect';
 import {
   FlaskConical,
   TestTube,
   Activity,
   Package,
-  Heart,
   Shield,
   Truck,
   Headphones,
-  ShoppingCart,
   Star,
   ArrowRight,
   CheckCircle2,
   Award,
   Users,
   TrendingUp,
-  BarChart3,
-  LineChart,
-  Beaker,
-  Droplets
+  ShoppingCart
 } from 'lucide-react';
+
+// Dynamic imports pour réduire le JavaScript initial
+const HeroCarousel = dynamic(() => import('./HeroCarousel'), {
+  loading: () => <div className="h-96 bg-gray-100 dark:bg-gray-800 animate-pulse" />,
+  ssr: false
+});
 import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../context/I18nContext';
 import { useCart } from '../../context/CartContext';
@@ -254,8 +256,9 @@ export default function HomePage({ categories }: HomePageProps) {
   const content = t[locale];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
-      <Header />
+    <AuthRedirect>
+      <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <Header />
 
       {/* Hero Carousel */}
       <HeroCarousel
@@ -308,11 +311,13 @@ export default function HomePage({ categories }: HomePageProps) {
                 <div className="w-full aspect-square bg-gradient-to-br from-sky-100 to-blue-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
                     src="/images/img1.png"
-                    alt={locale === 'fr' ? 'Qui sommes nous' : 'Who are we'}
+                    alt={locale === 'fr' ? 'Équipe d\'Angela Diagnostics et Services - Experts en réactifs de laboratoire' : 'Angela Diagnostics and Services Team - Laboratory Reagents Experts'}
                     width={400}
                     height={400}
                     className="object-cover w-full h-full"
                     unoptimized
+                    loading="lazy"
+                    priority={false}
                   />
                 </div>
               </div>
@@ -331,11 +336,13 @@ export default function HomePage({ categories }: HomePageProps) {
                 <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-green-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
                     src="/images/img2.png"
-                    alt={locale === 'fr' ? 'Notre Mission' : 'Our Mission'}
+                    alt={locale === 'fr' ? 'Mission d\'Angela Diagnostics - Fournir des réactifs de laboratoire de qualité au Cameroun' : 'Angela Diagnostics Mission - Providing quality laboratory reagents in Cameroon'}
                     width={400}
                     height={400}
                     className="object-cover w-full h-full"
                     unoptimized
+                    loading="lazy"
+                    priority={false}
                   />
                 </div>
               </div>
@@ -411,11 +418,13 @@ export default function HomePage({ categories }: HomePageProps) {
                 <div className="w-full aspect-square bg-gradient-to-br from-violet-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
                     src="/images/img3.jpg"
-                    alt={locale === 'fr' ? 'Nos Solutions' : 'Our Solutions'}
+                    alt={locale === 'fr' ? 'Solutions ADS - Stock local de réactifs de laboratoire avec livraison rapide' : 'ADS Solutions - Local stock of laboratory reagents with fast delivery'}
                     width={400}
                     height={400}
                     className="object-cover w-full h-full"
                     unoptimized
+                    loading="lazy"
+                    priority={false}
                   />
                 </div>
               </div>
@@ -470,7 +479,7 @@ export default function HomePage({ categories }: HomePageProps) {
                 key={index}
                 className="group p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 transition-all hover:shadow-xl border border-slate-200 dark:border-slate-700"
               >
-                <div className={`w-14 h-14 rounded-xl ${feature.bgColor} dark:bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-14 h-14 rounded-xl ${feature.bgColor} bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className={`w-7 h-7 ${feature.color}`} />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
@@ -558,7 +567,7 @@ export default function HomePage({ categories }: HomePageProps) {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-slate-200 dark:bg-slate-700 h-64 rounded-2xl" />
+                  <div className="bg-slate-200 bg-slate-700 h-64 rounded-2xl" />
                 </div>
               ))}
             </div>
@@ -690,6 +699,7 @@ export default function HomePage({ categories }: HomePageProps) {
       </section>
 
       <Footer />
-    </div>
+      </div>
+    </AuthRedirect>
   );
 }

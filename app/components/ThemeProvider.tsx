@@ -21,14 +21,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const savedDarkMode = localStorage.getItem('ads-dark-mode');
-      // Default to light mode (false) if no saved preference
-      const isDarkMode = savedDarkMode === 'true';
+      const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
       setIsDark(isDarkMode);
+      // Force the dark class on html element
       if (isDarkMode) {
         document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
       } else {
         document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
       }
       setMounted(true);
     } catch (e) {
@@ -43,9 +45,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setIsDark(newIsDark);
     if (newIsDark) {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
       console.log('Added dark class');
     } else {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
       console.log('Removed dark class');
     }
     try {

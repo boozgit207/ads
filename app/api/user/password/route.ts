@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
     const { currentPassword, newPassword } = await request.json();
 

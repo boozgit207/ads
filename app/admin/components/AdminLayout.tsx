@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import { ThemeProvider } from './ThemeProvider';
 import LanguageSwitcher, { useLanguage } from './LanguageSwitcher';
 import { logout } from '../../actions/auth';
+import AdminLoadingScreen from './LoadingScreen';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -18,6 +19,7 @@ export default function AdminLayout({ children, title, titleEn }: AdminLayoutPro
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <AdminLoadingScreen />
       <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 flex">
         <Sidebar />
         

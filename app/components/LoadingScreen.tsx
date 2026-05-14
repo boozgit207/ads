@@ -4,32 +4,60 @@ import { useState, useEffect } from 'react';
 
 export default function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    // Masquer après 500ms
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Ne rien afficher avant le montage pour éviter les erreurs d'hydratation
+  if (!mounted) return null;
+
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-slate-950">
-      <div className="flex flex-col items-center gap-8">
-        {/* Spinning Circle with Logo */}
-        <div className="relative w-24 h-24">
-          <div className="absolute inset-0 border-4 border-slate-200 dark:border-slate-700 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-sky-500 rounded-full border-t-transparent animate-spin"></div>
-          <img src="/logo_1.svg" alt="Logo" className="absolute inset-0 w-16 h-16 m-auto" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-zinc-950">
+      <div className="flex flex-col items-center gap-4">
+        {/* Logo avec cercle */}
+        <div className="relative w-32 h-32 flex items-center justify-center">
+          {/* Cercle extérieur animé */}
+          <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          {/* Cercle intérieur avec effet de glow */}
+          <div className="absolute inset-2 bg-blue-500/20 rounded-full blur-lg animate-pulse"></div>
+          {/* Conteneur du logo */}
+          <div className="relative w-20 h-20 bg-white dark:bg-zinc-900 rounded-full shadow-xl flex items-center justify-center z-10">
+            <img 
+              src="/logo_1.svg" 
+              alt="ADS Loading" 
+              className="w-14 h-14"
+              style={{ animation: 'pulse 2s infinite' }}
+            />
+          </div>
         </div>
 
-        {/* Loading Text */}
-        <p className="text-slate-600 dark:text-slate-300 text-lg font-medium animate-pulse">
-          Chargement...
-        </p>
+        {/* Texte */}
+        <div className="text-center">
+          <p className="text-zinc-600 dark:text-zinc-400 text-lg font-semibold">
+            Angela Diagnostics
+          </p>
+          <p className="text-zinc-500 dark:text-zinc-500 text-sm">
+            Chargement...
+          </p>
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
+      `}</style>
     </div>
   );
 }

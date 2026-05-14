@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireAdmin, logout } from '../../actions/auth';
+import AuthRedirect from '../../components/AuthRedirect';
 
 export const dynamic = 'force-dynamic';
 import { 

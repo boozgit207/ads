@@ -125,7 +125,9 @@ export default function AccountPage() {
         processing: 'En cours',
         shipped: 'Expédiée',
         delivered: 'Livrée',
-        cancelled: 'Annulée'
+        cancelled: 'Annulée',
+      deleteOrder: 'Supprimer la commande',
+      deleteConfirm: 'Êtes-vous sûr de vouloir supprimer cette commande ?'
       },
       settings: {
         title: 'Paramètres',
@@ -173,7 +175,9 @@ export default function AccountPage() {
         processing: 'Processing',
         shipped: 'Shipped',
         delivered: 'Delivered',
-        cancelled: 'Cancelled'
+        cancelled: 'Cancelled',
+      deleteOrder: 'Delete Order',
+      deleteConfirm: 'Are you sure you want to delete this order?'
       },
       settings: {
         title: 'Settings',
@@ -248,6 +252,33 @@ export default function AccountPage() {
       console.error('Error changing password:', error);
       setPasswordMessage(t.settings.passwordError);
       showToast(t.settings.passwordError, 'error');
+    }
+    setIsLoading(false);
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm(locale === 'fr' ? 'Êtes-vous sûr de vouloir supprimer cette commande ?' : 'Are you sure you want to delete this order?')) {
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/orders/user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+      
+      if (response.ok) {
+        showToast(locale === 'fr' ? 'Commande supprimée avec succès' : 'Order deleted successfully', 'success');
+        fetchOrders(); // Rafraîchir la liste des commandes
+      } else {
+        const data = await response.json();
+        showToast(data.error || (locale === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting order'), 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      showToast(locale === 'fr' ? 'Erreur lors de la suppression' : 'Error deleting order', 'error');
     }
     setIsLoading(false);
   };
@@ -499,10 +530,22 @@ export default function AccountPage() {
                                 {new Date(order.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}
                               </p>
                             </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getStatusColor(order.statut)}`}>
-                              {getStatusIcon(order.statut)}
-                              {t.orders[order.statut as keyof typeof t.orders] || order.statut}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${getStatusColor(order.statut)}`}>
+                                {getStatusIcon(order.statut)}
+                                {t.orders[order.statut as keyof typeof t.orders] || order.statut}
+                              </span>
+                              {order.statut === 'pending' && (
+                                <button
+                                  onClick={() => handleDeleteOrder(order.id)}
+                                  disabled={isLoading}
+                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                  title={t.orders.deleteOrder}
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
                             <p className="text-base text-zinc-600 dark:text-zinc-400">

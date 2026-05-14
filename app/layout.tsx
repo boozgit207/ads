@@ -13,30 +13,6 @@ import { I18nProvider } from "./context/I18nContext";
 import { createServerSupabaseClient, Profile } from "@/lib/supabase";
 import Script from "next/script";
 
-function DarkModeScript() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
-          (function() {
-            try {
-              const savedDarkMode = localStorage.getItem('ads-dark-mode');
-              // Default to light mode (false) if no saved preference
-              const isDarkMode = savedDarkMode === 'true';
-              if (isDarkMode) {
-                document.documentElement.classList.add('dark');
-              } else {
-                document.documentElement.classList.remove('dark');
-              }
-            } catch (e) {
-              console.warn('Dark mode script error:', e);
-            }
-          })();
-        `,
-      }}
-    />
-  );
-}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -136,7 +112,29 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <DarkModeScript />
+        <Script
+          id="dark-mode-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedDarkMode = localStorage.getItem('ads-dark-mode');
+                  const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDarkMode) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                  }
+                } catch (e) {
+                  console.warn('Dark mode script error:', e);
+                }
+              })();
+            `,
+          }}
+        />
         <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo_1.svg" />
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
