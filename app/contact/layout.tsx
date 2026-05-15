@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { absoluteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Contact | ADS - Angela Diagnostics et Services',
@@ -8,10 +9,10 @@ export const metadata: Metadata = {
     title: 'Contact | ADS - Angela Diagnostics et Services',
     description: 'Contactez-nous pour vos besoins en réactifs de laboratoire - Douala, Cameroun',
     type: 'website',
-    url: 'https://ads-diagnostics.com/contact',
+    url: absoluteUrl('/contact'),
   },
   alternates: {
-    canonical: 'https://ads-diagnostics.com/contact',
+    canonical: absoluteUrl('/contact'),
   },
 };
 

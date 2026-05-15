@@ -9,20 +9,24 @@ import {
   Truck, 
   CheckCircle, 
   Clock,
-  MapPin,
   Download,
   MessageCircle,
-  ChevronLeft,
-  ArrowLeft
+  ArrowLeft,
+  Trash2
 } from 'lucide-react';
 import { useI18n } from '../../context/I18nContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { showToast } from '../../components/Toast';
+import { canUserDeleteOrder, getOrderStatusColor, getOrderStatusLabel } from '@/lib/order-utils';
 
 export default function OrderTrackingPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { locale } = useI18n();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -41,6 +45,26 @@ export default function OrderTrackingPage() {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!order || !canUserDeleteOrder(order.statut)) return;
+    if (!confirm(locale === 'fr' ? 'Supprimer cette commande ?' : 'Delete this order?')) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(locale === 'fr' ? 'Commande supprimée' : 'Order deleted', 'success');
+        router.push('/account?tab=orders');
+      } else {
+        showToast(data.error || 'Erreur', 'error');
+      }
+    } catch {
+      showToast(locale === 'fr' ? 'Erreur' : 'Error', 'error');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -130,17 +154,20 @@ export default function OrderTrackingPage() {
     );
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: any = {
-      pending: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-300', icon: Clock },
-      processing: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: Package },
-      shipped: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: Truck },
-      delivered: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: CheckCircle },
-    };
-    return statusMap[status] || statusMap.pending;
+  const statusIcons: Record<string, typeof Clock> = {
+    en_attente: Clock,
+    pending: Clock,
+    paiement_recu: Package,
+    en_preparation: Package,
+    processing: Package,
+    expediee: Truck,
+    shipped: Truck,
+    livree: CheckCircle,
+    delivered: CheckCircle,
+    annulee: Clock,
+    remboursee: Clock,
   };
-
-  const StatusIcon = getStatusBadge(order.statut).icon;
+  const StatusIcon = statusIcons[order.statut] || Package;
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -162,11 +189,11 @@ export default function OrderTrackingPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">{t.orderId}</p>
-              <p className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">#{order.numero || order.id?.substring(0, 8)}</p>
+              <p className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white">#{order.numero || order.numero_commande || order.id?.substring(0, 8)}</p>
             </div>
-            <div className={`px-4 py-2 rounded-full flex items-center gap-2 font-semibold ${getStatusBadge(order.statut).bg} ${getStatusBadge(order.statut).text}`}>
+            <div className={`px-4 py-2 rounded-full flex items-center gap-2 font-semibold ${getOrderStatusColor(order.statut)}`}>
               <StatusIcon className="w-5 h-5" />
-              <span className="uppercase text-sm tracking-wider">{t[`status${order.statut?.charAt(0).toUpperCase() + order.statut?.slice(1)}` as keyof typeof t] || order.statut}</span>
+              <span className="uppercase text-sm tracking-wider">{getOrderStatusLabel(order.statut, locale)}</span>
             </div>
           </div>
         </section>
@@ -189,7 +216,7 @@ export default function OrderTrackingPage() {
               </div>
 
               {/* Step 2: Processing */}
-              {(order.statut === 'processing' || order.statut === 'shipped' || order.statut === 'delivered') && (
+              {(['paiement_recu', 'en_preparation', 'expediee', 'livree', 'processing', 'shipped', 'delivered'].includes(order.statut)) && (
                 <div className="relative pl-10 pb-8">
                   <div className={`absolute left-0 top-0 w-6 h-6 rounded-full flex items-center justify-center z-10 border-4 border-white dark:border-zinc-900 ${order.statut === 'processing' ? 'bg-blue-500' : 'bg-green-500'}`}>
                     <CheckCircle className="w-3 h-3 text-white" />
@@ -202,7 +229,7 @@ export default function OrderTrackingPage() {
               )}
 
               {/* Step 3: Shipped */}
-              {(order.statut === 'shipped' || order.statut === 'delivered') && (
+              {(['expediee', 'livree', 'shipped', 'delivered'].includes(order.statut)) && (
                 <div className="relative pl-10 pb-8">
                   <div className={`absolute left-0 top-0 w-6 h-6 rounded-full flex items-center justify-center z-10 border-4 border-white dark:border-zinc-900 ${order.statut === 'shipped' ? 'bg-blue-500' : 'bg-green-500'}`}>
                     <CheckCircle className="w-3 h-3 text-white" />
@@ -215,7 +242,7 @@ export default function OrderTrackingPage() {
               )}
 
               {/* Step 4: Delivered */}
-              {order.statut === 'delivered' && (
+              {(['livree', 'delivered'].includes(order.statut)) && (
                 <div className="relative pl-10">
                   <div className="absolute left-0 top-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center z-10 border-4 border-white dark:border-zinc-900">
                     <CheckCircle className="w-3 h-3 text-white" />
@@ -273,7 +300,7 @@ export default function OrderTrackingPage() {
               )}
               <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-end">
                 <span className="text-xs text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Total TTC' : 'Total (Incl. Duty)'}</span>
-                <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{(order.total || 0).toLocaleString()} FCFA</p>
+                <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{(order.total || order.total_commande || 0).toLocaleString()} FCFA</p>
               </div>
             </div>
           </div>
@@ -281,14 +308,33 @@ export default function OrderTrackingPage() {
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-col md:flex-row gap-4">
-          <button className="flex-1 md:flex-none border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2">
+          <a
+            href={`/api/receipt/${order.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 md:flex-none border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2"
+          >
             <Download className="w-5 h-5" />
             {t.downloadInvoice}
-          </button>
-          <button className="flex-1 md:flex-none bg-blue-600 dark:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30">
+          </a>
+          <Link
+            href="/contact"
+            className="flex-1 md:flex-none bg-blue-600 dark:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30"
+          >
             <MessageCircle className="w-5 h-5" />
             {t.supportChat}
-          </button>
+          </Link>
+          {canUserDeleteOrder(order.statut) && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex-1 md:flex-none border-2 border-red-500 text-red-600 px-6 py-3 rounded-lg font-bold hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Trash2 className="w-5 h-5" />
+              {locale === 'fr' ? 'Supprimer' : 'Delete'}
+            </button>
+          )}
         </div>
       </main>
 

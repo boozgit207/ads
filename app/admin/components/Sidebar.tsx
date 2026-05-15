@@ -32,6 +32,7 @@ const menuItems = [
   { href: '/admin/stocks', icon: Package, label: 'Stocks', labelEn: 'Stocks' },
   { href: '/admin/commandes', icon: ShoppingCart, label: 'Commandes', labelEn: 'Orders' },
   { href: '/admin/clients', icon: Users, label: 'Clients', labelEn: 'Clients' },
+  { href: '/admin/blog', icon: FileText, label: 'Blog', labelEn: 'Blog' },
   { href: '/admin/avis', icon: Star, label: 'Avis', labelEn: 'Reviews' },
   { href: '/admin/notifications', icon: Bell, label: 'Notifications', labelEn: 'Notifications' },
   { href: '/admin/profil', icon: User, label: 'Mon profil', labelEn: 'Profile' },

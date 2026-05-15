@@ -50,7 +50,10 @@ export async function GET() {
       const rating = ratingsMap.get(product.id) || { average: 0, count: 0 };
       return {
         id: product.id,
+        nom: product.nom,
+        nom_en: product.nom_en,
         name: product.nom,
+        reference: product.reference,
         price: product.prix,
         quantity: 1,
         stock: product.quantite_stock,

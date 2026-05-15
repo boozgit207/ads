@@ -6,6 +6,7 @@
   "nav": {
     "home": "Accueil",
     "catalog": "Catalogue",
+    "blog": "Blog",
     "about": "À propos",
     "contact": "Contact",
     "account": "Mon compte",
@@ -114,7 +115,8 @@
     "mtn_money": "MTN Mobile Money",
     "copyright": "© 2026 ADS - Angela Diagnostics et Services. Tous droits réservés.",
     "back_to_top": "Retour en haut",
-    "about_link": "À propos"
+    "about_link": "À propos",
+    "blog": "Blog"
   },
   "common": {
     "loading": "Chargement...",

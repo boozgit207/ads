@@ -2,10 +2,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Conditions d'Utilisation | ADS - Angela Diagnostics et Services",
   description: "Conditions d'utilisation d'ADS - Consultez nos termes et conditions pour l'utilisation de nos services.",
+  alternates: {
+    canonical: absoluteUrl("/terms"),
+  },
 };
 
 export default function TermsPage() {

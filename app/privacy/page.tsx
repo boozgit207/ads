@@ -2,10 +2,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Politique de Confidentialité | ADS - Angela Diagnostics et Services",
   description: "Politique de confidentialité d'ADS - Découvrez comment nous protégeons vos données personnelles.",
+  alternates: {
+    canonical: absoluteUrl("/privacy"),
+  },
 };
 
 export default function PrivacyPage() {

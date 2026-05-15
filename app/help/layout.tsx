@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { absoluteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Aide & FAQ | ADS - Questions Fréquentes',
@@ -8,10 +9,10 @@ export const metadata: Metadata = {
     title: 'Aide & FAQ | ADS - Questions Fréquentes',
     description: 'Trouvez les réponses à vos questions sur nos produits et services',
     type: 'website',
-    url: 'https://ads-diagnostics.com/help',
+    url: absoluteUrl('/help'),
   },
   alternates: {
-    canonical: 'https://ads-diagnostics.com/help',
+    canonical: absoluteUrl('/help'),
   },
 };
 

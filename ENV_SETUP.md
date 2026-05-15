@@ -3,6 +3,12 @@
 Ajoutez ces variables dans votre fichier `.env.local` à la racine du projet :
 
 ```env
+# Site URL (SEO: sitemap, canonical, Open Graph)
+NEXT_PUBLIC_SITE_URL=https://ads-diagnostics.com
+
+# Google Search Console verification (optional)
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=
+
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_cle_anon_public

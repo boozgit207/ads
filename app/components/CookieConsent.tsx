@@ -55,6 +55,10 @@ export default function CookieConsent() {
     }
   }, []);
 
+  const notifyConsentChange = () => {
+    window.dispatchEvent(new Event('ads-cookie-consent'));
+  };
+
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted');
     localStorage.setItem('cookie-preferences', JSON.stringify({
@@ -63,6 +67,7 @@ export default function CookieConsent() {
       marketing: true
     }));
     setShow(false);
+    notifyConsentChange();
   };
 
   const handleReject = () => {
@@ -73,6 +78,7 @@ export default function CookieConsent() {
       marketing: false
     }));
     setShow(false);
+    notifyConsentChange();
   };
 
   const handleSave = () => {
@@ -80,6 +86,7 @@ export default function CookieConsent() {
     localStorage.setItem('cookie-preferences', JSON.stringify(preferences));
     setShow(false);
     setShowCustomize(false);
+    notifyConsentChange();
   };
 
   const handleClose = () => {

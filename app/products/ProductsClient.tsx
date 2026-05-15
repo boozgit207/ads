@@ -12,6 +12,7 @@ import { Search, ChevronDown, ShoppingCart, Eye, FlaskConical, Check, ArrowUpDow
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
 import StarRating from '../components/StarRating';
+import { getProductDisplayName, getProductImageAlt } from '@/lib/image-seo';
 
 interface ProductsClientProps {
   products: Product[];
@@ -193,7 +194,7 @@ export default function ProductsClient({
   }
 
   // Helper pour obtenir le nom du produit selon la langue
-  const getProductName = (p: Product) => locale === 'fr' ? p.nom : (p.nom_en || p.nom);
+  const getProductName = (p: Product) => getProductDisplayName(p, locale);
   
   // Helper pour obtenir le prix (avec promo si applicable)
   const getProductPrice = (p: Product) => {
@@ -346,7 +347,7 @@ export default function ProductsClient({
                     <Image
                       src={product.image_principale_url || ''}
                       unoptimized={product.image_principale_url?.includes('cloudinary.com')}
-                      alt={getProductName(product)}
+                      alt={getProductImageAlt(product, locale)}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
@@ -473,7 +474,7 @@ export default function ProductsClient({
                                         <Image
                                           src={product.image_principale_url || ''}
                                           unoptimized={product.image_principale_url?.includes('cloudinary.com')}
-                                          alt={getProductName(product)}
+                                          alt={getProductImageAlt(product, locale)}
                                           fill
                                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                                         />

@@ -3,9 +3,11 @@ import { Metadata } from 'next';
 import { getProductBySlug, getSimilarProducts } from '../../actions/catalog';
 import { getProductReviews } from '../../actions/reviews';
 import ProductDetailClient from './ProductDetailClient';
+import ProductStructuredData from '../../components/ProductStructuredData';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { notFound } from 'next/navigation';
+import { absoluteUrl, productPath } from '@/lib/seo';
 
 // Générer les métadonnées dynamiques pour chaque produit
 export async function generateMetadata({ 
@@ -24,8 +26,11 @@ export async function generateMetadata({
   }
   
   const product = productResult.product;
-  const title = `${product.nom} | ADS - Angela Diagnostics et Services`;
-  const description = product.description?.substring(0, 160) || 
+  const canonicalPath = productPath(product);
+  const title = product.meta_title || `${product.nom} | ADS - Angela Diagnostics et Services`;
+  const description =
+    product.meta_description?.substring(0, 160) ||
+    product.description?.substring(0, 160) ||
     `Achetez ${product.nom} chez ADS. ${product.categorie?.nom || 'Réactif de laboratoire'} de qualité professionnelle.`;
   const keywords = [
     product.nom,
@@ -47,7 +52,7 @@ export async function generateMetadata({
       title,
       description,
       type: 'website',
-      url: `https://ads-diagnostics.com/product/${slug}`,
+      url: absoluteUrl(canonicalPath),
       images: product.image_principale_url ? [
         {
           url: product.image_principale_url,
@@ -64,7 +69,7 @@ export async function generateMetadata({
       images: product.image_principale_url ? [product.image_principale_url] : undefined,
     },
     alternates: {
-      canonical: `https://ads-diagnostics.com/product/${slug}`,
+      canonical: absoluteUrl(canonicalPath),
     },
   };
 }
@@ -92,14 +97,29 @@ export default async function ProductPage({
     getSimilarProducts(product.id, product.categorie_id, 4)
   ]);
 
+  const reviews = reviewsResult.success ? reviewsResult.reviews || [] : [];
+  const reviewCount = reviews.length;
+  const averageRating =
+    reviewCount > 0
+      ? reviews.reduce((sum, r) => sum + r.note, 0) / reviewCount
+      : undefined;
+  const productForSeo = {
+    ...product,
+    reviewCount,
+    averageRating,
+  };
+
   return (
-    <Suspense fallback={<ProductLoading />}>
-      <ProductDetailClient 
-        product={product}
-        reviews={reviewsResult.success ? reviewsResult.reviews || [] : []}
-        similarProducts={similarResult.success ? similarResult.products || [] : []}
-      />
-    </Suspense>
+    <>
+      <ProductStructuredData product={productForSeo} />
+      <Suspense fallback={<ProductLoading />}>
+        <ProductDetailClient 
+          product={product}
+          reviews={reviews}
+          similarProducts={similarResult.success ? similarResult.products || [] : []}
+        />
+      </Suspense>
+    </>
   );
 }
 

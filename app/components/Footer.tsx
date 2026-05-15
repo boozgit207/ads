@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin, ArrowUp } from "lucide-react";
 import { CONTACT, COMPANY } from "@/lib/config";
+import { imageAlt } from "@/lib/image-seo";
 import { useI18n } from "@/app/context/I18nContext";
 
 // Icônes réseaux sociaux en SVG inline (lucide-react n'a pas les icônes de marques)
@@ -32,7 +33,7 @@ const LinkedinIcon = () => (
 );
 
 export default function Footer() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -46,7 +47,7 @@ export default function Footer() {
           {/* Column 1: About */}
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <img src="/logo_1.svg" alt="ADS Logo" className="h-20 w-20" />
+              <img src="/logo_1.svg" alt={imageAlt('logo', locale)} className="h-20 w-20" />
               <div>
                 <span className="text-2xl font-bold text-slate-900 dark:text-white">ADS</span>
                 <span className="block text-sm font-semibold text-slate-500 dark:text-slate-400">Angela Diagnostics</span>
@@ -116,6 +117,12 @@ export default function Footer() {
                 <Link href="/contact" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
                   <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
                   {t.footer.contact}
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-sm text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 transition-colors flex items-center gap-3 group">
+                  <span className="w-2 h-2 rounded-full bg-sky-500 group-hover:scale-125 transition-transform"></span>
+                  {t.footer.blog}
                 </Link>
               </li>
               <li>

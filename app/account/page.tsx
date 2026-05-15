@@ -23,8 +23,10 @@ import {
   XCircle,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Trash2
 } from 'lucide-react';
+import { canUserDeleteOrder, getOrderStatusColor, getOrderStatusLabel } from '@/lib/order-utils';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../context/I18nContext';
 import Link from 'next/link';
@@ -127,8 +129,9 @@ export default function AccountPage() {
         shipped: 'Expédiée',
         delivered: 'Livrée',
         cancelled: 'Annulée',
-      deleteOrder: 'Supprimer la commande',
-      deleteConfirm: 'Êtes-vous sûr de vouloir supprimer cette commande ?'
+        deleteOrder: 'Supprimer',
+        deleteConfirm: 'Supprimer cette commande définitivement ?',
+        deleteNotAllowed: 'Seules les commandes en attente ou annulées peuvent être supprimées',
       },
       settings: {
         title: 'Paramètres',
@@ -177,8 +180,9 @@ export default function AccountPage() {
         shipped: 'Shipped',
         delivered: 'Delivered',
         cancelled: 'Cancelled',
-      deleteOrder: 'Delete Order',
-      deleteConfirm: 'Are you sure you want to delete this order?'
+        deleteOrder: 'Delete',
+        deleteConfirm: 'Permanently delete this order?',
+        deleteNotAllowed: 'Only pending or cancelled orders can be deleted',
       },
       settings: {
         title: 'Settings',
@@ -309,12 +313,25 @@ export default function AccountPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pending': return <Clock className="w-4 h-4" />;
-      case 'processing': return <Package className="w-4 h-4" />;
-      case 'shipped': return <Truck className="w-4 h-4" />;
-      case 'delivered': return <CheckCircle className="w-4 h-4" />;
-      case 'cancelled': return <XCircle className="w-4 h-4" />;
-      default: return <Package className="w-4 h-4" />;
+      case 'pending':
+      case 'en_attente':
+        return <Clock className="w-4 h-4" />;
+      case 'processing':
+      case 'paiement_recu':
+      case 'en_preparation':
+        return <Package className="w-4 h-4" />;
+      case 'shipped':
+      case 'expediee':
+        return <Truck className="w-4 h-4" />;
+      case 'delivered':
+      case 'livree':
+        return <CheckCircle className="w-4 h-4" />;
+      case 'cancelled':
+      case 'annulee':
+      case 'remboursee':
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <Package className="w-4 h-4" />;
     }
   };
 
@@ -530,7 +547,7 @@ export default function AccountPage() {
                               </div>
                               <div>
                                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Commande' : 'Order'}</span>
-                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">#{order.numero || order.reference || order.id?.substring(0, 8)}</h3>
+                                <h3 className="text-lg font-bold text-zinc-900 dark:text-white">#{order.numero || order.numero_commande || order.id?.substring(0, 8)}</h3>
                               </div>
                             </div>
                             <div className="flex flex-wrap gap-4 items-center">
@@ -538,14 +555,9 @@ export default function AccountPage() {
                                 <p className="text-xs text-zinc-500 dark:text-zinc-400">{locale === 'fr' ? 'Date' : 'Date'}</p>
                                 <p className="font-medium text-zinc-900 dark:text-white">{new Date(order.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US')}</p>
                               </div>
-                              <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${
-                                order.statut === 'pending' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
-                                order.statut === 'shipped' || order.statut === 'processing' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
-                                order.statut === 'delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
-                                'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
-                              }`}>
+                              <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${getOrderStatusColor(order.statut)}`}>
                                 {getStatusIcon(order.statut)}
-                                {t.orders[order.statut as keyof typeof t.orders] || order.statut}
+                                {getOrderStatusLabel(order.statut, locale)}
                               </div>
                             </div>
                           </div>
@@ -569,7 +581,7 @@ export default function AccountPage() {
                             </div>
                             <div className="md:w-48 bg-zinc-50 dark:bg-zinc-800 rounded-lg p-4 flex flex-col justify-center items-center">
                               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">{locale === 'fr' ? 'Total' : 'Total'} TTC</p>
-                              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{(order.total || 0).toLocaleString()} FCFA</p>
+                              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{(order.total || order.total_commande || 0).toLocaleString()} FCFA</p>
                             </div>
                           </div>
 
@@ -580,8 +592,19 @@ export default function AccountPage() {
                             </Link>
                             <Link href={`/orders/${order.id}`} className="px-6 py-2 text-sm font-bold bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
                               <Truck className="w-4 h-4" />
-                              {locale === 'fr' ? 'Suivre le colis' : 'Track Order'}
+                              {locale === 'fr' ? 'Suivre' : 'Track'}
                             </Link>
+                            {canUserDeleteOrder(order.statut) && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteOrder(order.id)}
+                                disabled={isLoading}
+                                className="px-6 py-2 text-sm font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                {t.orders.deleteOrder}
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}

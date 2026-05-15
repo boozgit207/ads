@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import Header from '../Header';
+import HeroCarousel from './HeroCarousel';
 import Footer from '../Footer';
 import StarRating from '../StarRating';
 import AuthRedirect from '../AuthRedirect';
@@ -25,14 +25,16 @@ import {
   ShoppingCart
 } from 'lucide-react';
 
-// Dynamic imports pour réduire le JavaScript initial
-const HeroCarousel = dynamic(() => import('./HeroCarousel'), {
-  loading: () => <div className="h-96 bg-gray-100 dark:bg-gray-800 animate-pulse" />,
-  ssr: false
-});
 import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../context/I18nContext';
 import { useCart } from '../../context/CartContext';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary-image';
+import {
+  SITE_IMAGES,
+  imageAlt,
+  getProductDisplayName,
+  getProductImageAlt,
+} from '@/lib/image-seo';
 
 interface HomePageProps {
   categories: { id: string; nom: string; description?: string | null }[];
@@ -274,10 +276,11 @@ export default function HomePage({ categories }: HomePageProps) {
           cta3: locale === 'fr' ? 'Commander maintenant' : 'Order now'
         }}
         isDark={isDark}
+        locale={locale}
       />
 
       {/* À propos de nous */}
-      <section className="py-20 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-900">
+      <section className="py-20 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 min-h-[520px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -310,14 +313,14 @@ export default function HomePage({ categories }: HomePageProps) {
               <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
                 <div className="w-full aspect-square bg-gradient-to-br from-sky-100 to-blue-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
-                    src="/images/img1.png"
-                    alt={locale === 'fr' ? 'Équipe d\'Angela Diagnostics et Services - Experts en réactifs de laboratoire' : 'Angela Diagnostics and Services Team - Laboratory Reagents Experts'}
-                    width={400}
-                    height={400}
+                    src={SITE_IMAGES.aboutTeam.path}
+                    alt={imageAlt('aboutTeam', locale)}
+                    width={600}
+                    height={600}
                     className="object-cover w-full h-full"
-                    unoptimized
+                    sizes="(max-width: 1024px) 100vw, 480px"
+                    quality={75}
                     loading="lazy"
-                    priority={false}
                   />
                 </div>
               </div>
@@ -335,14 +338,14 @@ export default function HomePage({ categories }: HomePageProps) {
               <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
                 <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-green-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
-                    src="/images/img2.png"
-                    alt={locale === 'fr' ? 'Mission d\'Angela Diagnostics - Fournir des réactifs de laboratoire de qualité au Cameroun' : 'Angela Diagnostics Mission - Providing quality laboratory reagents in Cameroon'}
-                    width={400}
-                    height={400}
+                    src={SITE_IMAGES.aboutMission.path}
+                    alt={imageAlt('aboutMission', locale)}
+                    width={600}
+                    height={600}
                     className="object-cover w-full h-full"
-                    unoptimized
+                    sizes="(max-width: 1024px) 100vw, 480px"
+                    quality={75}
                     loading="lazy"
-                    priority={false}
                   />
                 </div>
               </div>
@@ -417,14 +420,14 @@ export default function HomePage({ categories }: HomePageProps) {
               <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
                 <div className="w-full aspect-square bg-gradient-to-br from-violet-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
                   <Image
-                    src="/images/img3.jpg"
-                    alt={locale === 'fr' ? 'Solutions ADS - Stock local de réactifs de laboratoire avec livraison rapide' : 'ADS Solutions - Local stock of laboratory reagents with fast delivery'}
-                    width={400}
-                    height={400}
+                    src={SITE_IMAGES.aboutSolutions.path}
+                    alt={imageAlt('aboutSolutions', locale)}
+                    width={600}
+                    height={600}
                     className="object-cover w-full h-full"
-                    unoptimized
+                    sizes="(max-width: 1024px) 100vw, 480px"
+                    quality={75}
                     loading="lazy"
-                    priority={false}
                   />
                 </div>
               </div>
@@ -508,7 +511,7 @@ export default function HomePage({ categories }: HomePageProps) {
             </div>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-semibold mt-4 md:mt-0"
+              className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 font-semibold mt-4 md:mt-0"
             >
               {content.viewAll}
               <ArrowRight className="w-5 h-5" />
@@ -556,7 +559,7 @@ export default function HomePage({ categories }: HomePageProps) {
             </div>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 text-sky-500 hover:text-sky-600 font-semibold mt-4 md:mt-0"
+              className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 font-semibold mt-4 md:mt-0"
             >
               {content.viewAll}
               <ArrowRight className="w-5 h-5" />
@@ -579,11 +582,15 @@ export default function HomePage({ categories }: HomePageProps) {
                   className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
                 >
                   {/* Image */}
-                  <Link href={`/product/${product.id}`} className="block relative h-48 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
+                  <Link href={`/product/${product.slug || product.id}`} className="block relative h-48 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
                     {product.image ? (
                       <img
-                        src={product.image}
-                        alt={product.nom}
+                        src={optimizeCloudinaryUrl(product.image, 400)}
+                        alt={getProductImageAlt(product, locale)}
+                        width={400}
+                        height={300}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (
@@ -606,11 +613,11 @@ export default function HomePage({ categories }: HomePageProps) {
                     </div>
                   </Link>
                   <div className="p-4">
-                    <div className="text-xs font-medium text-sky-500 mb-1">
+                    <div className="text-xs font-medium text-sky-700 dark:text-sky-400 mb-1">
                       {product.laboratory}
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
-                      {product.name || product.nom}
+                      {getProductDisplayName(product, locale)}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 line-clamp-2">
                       {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
@@ -621,7 +628,7 @@ export default function HomePage({ categories }: HomePageProps) {
                     <div className="flex items-center justify-between gap-2">
                       <Link
                         href={`/product/${product.slug || product.id}`}
-                        className="flex-1 text-center py-2 rounded-xl border-2 border-sky-500 text-sky-500 font-semibold hover:bg-sky-500 hover:text-white transition-colors text-sm"
+                        className="flex-1 text-center py-2 rounded-xl border-2 border-sky-600 text-sky-700 dark:text-sky-400 dark:border-sky-500 font-semibold hover:bg-sky-600 hover:text-white transition-colors text-sm"
                       >
                         Voir détails
                       </Link>
@@ -632,9 +639,14 @@ export default function HomePage({ categories }: HomePageProps) {
                             addToCart(product);
                           }
                         }}
-                        className="w-10 h-10 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-colors flex-shrink-0"
+                        className="w-11 h-11 rounded-full bg-sky-600 hover:bg-sky-700 text-white flex items-center justify-center transition-colors flex-shrink-0"
+                        aria-label={
+                          locale === 'fr'
+                            ? `Ajouter ${getProductDisplayName(product, locale)} au panier`
+                            : `Add ${getProductDisplayName(product, locale)} to cart`
+                        }
                       >
-                        <ShoppingCart className="w-5 h-5" />
+                        <ShoppingCart className="w-5 h-5" aria-hidden />
                       </button>
                     </div>
                   </div>

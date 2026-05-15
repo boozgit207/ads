@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Microscope, FlaskConical, Truck, ArrowRight } from 'lucide-react';
+import { SITE_IMAGES, imageAlt, type Locale } from '@/lib/image-seo';
 
 interface HeroTranslations {
   title1: string;
@@ -20,6 +21,7 @@ interface HeroTranslations {
 interface HeroCarouselProps {
   translations: HeroTranslations;
   isDark: boolean;
+  locale?: Locale;
 }
 
 const slides = [
@@ -27,23 +29,26 @@ const slides = [
     id: 1,
     icon: Microscope,
     bgColor: 'from-sky-600 via-blue-700 to-indigo-800',
-    image: '/images/hero/lab-1.jpg'
+    image: SITE_IMAGES.heroLab.path,
+    altKey: 'heroLab' as const,
   },
   {
     id: 2,
     icon: FlaskConical,
     bgColor: 'from-emerald-600 via-emerald-700 to-teal-800',
-    image: '/images/hero/lab-2.jpg'
+    image: SITE_IMAGES.heroQuality.path,
+    altKey: 'heroQuality' as const,
   },
   {
     id: 3,
     icon: Truck,
     bgColor: 'from-violet-600 via-purple-700 to-pink-800',
-    image: '/images/hero/delivery.jpg'
-  }
+    image: SITE_IMAGES.heroDelivery.path,
+    altKey: 'heroDelivery' as const,
+  },
 ];
 
-export default function HeroCarousel({ translations, isDark }: HeroCarouselProps) {
+export default function HeroCarousel({ translations, isDark, locale = 'fr' }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
@@ -116,17 +121,19 @@ export default function HeroCarousel({ translations, isDark }: HeroCarouselProps
             }`}
           >
             {/* Background Image with Ken Burns Effect */}
-            {slide.image && (
+            {slide.image && (isActive || index === 0) && (
               <div className={`absolute inset-0 transition-transform duration-[10000ms] ease-in-out ${
                 isActive ? 'scale-110' : 'scale-100'
               }`}>
                 <Image
                   src={slide.image}
-                  alt={`Slide ${slide.id}`}
+                  alt={imageAlt(slide.altKey, locale)}
                   fill
                   className="object-cover"
                   priority={index === 0}
-                  quality={85}
+                  fetchPriority={index === 0 ? 'high' : 'auto'}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  quality={index === 0 ? 80 : 70}
                   sizes="100vw"
                 />
               </div>
@@ -209,13 +216,15 @@ export default function HeroCarousel({ translations, isDark }: HeroCarouselProps
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentSlide 
-                ? 'bg-white w-8' 
-                : 'bg-white/40 hover:bg-white/60 w-2'
-            }`}
+            className="min-h-11 min-w-11 rounded-full flex items-center justify-center"
             aria-label={`Aller au slide ${index + 1}`}
-          />
+          >
+            <span
+              className={`block rounded-full transition-all ${
+                index === currentSlide ? 'bg-white h-2 w-8' : 'bg-white/50 hover:bg-white/70 h-2 w-2'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>

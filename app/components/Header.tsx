@@ -17,12 +17,14 @@ import {
   Settings,
   ShoppingCart,
   Grid3X3,
-  ShoppingBag
+  ShoppingBag,
+  FileText
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "./ThemeProvider";
 import { useI18n } from "../context/I18nContext";
+import { imageAlt } from "@/lib/image-seo";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -115,7 +117,7 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity group">
-          <img src="/logo_1.svg" alt="Logo" className="h-16 w-16 group-hover:scale-110 transition-transform" />
+          <img src="/logo_1.svg" alt={imageAlt('logo', locale)} className="h-16 w-16 group-hover:scale-110 transition-transform" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -222,6 +224,14 @@ export default function Header() {
               </div>
             )}
           </div>
+
+          <Link
+            href="/blog"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+          >
+            <FileText className="w-4 h-4" />
+            {nav.blog}
+          </Link>
 
           <Link
             href="/contact"

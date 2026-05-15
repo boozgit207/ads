@@ -4,6 +4,7 @@ import "./globals.css";
 import ChatBot from "./components/chatbot/ChatBot";
 import ToastContainer from "./components/Toast";
 import StructuredData from "./components/StructuredData";
+import GoogleAnalytics from "./components/GoogleAnalytics";
 import CookieConsent from "./components/CookieConsent";
 import LoadingScreen from "./components/LoadingScreen";
 import { AuthProvider } from "./context/AuthContext";
@@ -11,6 +12,7 @@ import { CartProvider } from "./context/CartContext";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { I18nProvider } from "./context/I18nContext";
 import { createServerSupabaseClient, Profile } from "@/lib/supabase";
+import { defaultOgImage, siteUrl } from "@/lib/seo";
 import Script from "next/script";
 
 
@@ -25,6 +27,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "ADS - Angela Diagnostics et Services | Réactifs de Laboratoire",
     template: "%s | ADS - Angela Diagnostics et Services"
@@ -49,13 +52,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     alternateLocale: ["en_US"],
-    url: "https://ads-diagnostics.com",
+    url: siteUrl,
     siteName: "ADS - Angela Diagnostics et Services",
     title: "ADS - Angela Diagnostics et Services | Réactifs de Laboratoire",
     description: "Distribution de réactifs de laboratoire et solutions diagnostiques en Afrique",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: defaultOgImage,
         width: 1200,
         height: 630,
         alt: "ADS - Angela Diagnostics et Services",
@@ -66,13 +69,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ADS - Angela Diagnostics et Services | Réactifs de Laboratoire",
     description: "Distribution de réactifs de laboratoire et solutions diagnostiques en Afrique",
-    images: ["/images/og-image.jpg"],
+    images: [defaultOgImage],
     creator: "@ads_diagnostics",
   },
-  verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
-  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    },
+  }),
 };
 
 export const viewport = {
@@ -137,22 +141,7 @@ export default async function RootLayout({
         />
         <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo_1.svg" />
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-            strategy="afterInteractive"
-          />
-        )}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
-            `}
-          </Script>
-        )}
+        <GoogleAnalytics />
       </head>
       <body className="min-h-full flex flex-col">
         <LoadingScreen />

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { getProducts, getLaboratories, getCategories } from '../actions/catalog';
 import ProductsClient from './ProductsClient';
+import { absoluteUrl, defaultOgImage } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Nos Produits | ADS - Réactifs de Laboratoire & Tests Diagnostiques',
@@ -11,10 +12,10 @@ export const metadata: Metadata = {
     title: 'Nos Produits | ADS - Réactifs de Laboratoire',
     description: 'Catalogue complet de réactifs de laboratoire et tests diagnostiques - Livraison au Cameroun',
     type: 'website',
-    url: 'https://ads-diagnostics.com/products',
+    url: absoluteUrl('/products'),
     images: [
       {
-        url: '/images/og-products.jpg',
+        url: defaultOgImage,
         width: 1200,
         height: 630,
         alt: 'Catalogue de produits ADS',
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     ],
   },
   alternates: {
-    canonical: 'https://ads-diagnostics.com/products',
+    canonical: absoluteUrl('/products'),
   },
 };
 

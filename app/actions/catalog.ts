@@ -23,6 +23,10 @@ export interface Product {
   poids: number | null;
   unite: string;
   image_principale_url: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  meta_title_en?: string | null;
+  meta_description_en?: string | null;
   is_active: boolean;
   is_featured: boolean;
   categorie_id: string;

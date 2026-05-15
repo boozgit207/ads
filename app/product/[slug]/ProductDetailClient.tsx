@@ -31,6 +31,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useI18n } from '../../context/I18nContext';
+import { getProductImageAlt } from '@/lib/image-seo';
 import { addReview, deleteReview, updateReview } from '../../actions/reviews';
 
 interface ProductDetailClientProps {
@@ -299,7 +300,7 @@ export default function ProductDetailClient({
                 {images[selectedImage] ? (
                   <Image
                     src={images[selectedImage]}
-                    alt={getProductName()}
+                    alt={getProductImageAlt(product, locale, 'detail')}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     unoptimized={images[selectedImage]?.includes('cloudinary.com')}
@@ -330,7 +331,7 @@ export default function ProductDetailClient({
                       {img ? (
                         <Image
                           src={img}
-                          alt={`${getProductName()} - ${index + 1}`}
+                          alt={getProductImageAlt(product, locale, 'thumbnail')}
                           width={96}
                           height={96}
                           className="object-cover w-full h-full"
