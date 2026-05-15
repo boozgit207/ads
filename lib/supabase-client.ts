@@ -13,8 +13,7 @@ export const createBrowserClient = () => {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
-      flow: 'pkce',
-      debug: false,
+      detectSessionInUrl: true,
     },
   });
   
