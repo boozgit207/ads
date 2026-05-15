@@ -1,8 +1,8 @@
 import { createAdminSupabaseClient } from '@/app/actions/orders';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     if (!id) {
       return Response.json({ error: 'Order ID is required' }, { status: 400 });
