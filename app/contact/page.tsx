@@ -44,7 +44,7 @@ export default function ContactPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de l\'envoi');
+        throw new Error(result.error || result.hint || 'Erreur lors de l\'envoi');
       }
 
       showToast(locale === 'fr' ? 'Message envoyé avec succès !' : 'Message sent successfully!', 'success');

@@ -292,6 +292,71 @@ body {
     radial-gradient(at 0% 80%, rgba(16, 185, 129, 0.1) 0, transparent 45%);
 }
 
+.home-glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 24px 48px -24px rgba(0, 0, 0, 0.5);
+}
+
+.home-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #e2e8f0;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.home-image-frame {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-image-frame:hover {
+  transform: scale(1.03);
+}
+
+.home-orb-sky {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.5) 0%, transparent 70%);
+  animation: homeOrbDrift 14s ease-in-out infinite;
+}
+
+.home-orb-violet {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, transparent 70%);
+  animation: homeOrbDrift 18s ease-in-out infinite reverse;
+}
+
+@keyframes homeOrbDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -20px) scale(1.08);
+  }
+}
+
+.home-anim-slide-left {
+  animation: slideInLeft 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.home-anim-slide-right {
+  animation: slideInRight 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.home-anim-fade-up {
+  animation: homeFadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.home-anim-blur-in {
+  animation: homeBlurIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-anim-prep,
   .home-anim-fade-up,

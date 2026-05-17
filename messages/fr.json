@@ -116,7 +116,9 @@
     "copyright": "© 2026 ADS - Angela Diagnostics et Services. Tous droits réservés.",
     "back_to_top": "Retour en haut",
     "about_link": "À propos",
-    "blog": "Blog"
+    "blog": "Blog",
+    "partner_labs": "Laboratoires partenaires",
+    "partner_labs_desc": "Fortress Diagnostics, Bioline, Hightop, Liofilchem"
   },
   "common": {
     "loading": "Chargement...",

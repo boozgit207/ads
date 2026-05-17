@@ -26,11 +26,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     const savedLang = localStorage.getItem('ads-language') as Locale;
     if (savedLang && (savedLang === 'fr' || savedLang === 'en')) {
       setLocaleState(savedLang);
+      document.documentElement.lang = savedLang;
+    } else {
+      document.documentElement.lang = 'fr';
     }
-    // Set default HTML lang attribute to French
-    document.documentElement.lang = 'fr';
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.lang = locale;
+    }
+  }, [locale, mounted]);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);

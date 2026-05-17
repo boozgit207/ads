@@ -6,6 +6,8 @@ import { Mail, Phone, MapPin, ArrowUp } from "lucide-react";
 import { CONTACT, COMPANY } from "@/lib/config";
 import { imageAlt } from "@/lib/image-seo";
 import { useI18n } from "@/app/context/I18nContext";
+import { PARTNER_LABS } from "@/lib/lab-logos";
+import LabLogo from "@/app/components/LabLogo";
 
 // Icônes réseaux sociaux en SVG inline
 const FacebookIcon = () => (
@@ -190,6 +192,37 @@ export default function Footer() {
                 <span className="text-sm text-slate-600 dark:text-slate-400">{t.footer.mtn_money}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-14 pt-10 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                {t.footer.partner_labs}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                {t.footer.partner_labs_desc}
+              </p>
+            </div>
+            <Link
+              href="/products"
+              className="text-sm font-semibold text-sky-600 dark:text-sky-400 hover:underline"
+            >
+              {t.footer.products} →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {PARTNER_LABS.map((lab) => (
+              <Link
+                key={lab.id}
+                href={`/products/${lab.slug}`}
+                className="group flex items-center justify-center h-24 sm:h-28 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 shadow-sm hover:shadow-lg hover:border-sky-300 dark:hover:border-sky-600 hover:-translate-y-1 transition-all duration-300"
+                title={lab.name}
+              >
+                <LabLogo slug={lab.slug} nom={lab.name} size="lg" className="w-full h-full" />
+              </Link>
+            ))}
           </div>
         </div>
       </div>
