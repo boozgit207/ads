@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ChatBot from "./components/chatbot/ChatBot";
+import ClientExtras from "./components/ClientExtras";
 import ToastContainer from "./components/Toast";
 import StructuredData from "./components/StructuredData";
 import GoogleAnalytics from "./components/GoogleAnalytics";
@@ -133,7 +133,7 @@ export default async function RootLayout({
             <AuthProvider initialUser={null}>
               <CartProvider>
                 {children}
-                <ChatBot />
+                <ClientExtras />
                 <ToastContainer />
                 <CookieConsent />
               </CartProvider>

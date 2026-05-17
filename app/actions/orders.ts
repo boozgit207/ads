@@ -337,18 +337,67 @@ export async function createOrderFromCheckout(
     const phone = formatPhoneForStorage(input.phone);
 
     const methodePaiement =
-      input.paymentMethod === 'om' ? 'orange_money' : 'mtn_mobile_money';
+      input.paymentMethod === 'om' ? 'orange_money' : 'mtn_money';
     const typeLivraison =
       input.deliveryOption === 'delivery' ? 'livraison_domicile' : 'retrait_magasin';
 
-    const clientNote = input.notes?.trim()
-      ? `Note client: ${input.notes.trim()}`
-      : null;
+    let userId: string | null = input.userId || null;
+    let clientAnonymeId: string | null = null;
+
+    if (!userId) {
+      const { data: existingAnon } = await supabase
+        .from('clients_anonymes')
+        .select('id')
+        .eq('phone', phone)
+        .maybeSingle();
+
+      if (existingAnon?.id) {
+        clientAnonymeId = existingAnon.id;
+        await supabase
+          .from('clients_anonymes')
+          .update({
+            nom: input.lastName,
+            prenom: input.firstName,
+            email: input.email?.trim() || null,
+            adresse:
+              input.deliveryOption === 'delivery' ? input.address || null : null,
+            ville: input.city || 'Yaoundé',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingAnon.id);
+      } else {
+        const { data: newAnon, error: anonError } = await supabase
+          .from('clients_anonymes')
+          .insert({
+            nom: input.lastName,
+            prenom: input.firstName,
+            phone,
+            email: input.email?.trim() || null,
+            adresse:
+              input.deliveryOption === 'delivery' ? input.address || null : null,
+            ville: input.city || 'Yaoundé',
+          })
+          .select('id')
+          .single();
+
+        if (anonError || !newAnon) {
+          console.error('Erreur client anonyme:', anonError);
+          return {
+            success: false,
+            error:
+              anonError?.message ||
+              'Impossible d enregistrer les informations client',
+          };
+        }
+        clientAnonymeId = newAnon.id;
+      }
+    }
 
     const { data: order, error: orderError } = await supabase
       .from('commandes')
       .insert({
-        user_id: input.userId || null,
+        user_id: userId,
+        client_anonyme_id: clientAnonymeId,
         client_nom: input.lastName,
         client_prenom: input.firstName,
         client_phone: phone,
@@ -362,7 +411,7 @@ export async function createOrderFromCheckout(
         total_commande: totalCommande,
         statut: 'en_attente',
         methode_paiement: methodePaiement,
-        note_admin: clientNote,
+        note_client: input.notes?.trim() || null,
       })
       .select()
       .single();

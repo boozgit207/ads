@@ -2,8 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+
+const Footer = dynamic(() => import('../components/Footer'), {
+  ssr: false,
+  loading: () => <footer className="border-t border-zinc-200 py-8" aria-hidden />,
+});
 import { showToast } from '../components/Toast';
 import {
   ChevronLeft,
@@ -357,11 +362,14 @@ export default function CheckoutPage() {
                   
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                      <label htmlFor="checkout-firstName" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                         {t.firstName}
                       </label>
                       <input
+                        id="checkout-firstName"
+                        name="firstName"
                         type="text"
+                        autoComplete="given-name"
                         value={formData.firstName}
                         onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                         className="w-full px-5 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -369,11 +377,14 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                      <label htmlFor="checkout-lastName" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                         {t.lastName}
                       </label>
                       <input
+                        id="checkout-lastName"
+                        name="lastName"
                         type="text"
+                        autoComplete="family-name"
                         value={formData.lastName}
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                         className="w-full px-5 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -381,11 +392,14 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                      <label htmlFor="checkout-phone" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                         {t.phone}
                       </label>
                       <input
+                        id="checkout-phone"
+                        name="phone"
                         type="tel"
+                        autoComplete="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="w-full px-5 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -394,11 +408,14 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                      <label htmlFor="checkout-email" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                         {t.email}
                       </label>
                       <input
+                        id="checkout-email"
+                        name="email"
                         type="email"
+                        autoComplete="email"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         className="w-full px-5 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -407,10 +424,12 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="mt-6">
-                    <label className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                    <label htmlFor="checkout-notes" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
                       {t.notes}
                     </label>
                     <textarea
+                      id="checkout-notes"
+                      name="notes"
                       value={formData.notes}
                       onChange={(e) => setFormData({...formData, notes: e.target.value})}
                       rows={3}

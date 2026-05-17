@@ -601,7 +601,23 @@ export async function uploadAndSaveProductImages(
     .from('produit_images')
     .insert(imagesToInsert)
     .select();
-  
+
   if (error) throw new Error(error.message);
+
+  const primaryUrl = uploadedUrls[0];
+  if (primaryUrl) {
+    await supabase
+      .from('produits')
+      .update({
+        image_principale_url: primaryUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', produit_id);
+  }
+
+  revalidatePath('/admin/produits');
+  revalidatePath('/products');
+  revalidatePath('/');
+
   return { urls: uploadedUrls, data };
 }

@@ -14,6 +14,7 @@ import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
 import StarRating from '../components/StarRating';
 import { getProductDisplayName, getProductImageAlt } from '@/lib/image-seo';
+import { resolveProductImageUrl } from '@/lib/product-image';
 import { catalogPath } from '@/lib/catalog-urls';
 import LabLogo from '@/app/components/LabLogo';
 import LabCatalogBanner from '@/app/components/catalog/LabCatalogBanner';
@@ -208,12 +209,13 @@ export default function ProductsClient({
   }[locale];
 
   const addToCart = (product: Product) => {
+    const imageUrl = resolveProductImageUrl(product);
     const cartItem = {
       id: product.id,
       name: locale === 'fr' ? product.nom : (product.nom_en || product.nom),
       price: product.prix,
       quantity: 1,
-      image: product.image_principale_url,
+      image: imageUrl,
       slug: product.slug,
       laboratory: product.laboratoire?.nom || product.categorie?.laboratoire?.nom,
       stock: product.quantite_stock
@@ -405,17 +407,19 @@ export default function ProductsClient({
                 {/* Products Grid */}
                 <div className="p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map((product) => (
+                    {filteredProducts.map((product) => {
+              const cardImage = resolveProductImageUrl(product);
+              return (
               <div
                 key={product.id}
                 className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
               >
                 {/* Image */}
                 <Link href={productHref(product)} className="block relative h-56 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
-                  {product.image_principale_url ? (
+                  {cardImage ? (
                     <Image
-                      src={product.image_principale_url || ''}
-                      unoptimized={product.image_principale_url?.includes('cloudinary.com')}
+                      src={cardImage}
+                      unoptimized={cardImage.includes('cloudinary.com')}
                       alt={getProductImageAlt(product, locale)}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -489,7 +493,8 @@ export default function ProductsClient({
                   />
                 </div>
               </div>
-                    ))}
+              );
+                    })}
                   </div>
                 </div>
               </div>

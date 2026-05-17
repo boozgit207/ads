@@ -1,20 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+
+const SKIP_PATHS = ['/checkout', '/cart', '/suivi'];
 
 export default function LoadingScreen() {
-  const [isLoading, setIsLoading] = useState(true);
+  const pathname = usePathname();
+  const skip = SKIP_PATHS.some((p) => pathname?.startsWith(p));
+  const [isLoading, setIsLoading] = useState(!skip);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Masquer après 500ms
+    if (skip) {
+      setIsLoading(false);
+      return;
+    }
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [skip]);
 
   // Ne rien afficher avant le montage pour éviter les erreurs d'hydratation
   if (!mounted) return null;

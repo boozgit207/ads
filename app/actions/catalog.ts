@@ -2,6 +2,7 @@
 
 import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
 import { isTransientSupabaseError, logCatalogError } from '@/lib/supabase-errors';
+import { resolveProductImageUrl } from '@/lib/product-image';
 
 // Types pour les produits
 export interface Product {
@@ -153,11 +154,13 @@ export async function getProducts(filters?: CatalogFilters): Promise<{ success: 
     // Transformer les données pour le frontend
     const products: Product[] = (data || []).map((item: any) => {
       const rating = ratingsMap.get(item.id) || { average: 0, count: 0 };
+      const imageUrl = resolveProductImageUrl(item);
       return {
         ...item,
+        image_principale_url: imageUrl,
         laboratoire: item.categorie?.laboratoire,
         averageRating: rating.average,
-        reviewCount: rating.count
+        reviewCount: rating.count,
       };
     });
 
@@ -196,6 +199,7 @@ export async function getProductById(id: string): Promise<{ success: boolean; pr
 
     const product: Product = {
       ...data,
+      image_principale_url: resolveProductImageUrl(data),
       laboratoire: data.categorie?.laboratoire,
     };
 
@@ -259,6 +263,10 @@ export async function getProductBySlug(slugOrId: string): Promise<{ success: boo
       categorie: categorieResult.data || undefined,
       images: imagesResult.data || [],
       laboratoire: categorieResult.data?.laboratoire || undefined,
+      image_principale_url: resolveProductImageUrl({
+        image_principale_url: data.image_principale_url,
+        images: imagesResult.data || [],
+      }),
     };
 
     return { success: true, product };
