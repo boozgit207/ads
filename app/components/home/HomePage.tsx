@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Header from '../Header';
 import HeroCarousel from './HeroCarousel';
+import AnimateInView from './AnimateInView';
+import SectionHeading from './SectionHeading';
 import Footer from '../Footer';
 import StarRating from '../StarRating';
 import AuthRedirect from '../AuthRedirect';
@@ -35,6 +37,9 @@ import {
   getProductDisplayName,
   getProductImageAlt,
 } from '@/lib/image-seo';
+import { getHomeContent } from '@/lib/home-content';
+import { PARTNER_LABS } from '@/lib/lab-logos';
+import LabLogo from '../LabLogo';
 
 interface HomePageProps {
   categories: { id: string; nom: string; description?: string | null }[];
@@ -53,70 +58,12 @@ const colors = {
   white: '#FFFFFF',
 };
 
-const laboratories = [
-  {
-    id: 'fortress',
-    name: 'Fortress Diagnostics',
-    description: 'Tests diagnostiques de pointe',
-    image: '/images/labs/fortress.jpg',
-    color: 'from-sky-500 to-blue-600',
-    icon: FlaskConical
-  },
-  {
-    id: 'bioline',
-    name: 'Bioline',
-    description: 'Solutions de sérologie',
-    image: '/images/labs/bioline.jpg',
-    color: 'from-emerald-500 to-green-600',
-    icon: TestTube
-  },
-  {
-    id: 'hightop',
-    name: 'Hightop',
-    description: 'Tests rapides et ELISA',
-    image: '/images/labs/hightop.jpg',
-    color: 'from-violet-500 to-purple-600',
-    icon: Activity
-  },
-  {
-    id: 'consommables',
-    name: 'Consommables',
-    description: 'Matériel de laboratoire',
-    image: '/images/labs/consommables.jpg',
-    color: 'from-orange-500 to-red-600',
-    icon: Package
-  }
-];
 
-const features = [
-  {
-    icon: Shield,
-    title: 'Qualité Certifiée',
-    description: 'Tous nos produits sont certifiés et conformes aux normes internationales',
-    color: 'text-sky-500',
-    bgColor: 'bg-sky-50'
-  },
-  {
-    icon: Truck,
-    title: 'Livraison Rapide',
-    description: 'Livraison express dans toute l\'Afrique centrale',
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-50'
-  },
-  {
-    icon: Headphones,
-    title: 'Support 24/7',
-    description: 'Équipe technique disponible à tout moment',
-    color: 'text-violet-500',
-    bgColor: 'bg-violet-50'
-  },
-  {
-    icon: Award,
-    title: 'Prix Compétitifs',
-    description: 'Tarifs adaptés aux professionnels de santé',
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-50'
-  }
+const featureMeta = [
+  { icon: Shield, color: 'text-sky-500', bgColor: 'bg-sky-50' },
+  { icon: Truck, color: 'text-emerald-500', bgColor: 'bg-emerald-50' },
+  { icon: Headphones, color: 'text-violet-500', bgColor: 'bg-violet-50' },
+  { icon: Award, color: 'text-orange-500', bgColor: 'bg-orange-50' },
 ];
 
 export default function HomePage({ categories }: HomePageProps) {
@@ -133,12 +80,22 @@ export default function HomePage({ categories }: HomePageProps) {
   const statsRef = useRef<HTMLDivElement>(null);
   const labsRef = useRef<HTMLDivElement>(null);
 
+  const copy = getHomeContent(locale);
+
   const statsData = [
-    { icon: Package, value: 500, suffix: '+', label: 'Produits' },
-    { icon: Award, value: 20, suffix: '+', label: 'Laboratoires' },
-    { icon: Users, value: 150, suffix: '+', label: 'Clients' },
-    { icon: TrendingUp, value: 300, suffix: '+', label: 'Commandes' }
+    { icon: Package, value: 500, suffix: '+', label: copy.stats.products },
+    { icon: Award, value: 20, suffix: '+', label: copy.stats.labs },
+    { icon: Users, value: 150, suffix: '+', label: copy.stats.clients },
+    { icon: TrendingUp, value: 300, suffix: '+', label: copy.stats.orders },
   ];
+
+  const laboratories = PARTNER_LABS;
+
+  const features = featureMeta.map((meta, i) => ({
+    ...meta,
+    title: copy.features.items[i].title,
+    description: copy.features.items[i].description,
+  }));
 
   useEffect(() => {
     setIsMounted(true);
@@ -222,41 +179,6 @@ export default function HomePage({ categories }: HomePageProps) {
     loadFeaturedProducts();
   }, [isMounted]);
 
-  const t = {
-    fr: {
-      heroTitle: 'Solutions Diagnostiques de Pointe',
-      heroSubtitle: 'Votre partenaire de confiance pour les réactifs de laboratoire et équipements médicaux en Afrique',
-      heroCTA: 'Explorer nos produits',
-      heroSecondary: 'Contacter nos experts',
-      laboratories: 'Nos Laboratoires Partenaires',
-      categories: 'Nos Catégories',
-      featured: 'Produits Vedettes',
-      viewAll: 'Voir tout',
-      addToCart: 'Ajouter au panier',
-      viewDetails: 'Voir détails',
-      features: 'Pourquoi nous choisir ?',
-      stats: 'Nos réalisations',
-      trust: 'Ils nous font confiance'
-    },
-    en: {
-      heroTitle: 'Cutting-Edge Diagnostic Solutions',
-      heroSubtitle: 'Your trusted partner for laboratory reagents and medical equipment in Africa',
-      heroCTA: 'Explore our products',
-      heroSecondary: 'Contact our experts',
-      laboratories: 'Our Partner Laboratories',
-      categories: 'Our Categories',
-      featured: 'Featured Products',
-      viewAll: 'View all',
-      addToCart: 'Add to cart',
-      viewDetails: 'View details',
-      features: 'Why choose us?',
-      stats: 'Our achievements',
-      trust: 'They trust us'
-    }
-  };
-
-  const content = t[locale];
-
   return (
     <AuthRedirect>
       <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -264,67 +186,69 @@ export default function HomePage({ categories }: HomePageProps) {
 
       {/* Hero Carousel */}
       <HeroCarousel
+        badge={copy.heroBadge}
         translations={{
-          title1: locale === 'fr' ? 'Solutions Diagnostiques de Pointe' : 'Cutting-Edge Diagnostic Solutions',
-          subtitle1: locale === 'fr' ? 'Votre partenaire de confiance pour les réactifs de laboratoire et équipements médicaux en Afrique' : 'Your trusted partner for laboratory reagents and medical equipment in Africa',
-          cta1: locale === 'fr' ? 'Explorer nos produits' : 'Explore our products',
-          title2: locale === 'fr' ? 'Qualité et Précision Garanties' : 'Quality and Precision Guaranteed',
-          subtitle2: locale === 'fr' ? 'Tests COVID-19, HIV, Malaria, Biochimie et plus - Certifié ISO 9001' : 'COVID-19, HIV, Malaria, Biochemistry tests and more - ISO 9001 Certified',
-          cta2: locale === 'fr' ? 'En savoir plus' : 'Learn more',
-          title3: locale === 'fr' ? 'Livraison Rapide et Fiable' : 'Fast and Reliable Delivery',
-          subtitle3: locale === 'fr' ? 'Service de livraison à travers tout le pays avec suivi en temps réel' : 'Nationwide delivery service with real-time tracking',
-          cta3: locale === 'fr' ? 'Commander maintenant' : 'Order now'
+          title1: copy.hero.slide1.title,
+          subtitle1: copy.hero.slide1.subtitle,
+          cta1: copy.hero.slide1.cta,
+          title2: copy.hero.slide2.title,
+          subtitle2: copy.hero.slide2.subtitle,
+          cta2: copy.hero.slide2.cta,
+          title3: copy.hero.slide3.title,
+          subtitle3: copy.hero.slide3.subtitle,
+          cta3: copy.hero.slide3.cta,
+          contact: locale === 'fr' ? 'Nous contacter' : 'Contact us',
         }}
         isDark={isDark}
         locale={locale}
       />
 
+      <div id="accueil-contenu" className="scroll-mt-20" aria-hidden />
+
       {/* À propos de nous */}
-      <section className="py-20 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 min-h-[520px]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                {locale === 'fr' ? 'À propos de nous' : 'About Us'}
+      <section className="py-24 home-mesh relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" aria-hidden />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <AnimateInView animation="slide-right" className="space-y-6">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">ADS</span>
+              <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white leading-tight">
+                {copy.about.title}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'Angela Diagnostics et Services (ADS) est une entreprise spécialisée dans la distribution de réactifs de laboratoire et de solutions diagnostiques de haute qualité au Cameroun. Depuis notre création, nous nous engageons à fournir aux professionnels de santé des produits fiables et précis pour améliorer les soins médicaux.'
-                  : 'Angela Diagnostics and Services (ADS) is a company specialized in the distribution of high-quality laboratory reagents and diagnostic solutions in Cameroon. Since our creation, we are committed to providing healthcare professionals with reliable and precise products to improve medical care.'}
+                {copy.about.p1}
               </p>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'Nous travaillons en partenariat avec les plus grands laboratoires internationaux pour garantir l\'excellence de nos produits et la satisfaction de nos clients.'
-                  : 'We work in partnership with the largest international laboratories to guarantee the excellence of our products and the satisfaction of our customers.'}
+                {copy.about.p2}
               </p>
-              <div className="flex gap-4 pt-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-6 h-6 text-sky-500" />
-                  <span className="text-slate-700 dark:text-slate-300">{locale === 'fr' ? 'Certifié ISO 9001' : 'ISO 9001 Certified'}</span>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-500/10 border border-sky-500/15">
+                  <CheckCircle2 className="w-5 h-5 text-sky-500" />
+                  <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{copy.about.badge1}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-6 h-6 text-sky-500" />
-                  <span className="text-slate-700 dark:text-slate-300">{locale === 'fr' ? 'Partenaires internationaux' : 'International partners'}</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-500/10 border border-sky-500/15">
+                  <CheckCircle2 className="w-5 h-5 text-sky-500" />
+                  <span className="text-slate-700 dark:text-slate-300 text-sm font-medium">{copy.about.badge2}</span>
                 </div>
               </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-500 rounded-3xl transform rotate-3 opacity-20"></div>
-              <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
-                <div className="w-full aspect-square bg-gradient-to-br from-sky-100 to-blue-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
+            </AnimateInView>
+            <AnimateInView animation="slide-left" delay={150} className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-br from-sky-400/30 to-blue-600/20 rounded-[2rem] blur-2xl home-float pointer-events-none" aria-hidden />
+              <div className="relative bg-white/80 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl p-4 shadow-2xl border border-white/50 dark:border-slate-700 home-card-glow">
+                <div className="w-full aspect-square rounded-2xl overflow-hidden">
                   <Image
                     src={SITE_IMAGES.aboutTeam.path}
                     alt={imageAlt('aboutTeam', locale)}
                     width={600}
                     height={600}
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full transition-transform duration-700 hover:scale-105"
                     sizes="(max-width: 1024px) 100vw, 480px"
                     quality={75}
                     loading="lazy"
                   />
                 </div>
               </div>
-            </div>
+            </AnimateInView>
           </div>
         </div>
       </section>
@@ -352,26 +276,22 @@ export default function HomePage({ categories }: HomePageProps) {
             </div>
             <div className="space-y-6 order-1 lg:order-2">
               <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                {locale === 'fr' ? 'Notre Mission' : 'Our Mission'}
+                {copy.mission.title}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'Notre rôle est de fournir des réactifs de laboratoire de qualité à tous les établissements de santé au Cameroun. Nous nous assurons que chaque produit que nous distribuons répond aux normes les plus strictes de qualité et de sécurité.'
-                  : 'Our role is to provide quality laboratory reagents to all healthcare facilities in Cameroon. We ensure that every product we distribute meets the strictest quality and safety standards.'}
+                {copy.mission.p1}
               </p>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'Nous offrons un accompagnement personnalisé, une formation continue et un support technique pour garantir l\'utilisation optimale de nos produits.'
-                  : 'We offer personalized support, continuous training and technical assistance to ensure optimal use of our products.'}
+                {copy.mission.p2}
               </p>
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <div className="bg-sky-50 dark:bg-slate-800 p-4 rounded-xl">
                   <Shield className="w-8 h-8 text-sky-500 mb-2" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">{locale === 'fr' ? 'Qualité garantie' : 'Quality guaranteed'}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-white">{copy.mission.card1}</h3>
                 </div>
                 <div className="bg-emerald-50 dark:bg-slate-800 p-4 rounded-xl">
                   <Headphones className="w-8 h-8 text-emerald-500 mb-2" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">{locale === 'fr' ? 'Support 24/7' : '24/7 Support'}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-white">{copy.mission.card2}</h3>
                 </div>
               </div>
             </div>
@@ -385,33 +305,23 @@ export default function HomePage({ categories }: HomePageProps) {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                {locale === 'fr' ? 'Nos Solutions' : 'Our Solutions'}
+                {copy.offer.title}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'Au Cameroun, l\'accès aux réactifs de laboratoire de qualité reste un défi majeur. De nombreux établissements de santé font face à des pénuries de réactifs, des coûts élevés et des délais de livraison importants.'
-                  : 'In Cameroon, access to quality laboratory reagents remains a major challenge. Many healthcare facilities face reagent shortages, high costs and long delivery times.'}
+                {copy.offer.p1}
               </p>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                {locale === 'fr'
-                  ? 'ADS répond à ce problème en offrant une gamme complète de réactifs de laboratoire de qualité à des prix compétitifs, avec une livraison rapide et un support technique de proximité.'
-                  : 'ADS addresses this problem by offering a complete range of quality laboratory reagents at competitive prices, with fast delivery and local technical support.'}
+                {copy.offer.p2}
               </p>
               <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg mt-6">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{locale === 'fr' ? 'Nos solutions :' : 'Our solutions:'}</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{copy.offer.listTitle}</h3>
                 <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
-                    {locale === 'fr' ? 'Stock local pour livraison rapide' : 'Local stock for fast delivery'}
-                  </li>
-                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
-                    {locale === 'fr' ? 'Prix adaptés au marché africain' : 'Prices adapted to African market'}
-                  </li>
-                  <li className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <CheckCircle2 className="w-5 h-5 text-violet-500" />
-                    {locale === 'fr' ? 'Formation et support technique' : 'Training and technical support'}
-                  </li>
+                  {copy.offer.list.map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                      <CheckCircle2 className="w-5 h-5 text-violet-500 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -437,50 +347,47 @@ export default function HomePage({ categories }: HomePageProps) {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-br from-sky-500 to-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              {content.stats}
-            </h2>
-            <p className="text-lg text-sky-100 max-w-2xl mx-auto">
-              Des chiffres qui parlent d'eux-mêmes
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8" ref={statsRef}>
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-600 via-blue-700 to-indigo-800 home-gradient-animate" aria-hidden />
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_50%)]" aria-hidden />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative text-white">
+          <SectionHeading title={copy.stats.title} subtitle={copy.stats.subtitle} dark align="center" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" ref={statsRef}>
             {statsData.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <stat.icon className="w-8 h-8" />
+              <AnimateInView
+                key={index}
+                animation="scale-up"
+                delay={index * 100}
+                className="text-center p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 home-card-glow"
+              >
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center">
+                  <stat.icon className="w-7 h-7" />
                 </div>
-                <div className="text-4xl font-bold mb-2">
+                <div className="text-4xl lg:text-5xl font-bold mb-2 tabular-nums">
                   {isStatsVisible ? `${animatedStats[index]}${stat.suffix}` : `0${stat.suffix}`}
                 </div>
-                <div className="text-sky-100">{stat.label}</div>
-              </div>
+                <div className="text-sky-100/90 text-sm font-medium">{stat.label}</div>
+              </AnimateInView>
             ))}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-slate-900">
+      <section className="py-24 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              {content.features}
-            </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Des solutions adaptées aux besoins des professionnels de santé
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <SectionHeading
+            title={copy.features.title}
+            subtitle={copy.features.subtitle}
+            label={locale === 'fr' ? 'Services' : 'Services'}
+          />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <div
+              <AnimateInView
                 key={index}
-                className="group p-6 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 transition-all hover:shadow-xl border border-slate-200 dark:border-slate-700"
+                animation="fade-up"
+                delay={index * 80}
+                className="group p-6 rounded-2xl bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/80 dark:border-slate-700 home-card-glow"
               >
                 <div className={`w-14 h-14 rounded-xl ${feature.bgColor} bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className={`w-7 h-7 ${feature.color}`} />
@@ -491,7 +398,7 @@ export default function HomePage({ categories }: HomePageProps) {
                 <p className="text-sm text-slate-600 dark:text-slate-400">
                   {feature.description}
                 </p>
-              </div>
+              </AnimateInView>
             ))}
           </div>
         </div>
@@ -503,43 +410,35 @@ export default function HomePage({ categories }: HomePageProps) {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                {content.laboratories}
+                {copy.partnerLabs.title}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-                Partenaires de confiance pour des produits de qualité
+                {copy.partnerLabs.subtitle}
               </p>
             </div>
             <Link
               href="/products"
               className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 font-semibold mt-4 md:mt-0"
             >
-              {content.viewAll}
+              {copy.sectionTitles.viewAll}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6" ref={labsRef}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" ref={labsRef}>
             {laboratories.map((lab, index) => (
-              <div
+              <Link
                 key={lab.id}
-                className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl transition-all duration-700 hover:scale-105 cursor-pointer border border-slate-200 dark:border-slate-700 ${
+                href={`/products/${lab.slug}`}
+                title={lab.name}
+                aria-label={lab.name}
+                className={`group flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-md hover:shadow-xl transition-all duration-500 hover:scale-[1.02] border border-slate-200/80 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600 ${
                   isLabsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${lab.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
-                <div className="p-6">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <lab.icon className="w-8 h-8 text-sky-500" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                    {lab.name}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {lab.description}
-                  </p>
-                </div>
-              </div>
+                <LabLogo slug={lab.slug} nom={lab.name} size="lg" className="w-full h-full min-h-[10rem] p-6 sm:p-8" />
+              </Link>
             ))}
           </div>
         </div>
@@ -551,17 +450,17 @@ export default function HomePage({ categories }: HomePageProps) {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                {content.featured}
+                {copy.featured.title}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-                Les produits les plus demandés par nos clients
+                {copy.featured.subtitle}
               </p>
             </div>
             <Link
               href="/products"
               className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 dark:text-sky-400 dark:hover:text-sky-300 font-semibold mt-4 md:mt-0"
             >
-              {content.viewAll}
+              {copy.sectionTitles.viewAll}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -620,7 +519,7 @@ export default function HomePage({ categories }: HomePageProps) {
                       {getProductDisplayName(product, locale)}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 line-clamp-2">
-                      {product.category || 'Produit de haute qualité pour diagnostics médicaux'}
+                      {product.category || copy.featured.fallbackCategory}
                     </p>
                     <div className="mb-3">
                       <StarRating rating={product.averageRating || 0} size={14} />
@@ -660,7 +559,7 @@ export default function HomePage({ categories }: HomePageProps) {
       {/* CTA Section */}
       <section className="py-20 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-12 lg:p-16">
+          <AnimateInView animation="scale-up" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 home-gradient-animate p-12 lg:p-16 home-shine border border-white/10 shadow-2xl shadow-sky-500/20">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -670,43 +569,42 @@ export default function HomePage({ categories }: HomePageProps) {
             <div className="relative grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                  Prêt à commander ?
+                  {copy.cta.title}
                 </h2>
                 <p className="text-lg text-sky-100 mb-8">
-                  Contactez notre équipe d'experts pour une consultation personnalisée
+                  {copy.cta.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/contact"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-sky-600 font-semibold hover:bg-sky-50 transition-all"
                   >
-                    {content.heroSecondary}
+                    {copy.cta.primary}
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                   <Link
                     href="/products"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border-2 border-white/30 text-white font-semibold hover:bg-white/10 transition-all"
                   >
-                    {content.heroCTA}
+                    {copy.cta.secondary}
                   </Link>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: CheckCircle2, text: 'Qualité certifiée' },
-                  { icon: Truck, text: 'Livraison rapide' },
-                  { icon: Headphones, text: 'Support 24/7' },
-                  { icon: Shield, text: 'Garantie satisfait' }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                {copy.cta.bullets.map((text, index) => {
+                  const icons = [CheckCircle2, Truck, Headphones, Shield];
+                  const Icon = icons[index] || CheckCircle2;
+                  return { icon: Icon, text };
+                }).map((item, index) => (
+                  <AnimateInView key={index} animation="fade-up" delay={200 + index * 80} className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 hover:bg-white/15 transition-colors">
                     <item.icon className="w-6 h-6 flex-shrink-0" />
                     <span className="text-white font-medium">{item.text}</span>
-                  </div>
+                  </AnimateInView>
                 ))}
               </div>
             </div>
-          </div>
+          </AnimateInView>
         </div>
       </section>
 

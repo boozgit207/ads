@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { createBrowserClient } from '@/lib/supabase-client';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -25,6 +26,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+async function loadProfileFromSession(
+  supabase: ReturnType<typeof createBrowserClient>,
+  authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> }
+): Promise<User> {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle();
+
+  if (profile) return profile as User;
+
+  return {
+    id: authUser.id,
+    email: authUser.email || '',
+    first_name: (authUser.user_metadata?.first_name as string) || null,
+    last_name: (authUser.user_metadata?.last_name as string) || null,
+    avatar: (authUser.user_metadata?.avatar_url as string) || null,
+    role: (authUser.user_metadata?.role as string) || 'user',
+  };
+}
+
 export function AuthProvider({ children, initialUser }: { children: ReactNode; initialUser: User | null }) {
   const [user, setUser] = useState<User | null>(initialUser);
   const [loading, setLoading] = useState(!initialUser);
@@ -33,31 +56,10 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   const refreshUser = async () => {
     try {
       const { data: { user: authUser }, error } = await supabase.auth.getUser();
-
       if (error || !authUser) {
         setUser(null);
       } else {
-        // Get profile data
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .maybeSingle();
-
-        if (profile) {
-          setUser(profile as User | null);
-        } else {
-          // Fallback to auth user data if profile not accessible
-          const fallbackUser = {
-            id: authUser.id,
-            email: authUser.email || '',
-            first_name: authUser.user_metadata?.first_name || null,
-            last_name: authUser.user_metadata?.last_name || null,
-            avatar: authUser.user_metadata?.avatar_url || null,
-            role: authUser.user_metadata?.role || 'user'
-          };
-          setUser(fallbackUser);
-        }
+        setUser(await loadProfileFromSession(supabase, authUser));
       }
     } catch (error) {
       console.error('AuthContext: Error in refreshUser:', error);
@@ -71,58 +73,33 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
     try {
       await supabase.auth.signOut({ scope: 'global' });
       setUser(null);
-      localStorage.removeItem('ads-dark-mode');
-      localStorage.removeItem('ads-language');
     } catch (error) {
       console.error('AuthContext: Error signing out:', error);
+      setUser(null);
     }
   };
 
   useEffect(() => {
-    // Only call refreshUser if we don't have initialUser from server
-    if (!initialUser) {
-      refreshUser();
-    }
+    setLoading(false);
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        // Don't override initialUser on INITIAL_SESSION if session is null
-        if (event === 'INITIAL_SESSION' && !session && initialUser) {
-          setLoading(false);
-          return;
-        }
-
-        if (session?.user) {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (profile) {
-            setUser(profile as User | null);
-          } else {
-            // Fallback to auth user data if profile not accessible
-            const fallbackUser = {
-              id: session.user.id,
-              email: session.user.email || '',
-              first_name: session.user.user_metadata?.first_name || null,
-              last_name: session.user.user_metadata?.last_name || null,
-              avatar: session.user.user_metadata?.avatar_url || null,
-              role: session.user.user_metadata?.role || 'user'
-            };
-            setUser(fallbackUser);
-          }
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        return;
       }
-    );
+
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(await loadProfileFromSession(supabase, session.user));
+        return;
+      }
+
+      if (event === 'USER_UPDATED' && session?.user) {
+        setUser(await loadProfileFromSession(supabase, session.user));
+      }
+    });
 
     return () => subscription.unsubscribe();
-  }, [initialUser]);
+  }, [supabase]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser, signOut }}>

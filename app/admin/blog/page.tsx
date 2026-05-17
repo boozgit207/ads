@@ -24,7 +24,9 @@ export default function AdminBlogPage() {
     titre_en: '',
     slug: '',
     extrait: '',
+    extrait_en: '',
     contenu: '',
+    contenu_en: '',
     image_url: '',
     auteur: 'ADS',
     is_published: false,
@@ -60,7 +62,9 @@ export default function AdminBlogPage() {
       titre_en: '',
       slug: '',
       extrait: '',
+      extrait_en: '',
       contenu: '',
+      contenu_en: '',
       image_url: '',
       auteur: 'ADS',
       is_published: false,
@@ -77,7 +81,9 @@ export default function AdminBlogPage() {
       titre_en: post.titre_en || '',
       slug: post.slug || '',
       extrait: post.extrait || '',
+      extrait_en: post.extrait_en || '',
       contenu: post.contenu || '',
+      contenu_en: post.contenu_en || '',
       image_url: post.image_url || '',
       auteur: post.auteur || 'ADS',
       is_published: post.is_published ?? false,
@@ -237,6 +243,12 @@ export default function AdminBlogPage() {
                     className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700"
                   />
                   <input
+                    placeholder="Titre (English)"
+                    value={form.titre_en}
+                    onChange={(e) => setForm({ ...form, titre_en: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700"
+                  />
+                  <input
                     placeholder="Slug (optionnel)"
                     value={form.slug}
                     onChange={(e) => setForm({ ...form, slug: e.target.value })}
@@ -250,9 +262,23 @@ export default function AdminBlogPage() {
                     className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700"
                   />
                   <textarea
+                    placeholder="Extrait (English)"
+                    value={form.extrait_en}
+                    onChange={(e) => setForm({ ...form, extrait_en: e.target.value })}
+                    rows={2}
+                    className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700"
+                  />
+                  <textarea
                     placeholder="Contenu (HTML autorisé) *"
                     value={form.contenu}
                     onChange={(e) => setForm({ ...form, contenu: e.target.value })}
+                    rows={10}
+                    className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700 font-mono text-sm"
+                  />
+                  <textarea
+                    placeholder="Contenu (English - HTML autorisé)"
+                    value={form.contenu_en}
+                    onChange={(e) => setForm({ ...form, contenu_en: e.target.value })}
                     rows={10}
                     className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700 font-mono text-sm"
                   />

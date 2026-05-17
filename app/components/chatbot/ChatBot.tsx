@@ -276,14 +276,15 @@ export default function ChatBot() {
     return response;
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const processMessage = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     setShowSuggestions(false);
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: trimmed,
       timestamp: new Date()
     };
 
@@ -291,12 +292,10 @@ export default function ChatBot() {
     setInput('');
     setIsTyping(true);
 
-    // Check if input is a number (option selection)
-    const numberInput = parseInt(input.trim());
     const lastMessage = messages[messages.length - 1];
 
-    if (!isNaN(numberInput) && lastMessage?.options) {
-      const selectedOption = lastMessage.options.find(opt => opt.id === input.trim());
+    if (lastMessage?.options) {
+      const selectedOption = lastMessage.options.find(opt => opt.id === trimmed);
       if (selectedOption) {
         const response = handleOption(selectedOption.action);
         const botMessage: Message = {
@@ -313,8 +312,7 @@ export default function ChatBot() {
       }
     }
 
-    // Handle keyword input
-    const lowerMsg = input.toLowerCase();
+    const lowerMsg = trimmed.toLowerCase();
     let action = '';
 
     if (lowerMsg.includes('produit') || lowerMsg.includes('product')) action = 'products';
@@ -323,25 +321,66 @@ export default function ChatBot() {
     else if (lowerMsg.includes('livraison') || lowerMsg.includes('delivery')) action = 'delivery';
     else if (lowerMsg.includes('contact')) action = 'contact';
     else if (lowerMsg.includes('à propos') || lowerMsg.includes('about')) action = 'about';
-    else if (lowerMsg.includes('retour') || lowerMsg.includes('back') || input === '0') action = 'main';
+    else if (lowerMsg.includes('retour') || lowerMsg.includes('back') || trimmed === '0') action = 'main';
 
-    const response = handleOption(action);
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: response.content,
-      timestamp: new Date(),
-      options: response.options,
-      action: response.action
-    };
-    setMessages(prev => [...prev, botMessage]);
-    setIsTyping(false);
+    if (action) {
+      const response = handleOption(action);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date(),
+        options: response.options,
+        action: response.action
+      };
+      setMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+      return;
+    }
+
+    // For other questions, use the Gemini API
+    try {
+      const response = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: trimmed,
+          lang: locale
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de la génération de la réponse');
+      }
+
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: result.response,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Erreur chatbot:', error);
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: locale === 'fr' 
+          ? 'Désolé, je n\'ai pas pu traiter votre demande. Veuillez réessayer ou contacter notre support.'
+          : 'Sorry, I couldn\'t process your request. Please try again or contact our support.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
-  const handleQuickAction = (action: string) => {
-    setInput(action);
-    handleSend();
-  };
+  const handleSend = () => processMessage(input);
 
   return (
     <>
@@ -417,10 +456,7 @@ export default function ChatBot() {
                       {message.options.map((option) => (
                         <button
                           key={option.id}
-                          onClick={() => {
-                            setInput(option.id);
-                            handleSend();
-                          }}
+                          onClick={() => processMessage(option.id)}
                           className="w-full text-left px-4 py-2 bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-300 rounded-lg text-sm font-medium hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
                         >
                           {option.id}. {option.label}

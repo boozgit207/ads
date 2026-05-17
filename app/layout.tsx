@@ -11,7 +11,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { I18nProvider } from "./context/I18nContext";
-import { createServerSupabaseClient, Profile } from "@/lib/supabase";
 import { defaultOgImage, siteUrl } from "@/lib/seo";
 import Script from "next/script";
 
@@ -32,8 +31,8 @@ export const metadata: Metadata = {
     default: "ADS - Angela Diagnostics et Services | Réactifs de Laboratoire",
     template: "%s | ADS - Angela Diagnostics et Services"
   },
-  description: "Votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.",
-  keywords: "réactifs laboratoire, tests diagnostiques, COVID-19, HIV, malaria, biochimie, Fortress Diagnostics, Bioline, Hightop, Cameroun, Afrique, diagnostics médicaux, équipements laboratoire, Elisa, test rapide, chlamydia",
+  description: "Distributeur de réactifs de laboratoire au Cameroun — Fortress Diagnostics, Bioline, latex, ELISA, biochimie. Stock à Yaoundé, livraison nationale.",
+  keywords: "réactifs laboratoire Cameroun, Fortress Diagnostics, Bioline, latex RPR CRP, ELISA, biochimie, réactifs Yaoundé, réactifs Douala, distributeur laboratoire",
   authors: [{ name: "ADS - Angela Diagnostics et Services" }],
   creator: "ADS - Angela Diagnostics et Services",
   publisher: "ADS - Angela Diagnostics et Services",
@@ -90,25 +89,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createServerSupabaseClient();
-  
-  let initialUser: Profile | null = null;
-  try {
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-    
-    if (authUser && !authError) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .maybeSingle();
-      initialUser = profile as Profile | null;
-    }
-  } catch (error) {
-    console.error('Layout: Error fetching user:', error);
-    initialUser = null;
-  }
-
   return (
     <html
       lang="fr"
@@ -148,7 +128,7 @@ export default async function RootLayout({
         <StructuredData />
         <I18nProvider>
           <ThemeProvider>
-            <AuthProvider initialUser={initialUser}>
+            <AuthProvider initialUser={null}>
               <CartProvider>
                 {children}
                 <ChatBot />

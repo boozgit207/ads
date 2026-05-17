@@ -9,6 +9,8 @@ import Footer from '../../components/Footer';
 import { notFound } from 'next/navigation';
 import { absoluteUrl, productPath } from '@/lib/seo';
 
+export const revalidate = 3600;
+
 // Générer les métadonnées dynamiques pour chaque produit
 export async function generateMetadata({ 
   params 

@@ -7,6 +7,8 @@ import { getPostBySlug } from '../../actions/blog';
 import { absoluteUrl } from '@/lib/seo';
 import { ArrowLeft, Calendar, User } from 'lucide-react';
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {
@@ -90,7 +92,7 @@ export default async function BlogPostPage({
 
         <article
           className="prose prose-zinc dark:prose-invert max-w-none prose-headings:text-zinc-900 dark:prose-headings:text-white"
-          dangerouslySetInnerHTML={{ __html: post.contenu }}
+          dangerouslySetInnerHTML={{ __html: post.contenu || '<p></p>' }}
         />
       </main>
       <Footer />

@@ -1,65 +1,36 @@
 'use server';
 
-import { createPublicSupabaseClient } from '@/lib/supabase';
+import { getCachedPublishedPosts, getCachedPostBySlug } from '@/lib/blog-cache';
+import type { BlogPost } from '@/lib/blog-types';
 
-export interface BlogPost {
-  id: string;
-  titre: string;
-  titre_en: string | null;
-  slug: string;
-  extrait: string | null;
-  extrait_en: string | null;
-  contenu: string;
-  contenu_en: string | null;
-  image_url: string | null;
-  auteur: string | null;
-  is_published: boolean;
-  published_at: string | null;
-  meta_title: string | null;
-  meta_description: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type { BlogPost } from '@/lib/blog-types';
 
-export async function getPublishedPosts(): Promise<{ success: boolean; posts?: BlogPost[]; error?: string }> {
+export async function getPublishedPosts(): Promise<{
+  success: boolean;
+  posts?: BlogPost[];
+  error?: string;
+}> {
   try {
-    const supabase = createPublicSupabaseClient();
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('is_published', true)
-      .order('published_at', { ascending: false });
-
-    if (error) {
-      if (error.code === '42P01') {
-        return { success: true, posts: [] };
-      }
-      return { success: false, error: error.message };
-    }
-    return { success: true, posts: data || [] };
+    const posts = await getCachedPublishedPosts();
+    return { success: true, posts };
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Erreur inconnue';
-    return { success: false, error: message };
+    console.error('getPublishedPosts:', message);
+    return { success: false, error: message, posts: [] };
   }
 }
 
-export async function getPostBySlug(slug: string): Promise<{ success: boolean; post?: BlogPost; error?: string }> {
+export async function getPostBySlug(slug: string): Promise<{
+  success: boolean;
+  post?: BlogPost;
+  error?: string;
+}> {
   try {
-    const supabase = createPublicSupabaseClient();
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('is_published', true)
-      .maybeSingle();
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-    if (!data) {
+    const post = await getCachedPostBySlug(slug);
+    if (!post) {
       return { success: false, error: 'Article introuvable' };
     }
-    return { success: true, post: data };
+    return { success: true, post };
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Erreur inconnue';
     return { success: false, error: message };

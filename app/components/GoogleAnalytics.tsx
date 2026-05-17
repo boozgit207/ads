@@ -1,7 +1,8 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 
 function hasAnalyticsConsent(): boolean {
   if (typeof window === 'undefined') return false;
@@ -17,7 +18,23 @@ function hasAnalyticsConsent(): boolean {
   }
 }
 
-/** Charge Google Analytics uniquement après consentement cookies (analytiques). */
+function GoogleAnalyticsPageViews({ measurementId }: { measurementId: string }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!hasAnalyticsConsent()) return;
+    const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
+    if (!gtag) return;
+    const query = searchParams?.toString();
+    const page_path = query ? `${pathname}?${query}` : pathname;
+    gtag('config', measurementId, { page_path });
+  }, [pathname, searchParams, measurementId]);
+
+  return null;
+}
+
+/** Charge Google Analytics après consentement + suit les changements de page (App Router). */
 export default function GoogleAnalytics() {
   const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const [enabled, setEnabled] = useState(false);
@@ -42,16 +59,19 @@ export default function GoogleAnalytics() {
     <>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
-      <Script id="google-analytics" strategy="lazyOnload">
+      <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${measurementId}', { anonymize_ip: true });
+          gtag('config', '${measurementId}', { anonymize_ip: true, send_page_view: true });
         `}
       </Script>
+      <Suspense fallback={null}>
+        <GoogleAnalyticsPageViews measurementId={measurementId} />
+      </Suspense>
     </>
   );
 }

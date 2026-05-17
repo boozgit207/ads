@@ -393,9 +393,6 @@ export default function ProductDetailClient({
                     <p className="text-5xl font-bold text-zinc-900 dark:text-white mb-3">
                       {product.prix.toLocaleString()} FCFA
                     </p>
-                    <p className="text-base text-zinc-500 dark:text-zinc-400 font-medium">
-                      HT / {product.unite || 'unité'}
-                    </p>
                     {product.prix_promo && product.prix_promo < product.prix && (
                       <p className="text-xl text-zinc-400 line-through mt-2">
                         {product.prix.toLocaleString()} FCFA
@@ -417,11 +414,6 @@ export default function ProductDetailClient({
                   <StockIcon className="w-5 h-5" />
                   {stockStatus.text}
                 </span>
-                {isInStock() && (
-                  <span className="text-base font-medium text-zinc-600 dark:text-zinc-400">
-                    {product.quantite_stock} {t.stockAvailable}
-                  </span>
-                )}
               </div>
 
               {/* Quantity Selector */}
@@ -572,17 +564,6 @@ export default function ProductDetailClient({
                       <div>
                         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{t.country}</p>
                         <p className="font-semibold text-zinc-900 dark:text-white text-lg">{product.pays_fabricant}</p>
-                      </div>
-                    </div>
-                  )}
-                  {product.poids && (
-                    <div className="p-6 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 flex items-start gap-4 hover:shadow-md transition-shadow">
-                      <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                        <Weight className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">{t.weight}</p>
-                        <p className="font-semibold text-zinc-900 dark:text-white text-lg">{product.poids} {product.unite === 'g' ? 'g' : 'kg'}</p>
                       </div>
                     </div>
                   )}

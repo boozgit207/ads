@@ -1,6 +1,7 @@
 'use server';
 
 import { createServerSupabaseClient, createPublicSupabaseClient } from '@/lib/supabase';
+import { isTransientSupabaseError, logCatalogError } from '@/lib/supabase-errors';
 
 // Types pour les produits
 export interface Product {
@@ -116,12 +117,14 @@ export async function getProducts(filters?: CatalogFilters): Promise<{ success: 
     const { data, error } = await query;
 
     if (error) {
-      // Gérer JWT expired et autres erreurs d'auth
       if (error.message.includes('JWT expired') || error.message.includes('Invalid JWT') || error.code === 'PGRST303') {
-        console.log('JWT expired lors de getProducts, retour de tableau vide');
         return { success: true, products: [] };
       }
-      console.error('Erreur lors de la récupération des produits:', error);
+      if (isTransientSupabaseError(error)) {
+        logCatalogError('getProducts', error);
+        return { success: true, products: [] };
+      }
+      logCatalogError('Erreur lors de la récupération des produits', error);
       return { success: false, error: 'Impossible de charger les produits. Veuillez réessayer.' };
     }
 
@@ -277,13 +280,15 @@ export async function getLaboratories(): Promise<{ success: boolean; laboratorie
       .order('nom', { ascending: true });
 
     if (error) {
-      // Gérer JWT expired et autres erreurs d'auth
       if (error.message.includes('JWT expired') || error.message.includes('Invalid JWT') || error.code === 'PGRST303') {
-        console.log('JWT expired lors de getLaboratories, retour de tableau vide');
         return { success: true, laboratories: [] };
       }
-      console.error('Erreur lors de la récupération des laboratoires:', error);
-      return { success: false, error: error.message };
+      if (isTransientSupabaseError(error)) {
+        logCatalogError('getLaboratories', error);
+        return { success: true, laboratories: [] };
+      }
+      logCatalogError('Erreur lors de la récupération des laboratoires', error);
+      return { success: true, laboratories: [] };
     }
 
     return { success: true, laboratories: data || [] };
@@ -312,13 +317,15 @@ export async function getCategories(laboratoryId?: string): Promise<{ success: b
     const { data, error } = await query;
 
     if (error) {
-      // Gérer JWT expired et autres erreurs d'auth
       if (error.message.includes('JWT expired') || error.message.includes('Invalid JWT') || error.code === 'PGRST303') {
-        console.log('JWT expired lors de getCategories, retour de tableau vide');
         return { success: true, categories: [] };
       }
-      console.error('Erreur lors de la récupération des catégories:', error);
-      return { success: false, error: error.message };
+      if (isTransientSupabaseError(error)) {
+        logCatalogError('getCategories', error);
+        return { success: true, categories: [] };
+      }
+      logCatalogError('Erreur lors de la récupération des catégories', error);
+      return { success: true, categories: [] };
     }
 
     return { success: true, categories: data || [] };

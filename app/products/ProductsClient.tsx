@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Header from '../components/Header';
@@ -8,64 +8,126 @@ import Footer from '../components/Footer';
 import LoadingScreen from '../components/LoadingScreen';
 import { showToast } from '../components/Toast';
 import { Product, Laboratory, Category } from '../actions/catalog';
-import { Search, ChevronDown, ShoppingCart, Eye, FlaskConical, Check, ArrowUpDown } from 'lucide-react';
+import {
+  ShoppingCart,
+  Eye,
+  FlaskConical,
+  Check,
+  PanelLeftOpen,
+} from 'lucide-react';
+import CatalogFiltersPanel, { OPEN_CATALOG_FILTERS_EVENT } from './CatalogFiltersPanel';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
 import StarRating from '../components/StarRating';
 import { getProductDisplayName, getProductImageAlt } from '@/lib/image-seo';
+import { catalogPath } from '@/lib/catalog-urls';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary-image';
+import LabLogo from '@/app/components/LabLogo';
 
 interface ProductsClientProps {
   products: Product[];
   laboratories: Laboratory[];
   categories: Category[];
-  initialLab?: string;
-  initialCategory?: string;
+  initialLabId?: string;
+  initialCategoryId?: string;
+  initialLabSlug?: string;
+  initialCategorySlug?: string;
+}
+
+function productHref(product: Product) {
+  return `/product/${product.slug || product.id}`;
 }
 
 export default function ProductsClient({
   products,
   laboratories,
   categories,
-  initialLab,
-  initialCategory
+  initialLabId = 'Tous',
+  initialCategoryId = 'Tous',
+  initialLabSlug,
+  initialCategorySlug,
 }: ProductsClientProps) {
   const { addToCart: addToCartToContext } = useCart();
   const { locale } = useI18n();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLab, setSelectedLab] = useState(initialLab || 'Tous');
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'Tous');
+  const [selectedLabId, setSelectedLabId] = useState(initialLabId);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategoryId);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
-  const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, price-asc, price-desc
+  const [sortBy, setSortBy] = useState('name-asc');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Convertir le nom du laboratoire en ID si nécessaire
-  const selectedLabId = selectedLab === 'Tous' ? 'Tous' : (laboratories.find(l => l.nom === selectedLab)?.id || selectedLab);
+  useEffect(() => {
+    const openDrawer = () => setFiltersOpen(true);
+    window.addEventListener(OPEN_CATALOG_FILTERS_EVENT, openDrawer);
+    return () => window.removeEventListener(OPEN_CATALOG_FILTERS_EVENT, openDrawer);
+  }, []);
+
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [filtersOpen]);
+
+  const currentLab = useMemo(
+    () => (selectedLabId === 'Tous' ? undefined : laboratories.find((l) => l.id === selectedLabId)),
+    [selectedLabId, laboratories]
+  );
+  const currentCategory = useMemo(
+    () =>
+      selectedCategoryId === 'Tous'
+        ? undefined
+        : categories.find((c) => c.id === selectedCategoryId),
+    [selectedCategoryId, categories]
+  );
+  const displayLab = currentLab;
+  const displayCategory = currentCategory;
+
+  const updateFilters = useCallback(
+    (labId: string, categoryId: string) => {
+      setSelectedLabId(labId);
+      setSelectedCategoryId(categoryId);
+      if (typeof window !== 'undefined') {
+        const lab = labId === 'Tous' ? null : laboratories.find((l) => l.id === labId);
+        const cat = categoryId === 'Tous' ? null : categories.find((c) => c.id === categoryId);
+        const path = catalogPath(lab, cat);
+        window.history.replaceState(null, '', path);
+      }
+    },
+    [laboratories, categories]
+  );
+
+  useEffect(() => {
+    setSelectedLabId(initialLabId);
+    setSelectedCategoryId(initialCategoryId);
+  }, [initialLabId, initialCategoryId]);
+
+  const visibleCategories = useMemo(() => {
+    if (selectedLabId === 'Tous') return categories;
+    return categories.filter((c) => c.laboratoire_id === selectedLabId);
+  }, [categories, selectedLabId]);
 
   // Filtrer les produits quand les filtres changent
   useEffect(() => {
     let filtered = products;
 
-    // Filtre par recherche
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.nom?.toLowerCase().includes(term) ||
-        p.nom_en?.toLowerCase().includes(term) ||
-        p.description?.toLowerCase().includes(term) ||
-        p.reference?.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (p) =>
+          p.nom?.toLowerCase().includes(term) ||
+          p.nom_en?.toLowerCase().includes(term) ||
+          p.description?.toLowerCase().includes(term) ||
+          p.reference?.toLowerCase().includes(term)
       );
     }
 
-    // Filtre par catégorie (prioritaire sur le laboratoire)
-    if (selectedCategory !== 'Tous') {
-      filtered = filtered.filter(p => p.categorie_id === selectedCategory);
-      // Si une catégorie est sélectionnée, ne pas filtrer par laboratoire
-      // pour éviter de masquer des produits de cette catégorie
-    } else if (selectedLab !== 'Tous') {
-      // Filtre par laboratoire seulement si aucune catégorie n'est sélectionnée
-      filtered = filtered.filter(p =>
-        p.laboratoire?.id === selectedLab ||
-        p.laboratoire?.nom === selectedLab
-      );
+    if (selectedCategoryId !== 'Tous') {
+      filtered = filtered.filter((p) => p.categorie_id === selectedCategoryId);
+    } else if (selectedLabId !== 'Tous') {
+      filtered = filtered.filter((p) => p.laboratoire?.id === selectedLabId);
     }
 
     // Tri des produits
@@ -85,7 +147,7 @@ export default function ProductsClient({
     });
 
     setFilteredProducts(filtered);
-  }, [searchTerm, selectedLab, selectedCategory, sortBy, products]);
+  }, [searchTerm, selectedLabId, selectedCategoryId, sortBy, products, locale]);
 
   const t = {
     fr: {
@@ -109,7 +171,14 @@ export default function ProductsClient({
       nameAsc: 'Nom (A-Z)',
       nameDesc: 'Nom (Z-A)',
       priceAsc: 'Prix (croissant)',
-      priceDesc: 'Prix (décroissant)'
+      priceDesc: 'Prix (décroissant)',
+      catalogTitle: 'Catalogue réactifs',
+      labs: 'Marques / laboratoires',
+      categories: 'Catégories',
+      showFilters: 'Afficher les filtres',
+      hideFilters: 'Masquer les filtres',
+      filtersTitle: 'Filtres',
+      applyFilters: 'Appliquer',
     },
     en: {
       title: 'Our Products',
@@ -132,8 +201,15 @@ export default function ProductsClient({
       nameAsc: 'Name (A-Z)',
       nameDesc: 'Name (Z-A)',
       priceAsc: 'Price (low to high)',
-      priceDesc: 'Price (high to low)'
-    }
+      priceDesc: 'Price (high to low)',
+      catalogTitle: 'Reagents catalog',
+      labs: 'Brands / laboratories',
+      categories: 'Categories',
+      showFilters: 'Show filters',
+      hideFilters: 'Hide filters',
+      filtersTitle: 'Filters',
+      applyFilters: 'Apply',
+    },
   }[locale];
 
   const addToCart = (product: Product) => {
@@ -153,45 +229,37 @@ export default function ProductsClient({
     showToast(locale === 'fr' ? 'Produit ajouté au panier !' : 'Product added to cart!', 'success');
   };
 
-  // Préparer les options de filtres selon le contexte
-  let labOptions: string[] = ['Tous'];
-  let catOptions: { id: string; nom: string }[] = [{ id: 'Tous', nom: t.all }];
+  const filterLabels = {
+    search: t.search,
+    all: t.all,
+    labs: t.labs,
+    categories: t.categories,
+    nameAsc: t.nameAsc,
+    nameDesc: t.nameDesc,
+    priceAsc: t.priceAsc,
+    priceDesc: t.priceDesc,
+    filtersTitle: t.filtersTitle,
+    apply: t.applyFilters,
+  };
 
-  // Si une catégorie est spécifique, afficher seulement les laboratoires qui ont des produits dans cette catégorie
-  if (selectedCategory !== 'Tous') {
-    // Récupérer les IDs des laboratoires qui ont des produits dans cette catégorie
-    const labIdsInCategory = Array.from(new Set(
-      products
-        .filter(p => p.categorie_id === selectedCategory && p.laboratoire?.id)
-        .map(p => p.laboratoire!.id)
-    ));
-    
-    // Filtrer la liste des laboratoires pour ne garder que ceux qui ont des produits dans cette catégorie
-    const labsInCategory = laboratories
-      .filter(lab => labIdsInCategory.includes(lab.id))
-      .map(lab => lab.nom)
-      .sort(); // Trier par ordre alphabétique
-    
-    labOptions = ['Tous', ...labsInCategory];
-  } else {
-    // Sinon afficher tous les laboratoires triés par ordre alphabétique
-    const allLabs = Array.from(new Set(laboratories.map(l => l.nom))).sort();
-    labOptions = ['Tous', ...allLabs];
-  }
+  const handleSelectLab = (labId: string) => {
+    updateFilters(labId, 'Tous');
+    setFiltersOpen(false);
+  };
 
-  // Filtrer les catégories selon le laboratoire sélectionné (seulement si pas de catégorie spécifique)
-  if (selectedCategory === 'Tous') {
-    const filteredCategories = selectedLabId === 'Tous'
-      ? categories
-      : categories.filter(c => c.laboratoire_id === selectedLabId);
-    catOptions = [{ id: 'Tous', nom: t.all }, ...filteredCategories.map(c => ({ id: c.id, nom: c.nom }))];
-  } else {
-    // Si une catégorie est sélectionnée, ne montrer que cette catégorie dans le filtre
-    const currentCategory = categories.find(c => c.id === selectedCategory);
-    if (currentCategory) {
-      catOptions = [{ id: 'Tous', nom: t.all }, { id: currentCategory.id, nom: currentCategory.nom }];
-    }
-  }
+  const handleSelectCategory = (labId: string, categoryId: string) => {
+    updateFilters(labId, categoryId);
+    setFiltersOpen(false);
+  };
+
+  const pageTitle =
+    displayCategory && displayLab
+      ? `${displayCategory.nom} — ${displayLab.nom}`
+      : displayLab
+        ? displayLab.nom
+        : displayCategory
+          ? displayCategory.nom
+          : t.title;
 
   // Helper pour obtenir le nom du produit selon la langue
   const getProductName = (p: Product) => getProductDisplayName(p, locale);
@@ -216,8 +284,11 @@ export default function ProductsClient({
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 dark:from-blue-900 dark:via-blue-950 dark:to-indigo-950 border-b border-blue-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <p className="text-blue-200 text-sm font-medium uppercase tracking-wider mb-2">
+            {t.catalogTitle}
+          </p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
-            {t.title}
+            {pageTitle}
           </h1>
           <p className="text-blue-100 dark:text-blue-200 text-lg">
             {filteredProducts.length} {t.results}
@@ -225,112 +296,128 @@ export default function ProductsClient({
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-700 sticky top-16 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
-              <input
-                type="text"
-                placeholder={t.search}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 w-full">
+        {filtersOpen && (
+          <>
+            <button
+              type="button"
+              className="fixed inset-0 bg-black/50 z-40"
+              aria-label={t.hideFilters}
+              onClick={() => setFiltersOpen(false)}
+            />
+            <aside className="fixed left-0 top-16 bottom-0 z-50 w-[min(320px,90vw)] bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 shadow-xl p-4 flex flex-col">
+              <CatalogFiltersPanel
+                labels={filterLabels}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                selectedLabId={selectedLabId}
+                selectedCategoryId={selectedCategoryId}
+                laboratories={laboratories}
+                visibleCategories={visibleCategories}
+                onSelectLab={handleSelectLab}
+                onSelectCategory={handleSelectCategory}
+                showClose
+                onClose={() => setFiltersOpen(false)}
               />
-            </div>
+            </aside>
+          </>
+        )}
 
-            {/* Laboratory Filter */}
-            <div className="relative min-w-[180px]">
-              <select
-                value={selectedLab}
-                onChange={(e) => {
-                  setSelectedLab(e.target.value);
-                  // Ne réinitialiser la catégorie que si on n'est pas dans une catégorie spécifique
-                  if (selectedCategory === 'Tous') {
-                    setSelectedCategory('Tous');
-                  }
-                }}
-                className="appearance-none pl-4 pr-10 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
-              >
-                {labOptions.map(lab => (
-                  <option key={lab} value={lab}>{lab}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 pointer-events-none" />
-            </div>
+        <div className="flex items-center gap-3 py-4">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:border-blue-400 hover:text-blue-600 transition-colors"
+          >
+            <PanelLeftOpen className="w-4 h-4" />
+            {t.showFilters}
+          </button>
+        </div>
 
-            {/* Category Filter */}
-            <div className="relative min-w-[180px]">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
-              >
-                {catOptions.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.nom}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 pointer-events-none" />
-            </div>
-
-            {/* Sort Filter */}
-            <div className="relative min-w-[180px]">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-sm cursor-pointer"
-              >
-                <option value="name-asc">{t.nameAsc}</option>
-                <option value="name-desc">{t.nameDesc}</option>
-                <option value="price-asc">{t.priceAsc}</option>
-                <option value="price-desc">{t.priceDesc}</option>
-              </select>
-              <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 pointer-events-none" />
+      {displayLab && (
+        <div className="pt-4">
+          <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg">
+            <div className="relative h-36 sm:h-44 md:h-52">
+              {displayLab.image_url ? (
+                <Image
+                  src={optimizeCloudinaryUrl(displayLab.image_url, 1200)}
+                  alt={displayLab.nom}
+                  fill
+                  className="object-cover"
+                  unoptimized={displayLab.image_url.includes('cloudinary.com')}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-950/85 via-blue-900/70 to-indigo-900/50" />
+              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">{displayLab.nom}</h2>
+                {displayLab.description && (
+                  <p className="text-blue-100 text-sm sm:text-base mt-1 max-w-2xl line-clamp-2">
+                    {displayLab.description}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Products Grid */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+      <main className="py-6 lg:py-10 w-full">
         {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
             <FlaskConical className="w-20 h-20 text-zinc-300 mx-auto mb-6" />
             <p className="text-zinc-500 text-xl font-medium mb-4">{t.noResults}</p>
-            {(selectedCategory !== 'Tous' || selectedLab !== 'Tous' || searchTerm) && (
+            {(selectedCategoryId !== 'Tous' || selectedLabId !== 'Tous' || searchTerm) && (
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => {
-                    setSelectedCategory('Tous');
-                    setSelectedLab('Tous');
+                    updateFilters('Tous', 'Tous');
                     setSearchTerm('');
                   }}
                   className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
                 >
                   {t.resetFilters}
                 </button>
-                <Link
-                  href="/products"
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateFilters('Tous', 'Tous');
+                    setSearchTerm('');
+                  }}
                   className="px-6 py-3 bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors font-medium"
                 >
                   {t.seeAllProducts}
-                </Link>
+                </button>
               </div>
             )}
           </div>
         ) : (
           <div className="space-y-8">
             {/* Si une catégorie est spécifique, afficher directement les produits sans regrouper par laboratoire */}
-            {selectedCategory !== 'Tous' ? (
+            {selectedCategoryId !== 'Tous' ? (
               <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                 {/* Category Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 px-6 py-4">
-                  <h2 className="text-2xl font-bold text-white">
-                    {categories.find(c => c.id === selectedCategory)?.nom || selectedCategory}
-                  </h2>
-                  <p className="text-blue-100 text-sm mt-1">{filteredProducts.length} {locale === 'fr' ? 'produits' : 'products'}</p>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 px-6 py-4 flex items-center gap-4">
+                  {(displayLab || displayCategory) && (
+                    <div className="rounded-xl bg-white p-2 shadow-md shrink-0">
+                      <LabLogo
+                        slug={displayLab?.slug || laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.slug}
+                        nom={displayLab?.nom || laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.nom}
+                        size="md"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">
+                      {displayCategory?.nom || categories.find((c) => c.id === selectedCategoryId)?.nom}
+                    </h2>
+                    <p className="text-blue-100 text-sm mt-1">
+                      {filteredProducts.length} {locale === 'fr' ? 'produits' : 'products'}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Products Grid */}
@@ -342,7 +429,7 @@ export default function ProductsClient({
                 className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
               >
                 {/* Image */}
-                <Link href={`/product/${product.id}`} className="block relative h-56 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
+                <Link href={productHref(product)} className="block relative h-56 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
                   {product.image_principale_url ? (
                     <Image
                       src={product.image_principale_url || ''}
@@ -388,9 +475,13 @@ export default function ProductsClient({
                 {/* Content */}
                 <div className="p-5">
                   <div className="mb-3">
-                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
-                      {product.laboratoire?.nom || product.categorie?.laboratoire?.nom || 'ADS'}
-                    </p>
+                    <div className="mb-2">
+                      <LabLogo
+                        slug={product.laboratoire?.slug || product.categorie?.laboratoire?.slug}
+                        nom={product.laboratoire?.nom || product.categorie?.laboratoire?.nom}
+                        size="sm"
+                      />
+                    </div>
                     <h3 className="font-bold text-zinc-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {getProductName(product)}
                     </h3>
@@ -408,7 +499,7 @@ export default function ProductsClient({
                   {/* Actions */}
                   <div className="flex gap-3">
                     <Link
-                      href={`/product/${product.id}`}
+                      href={productHref(product)}
                       className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 font-semibold transition-all duration-300"
                     >
                       <Eye className="w-5 h-5" />
@@ -431,7 +522,10 @@ export default function ProductsClient({
             ) : (
               /* Affichage normal groupé par laboratoire quand aucune catégorie n'est sélectionnée */
               <>
-                {laboratories.map((lab) => {
+                {(selectedLabId === 'Tous'
+                  ? laboratories
+                  : laboratories.filter((l) => l.id === selectedLabId)
+                ).map((lab) => {
                   const labProducts = filteredProducts.filter(p => p.laboratoire?.id === lab.id);
                   if (labProducts.length === 0) return null;
 
@@ -443,9 +537,29 @@ export default function ProductsClient({
                   return (
                     <div key={lab.id} className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                       {/* Laboratory Header */}
-                      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 px-6 py-4">
-                        <h2 className="text-2xl font-bold text-white">{lab.nom}</h2>
-                        <p className="text-blue-100 text-sm mt-1">{labProducts.length} {locale === 'fr' ? 'produits' : 'products'}</p>
+                      <div className="relative h-28 sm:h-32 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 overflow-hidden">
+                        {lab.image_url && (
+                          <Image
+                            src={optimizeCloudinaryUrl(lab.image_url, 800)}
+                            alt={lab.nom}
+                            fill
+                            className="object-cover opacity-40"
+                            unoptimized={lab.image_url.includes('cloudinary.com')}
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-indigo-900/70" />
+                        <div className="relative px-6 py-4 flex items-end h-full gap-4">
+                          {/* Laboratory Logo */}
+                          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 p-2">
+                            <LabLogo slug={lab.slug} nom={lab.nom} size="xl" className="w-full h-full" />
+                          </div>
+                          <div>
+                            <h2 className="text-2xl font-bold text-white">{lab.nom}</h2>
+                            <p className="text-blue-100 text-sm mt-1">
+                              {labProducts.length} {locale === 'fr' ? 'produits' : 'products'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Categories */}
@@ -469,7 +583,7 @@ export default function ProductsClient({
                                     className="group bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-500"
                                   >
                                     {/* Image */}
-                                    <Link href={`/product/${product.id}`} className="block relative h-56 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
+                                    <Link href={productHref(product)} className="block relative h-56 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
                                       {product.image_principale_url ? (
                                         <Image
                                           src={product.image_principale_url || ''}
@@ -515,9 +629,13 @@ export default function ProductsClient({
                                     {/* Content */}
                                     <div className="p-5">
                                       <div className="mb-3">
-                                        <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
-                                          {product.laboratoire?.nom || product.categorie?.laboratoire?.nom || 'ADS'}
-                                        </p>
+                                        <div className="mb-2">
+                                          <LabLogo
+                                            slug={product.laboratoire?.slug || product.categorie?.laboratoire?.slug}
+                                            nom={product.laboratoire?.nom || product.categorie?.laboratoire?.nom}
+                                            size="sm"
+                                          />
+                                        </div>
                                         <h3 className="font-bold text-zinc-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                           {getProductName(product)}
                                         </h3>
@@ -535,7 +653,7 @@ export default function ProductsClient({
                                       {/* Actions */}
                                       <div className="flex gap-3">
                                         <Link
-                                          href={`/product/${product.id}`}
+                                          href={productHref(product)}
                                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 font-semibold transition-all duration-300"
                                         >
                                           <Eye className="w-5 h-5" />
@@ -565,6 +683,7 @@ export default function ProductsClient({
           </div>
         )}
       </main>
+      </div>
 
       <Footer />
       </div>

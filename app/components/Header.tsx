@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { 
   Home, 
   HelpCircle, 
@@ -18,15 +19,21 @@ import {
   ShoppingCart,
   Grid3X3,
   ShoppingBag,
-  FileText
+  FileText,
+  SlidersHorizontal,
 } from "lucide-react";
+import { OPEN_CATALOG_FILTERS_EVENT } from "../products/CatalogFiltersPanel";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "./ThemeProvider";
 import { useI18n } from "../context/I18nContext";
 import { imageAlt } from "@/lib/image-seo";
+import { catalogPath } from "@/lib/catalog-urls";
+import LabLogo from "@/app/components/LabLogo";
 
 export default function Header() {
+  const pathname = usePathname();
+  const isCatalogPage = pathname?.startsWith('/products');
   const { user, signOut } = useAuth();
   const { cartCount } = useCart();
   const { isDark, toggleTheme, mounted } = useTheme();
@@ -36,6 +43,22 @@ export default function Header() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isCatalogMenuOpen && !target.closest('[data-catalog-menu]')) {
+        setIsCatalogMenuOpen(false);
+      }
+      if (isAboutMenuOpen && !target.closest('[data-about-menu]')) {
+        setIsAboutMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCatalogMenuOpen, isAboutMenuOpen]);
   const [orderCount, setOrderCount] = useState(0);
   const [laboratories, setLaboratories] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -131,7 +154,7 @@ export default function Header() {
           </Link>
 
           {/* Catalog Dropdown */}
-          <div className="relative">
+          <div className="relative" data-catalog-menu>
             <button
               onClick={() => setIsCatalogMenuOpen(!isCatalogMenuOpen)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
@@ -142,36 +165,51 @@ export default function Header() {
             </button>
 
             {isCatalogMenuOpen && (
-              <div className="absolute left-0 mt-2 w-96 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2 z-50 max-h-96 overflow-y-auto">
+              <div className="absolute left-0 mt-2 w-[22rem] rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 py-2 z-50 max-h-[28rem] overflow-y-auto">
+                <Link
+                  href="/products"
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-900/20 border-b border-slate-100 dark:border-slate-800 mb-1"
+                  onClick={() => setIsCatalogMenuOpen(false)}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                  {locale === 'fr' ? 'Tout le catalogue' : 'Full catalog'}
+                </Link>
                 {laboratories.map((lab) => {
                   const labCategories = categories.filter(cat => cat.laboratoire_id === lab.id);
                   const isExpanded = expandedLabs.has(lab.id);
                   return (
-                    <div key={lab.id}>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          const newExpanded = new Set(expandedLabs);
-                          if (newExpanded.has(lab.id)) {
-                            newExpanded.delete(lab.id);
-                          } else {
-                            newExpanded.add(lab.id);
-                          }
-                          setExpandedLabs(newExpanded);
-                        }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      >
-                        <span>{lab.nom}</span>
+                    <div key={lab.id} className="border-b border-slate-50 dark:border-slate-800/80 last:border-0">
+                      <div className="flex items-center gap-1 pr-2">
+                        <Link
+                          href={catalogPath(lab)}
+                          className="flex-1 flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800 transition-colors min-w-0"
+                          onClick={() => setIsCatalogMenuOpen(false)}
+                        >
+                          <LabLogo slug={lab.slug} nom={lab.nom} size="sm" className="shrink-0 rounded-lg bg-white border border-slate-100 dark:border-slate-700" />
+                          <span className="truncate">{lab.nom}</span>
+                        </Link>
                         {labCategories.length > 0 && (
-                          <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newExpanded = new Set(expandedLabs);
+                              if (newExpanded.has(lab.id)) newExpanded.delete(lab.id);
+                              else newExpanded.add(lab.id);
+                              setExpandedLabs(newExpanded);
+                            }}
+                            className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            aria-label={locale === 'fr' ? 'Catégories' : 'Categories'}
+                          >
+                            <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          </button>
                         )}
-                      </button>
+                      </div>
                       {isExpanded && labCategories.length > 0 && (
-                        <div className="pl-8 pr-4 py-1">
+                        <div className="pb-2 pl-14 pr-4 space-y-0.5">
                           {labCategories.map((cat) => (
                             <Link
                               key={cat.id}
-                              href={`/products?lab=${lab.id}&category=${cat.id}`}
+                              href={catalogPath(lab, cat)}
                               className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                               onClick={() => setIsCatalogMenuOpen(false)}
                             >
@@ -188,7 +226,7 @@ export default function Header() {
           </div>
 
           {/* About Dropdown */}
-          <div className="relative">
+          <div className="relative" data-about-menu>
             <button
               onClick={() => setIsAboutMenuOpen(!isAboutMenuOpen)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
@@ -397,6 +435,20 @@ export default function Header() {
             </Link>
           )}
 
+          {isCatalogPage && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                window.dispatchEvent(new CustomEvent(OPEN_CATALOG_FILTERS_EVENT));
+              }}
+              className="lg:hidden flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+              aria-label={locale === 'fr' ? 'Filtres catalogue' : 'Catalog filters'}
+            >
+              <SlidersHorizontal className="w-5 h-5" />
+            </button>
+          )}
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -434,41 +486,61 @@ export default function Header() {
                 <ChevronDown className={`w-4 h-4 transition-transform ${isCatalogMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {isCatalogMenuOpen && (
-                <div className="pl-8 pr-4 py-2 space-y-1">
+                <div className="pl-4 pr-2 py-2 space-y-1">
+                  <Link
+                    href="/products"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsCatalogMenuOpen(false);
+                    }}
+                    className="block px-4 py-2 text-sm font-semibold text-sky-600 dark:text-sky-400"
+                  >
+                    {locale === 'fr' ? 'Tout le catalogue' : 'Full catalog'}
+                  </Link>
                   {laboratories.map((lab) => {
                     const labCategories = categories.filter(cat => cat.laboratoire_id === lab.id);
                     const isExpanded = expandedLabs.has(lab.id);
                     return (
                       <div key={lab.id}>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const newExpanded = new Set(expandedLabs);
-                            if (newExpanded.has(lab.id)) {
-                              newExpanded.delete(lab.id);
-                            } else {
-                              newExpanded.add(lab.id);
-                            }
-                            setExpandedLabs(newExpanded);
-                          }}
-                          className="w-full flex items-center justify-between px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg"
-                        >
-                          <span>{lab.nom}</span>
+                        <div className="flex items-center gap-1">
+                          <Link
+                            href={catalogPath(lab)}
+                            onClick={() => {
+                              setIsMobileMenuOpen(false);
+                              setIsCatalogMenuOpen(false);
+                            }}
+                            className="flex-1 flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 min-w-0"
+                          >
+                            <LabLogo slug={lab.slug} nom={lab.nom} size="sm" className="shrink-0 rounded bg-white border border-slate-100 dark:border-slate-700" />
+                            <span className="truncate">{lab.nom}</span>
+                          </Link>
                           {labCategories.length > 0 && (
-                            <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newExpanded = new Set(expandedLabs);
+                                if (newExpanded.has(lab.id)) newExpanded.delete(lab.id);
+                                else newExpanded.add(lab.id);
+                                setExpandedLabs(newExpanded);
+                              }}
+                              className="p-2 text-slate-400"
+                              aria-label={locale === 'fr' ? 'Catégories' : 'Categories'}
+                            >
+                              <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                            </button>
                           )}
-                        </button>
+                        </div>
                         {isExpanded && labCategories.length > 0 && (
-                          <div className="pl-4 py-1 space-y-1">
+                          <div className="pl-10 py-1 space-y-1">
                             {labCategories.map((cat) => (
                               <Link
                                 key={cat.id}
-                                href={`/products?lab=${lab.id}&category=${cat.id}`}
+                                href={catalogPath(lab, cat)}
                                 onClick={() => {
                                   setIsMobileMenuOpen(false);
                                   setIsCatalogMenuOpen(false);
                                 }}
-                                className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
+                                className="block px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                               >
                                 {cat.nom}
                               </Link>

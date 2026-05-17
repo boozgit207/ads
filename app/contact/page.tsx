@@ -33,12 +33,24 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      // Simuler l'envoi du formulaire
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de l\'envoi');
+      }
+
       showToast(locale === 'fr' ? 'Message envoyé avec succès !' : 'Message sent successfully!', 'success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {
+      console.error('Erreur:', error);
       showToast(locale === 'fr' ? 'Erreur lors de l\'envoi du message' : 'Error sending message', 'error');
     } finally {
       setIsSubmitting(false);
@@ -62,7 +74,7 @@ export default function ContactPage() {
       email: 'Email',
       phone: 'Téléphone',
       hours: 'Heures d\'ouverture',
-      hoursValue: 'Lun - Ven: 8h00 - 18h00',
+      hoursValue: 'Lun - Ven : 8h - 18h · Sam : 9h - 14h',
       backHome: 'Retour à l\'accueil',
       quickContact: 'Contact rapide',
       whatsapp: 'WhatsApp',
@@ -85,7 +97,7 @@ export default function ContactPage() {
       email: 'Email',
       phone: 'Phone',
       hours: 'Opening hours',
-      hoursValue: 'Mon - Fri: 8:00 AM - 6:00 PM',
+      hoursValue: 'Mon - Fri: 8:00 AM - 6:00 PM · Sat: 9:00 AM - 2:00 PM',
       backHome: 'Back to home',
       quickContact: 'Quick contact',
       whatsapp: 'WhatsApp',

@@ -4,12 +4,15 @@ import { getCategories } from "./actions/catalog";
 import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Accueil | ADS - Angela Diagnostics et Services",
-  description: "Découvrez ADS, votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique. Tests COVID-19, HIV, Malaria, Biochimie et plus.",
-  keywords: "accueil, réactifs laboratoire, tests diagnostiques, COVID-19, HIV, malaria, biochimie, Cameroun, Afrique, Elisa, test rapide, chlamydia",
+  title: "Réactifs de laboratoire au Cameroun | ADS - Fortress, Bioline",
+  description:
+    "ADS distribue des réactifs de laboratoire au Cameroun : latex RPR, CRP, ASO, ELISA, hormones, biochimie. Marques Fortress Diagnostics et Bioline. Stock Yaoundé, livraison Douala.",
+  keywords:
+    "réactifs laboratoire Cameroun, réactifs Fortress Diagnostics, Bioline Yaoundé, test latex RPR CRP, ELISA laboratoire, réactifs biochimie Douala, distributeur réactifs Afrique",
   openGraph: {
-    title: "Accueil | ADS - Angela Diagnostics et Services",
-    description: "Découvrez ADS, votre partenaire de confiance pour la distribution de réactifs de laboratoire et solutions diagnostiques en Afrique",
+    title: "Réactifs de laboratoire au Cameroun | ADS",
+    description:
+      "Distributeur de réactifs de laboratoire au Cameroun — Fortress, Bioline, Hightop. Commande en ligne, livraison et retrait à Yaoundé.",
     url: absoluteUrl("/"),
     type: "website",
   },

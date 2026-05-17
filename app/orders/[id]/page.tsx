@@ -9,7 +9,6 @@ import {
   Truck, 
   CheckCircle, 
   Clock,
-  Download,
   MessageCircle,
   ArrowLeft,
   Trash2
@@ -81,7 +80,6 @@ export default function OrderTrackingPage() {
       safetyProtocol: 'PROTOCOLE DE SÉCURITÉ',
       itemsInShipment: 'ARTICLES DANS CETTE EXPÉDITION',
       total: 'Total',
-      downloadInvoice: 'Télécharger la facture',
       supportChat: 'Chat support',
       loading: 'Chargement...',
       statusPending: 'En attente',
@@ -106,7 +104,6 @@ export default function OrderTrackingPage() {
       safetyProtocol: 'SAFETY PROTOCOL',
       itemsInShipment: 'ITEMS IN THIS SHIPMENT',
       total: 'Total',
-      downloadInvoice: 'Download Invoice',
       supportChat: 'Support Chat',
       loading: 'Loading...',
       statusPending: 'Pending',
@@ -308,15 +305,6 @@ export default function OrderTrackingPage() {
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-col md:flex-row gap-4">
-          <a
-            href={`/api/receipt/${order.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 md:flex-none border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2"
-          >
-            <Download className="w-5 h-5" />
-            {t.downloadInvoice}
-          </a>
           <Link
             href="/contact"
             className="flex-1 md:flex-none bg-blue-600 dark:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30"

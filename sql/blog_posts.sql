@@ -26,7 +26,8 @@ ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Lecture publique articles publiés" ON blog_posts;
 CREATE POLICY "Lecture publique articles publiés"
   ON blog_posts FOR SELECT
-  USING (is_published = true);
+  USING (is_published = true)
+  TO anon, authenticated;
 
 DROP POLICY IF EXISTS "Admins gestion blog" ON blog_posts;
 CREATE POLICY "Admins gestion blog"

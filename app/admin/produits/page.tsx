@@ -236,18 +236,21 @@ export default function ProduitsPage() {
         }
       }
 
+      const minStockRaw = formData.get('min_stock') as string;
+      const parsedMinStock = minStockRaw ? parseInt(minStockRaw, 10) : 5;
+
       const data = {
         categorie_id: formData.get('category') as string,
-        nom: formData.get('name') as string,
-        nom_en: formData.get('name_en') as string,
-        reference: formData.get('reference') as string,
-        code_barre: formData.get('barcode') as string,
-        description: formData.get('description') as string,
-        description_en: formData.get('description_en') as string,
+        nom: (formData.get('name') as string).trim(),
+        nom_en: (formData.get('name_en') as string)?.trim() || undefined,
+        reference: (formData.get('reference') as string)?.trim() || undefined,
+        code_barre: (formData.get('barcode') as string)?.trim() || undefined,
+        description: (formData.get('description') as string)?.trim() || undefined,
+        description_en: (formData.get('description_en') as string)?.trim() || undefined,
         prix: parseFloat(formData.get('price') as string),
-        quantite_stock: parseInt(formData.get('stock') as string),
-        seuil_alerte: parseInt(formData.get('min_stock') as string),
-        image_principale_url: imageUrl,
+        quantite_stock: parseInt(formData.get('stock') as string, 10) || 0,
+        seuil_alerte: Number.isNaN(parsedMinStock) ? 5 : parsedMinStock,
+        image_principale_url: imageUrl || undefined,
       };
 
       let productId = editingProduct?.id;
@@ -275,7 +278,8 @@ export default function ProduitsPage() {
       await loadData();
     } catch (error) {
       console.error('Error saving product:', error);
-      showToast('Erreur lors de l\'enregistrement du produit', 'error');
+      const msg = error instanceof Error ? error.message : 'Erreur lors de l\'enregistrement du produit';
+      showToast(msg, 'error');
     } finally {
       setUploading(false);
     }
@@ -692,6 +696,15 @@ export default function ProduitsPage() {
                       name="description"
                       rows={3}
                       defaultValue={editingProduct?.description}
+                      className="w-full border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 dark:bg-zinc-800 dark:text-white transition-all resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Description (English)</label>
+                    <textarea
+                      name="description_en"
+                      rows={3}
+                      defaultValue={editingProduct?.description_en}
                       className="w-full border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 dark:bg-zinc-800 dark:text-white transition-all resize-none"
                     />
                   </div>

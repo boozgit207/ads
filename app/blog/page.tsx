@@ -1,10 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { getPublishedPosts } from '../actions/blog';
 import { absoluteUrl } from '@/lib/seo';
 import { Calendar, User, ArrowRight } from 'lucide-react';
+
+/** ISR : régénération toutes les 60 s + invalidation via revalidateTag après publication admin */
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Blog | ADS - Angela Diagnostics et Services',
@@ -16,7 +20,6 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   const result = await getPublishedPosts();
   const posts = result.success ? result.posts || [] : [];
-
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <Header />
@@ -34,7 +37,7 @@ export default async function BlogPage() {
           {posts.length === 0 ? (
             <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800">
               <p className="text-xl text-zinc-500 dark:text-zinc-400">
-                Aucun article publié pour le moment. Revenez bientôt !
+                Aucun article pour le moment.
               </p>
             </div>
           ) : (
@@ -45,11 +48,14 @@ export default async function BlogPage() {
                   className="group bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
                 >
                   {post.image_url ? (
-                    <div className="aspect-video overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                      <img
+                    <div className="relative aspect-video overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                      <Image
                         src={post.image_url}
                         alt={post.titre}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        quality={80}
                       />
                     </div>
                   ) : (
@@ -76,7 +82,7 @@ export default async function BlogPage() {
                       {post.titre}
                     </h2>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-3 mb-4">
-                      {post.extrait || post.contenu.replace(/<[^>]+>/g, '').slice(0, 160)}
+                      {post.extrait || (post.contenu ?? '').replace(/<[^>]+>/g, '').slice(0, 160)}
                     </p>
                     <Link
                       href={`/blog/${post.slug}`}
@@ -96,3 +102,4 @@ export default async function BlogPage() {
     </div>
   );
 }
+

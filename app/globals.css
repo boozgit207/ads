@@ -98,3 +98,216 @@ body {
 .animate-slide-in-right {
   animation: slideInRight 0.8s ease-out forwards;
 }
+
+/* ——— Page d'accueil : animations au scroll ——— */
+@keyframes homeFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes homeScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes homeBlurIn {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes homeFloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-14px) scale(1.02);
+  }
+}
+
+@keyframes homeShimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes homeGradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes heroKenBurns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes heroLineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bounceSoft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.home-anim-prep:not(.home-anim-fade-up):not(.home-anim-fade-in):not(.home-anim-slide-left):not(.home-anim-slide-right):not(.home-anim-scale-up):not(.home-anim-blur-in) {
+  opacity: 0;
+}
+
+.home-anim-fade-up {
+  animation: homeFadeUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-anim-fade-in {
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+.home-anim-slide-left {
+  animation: slideInLeft 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-anim-slide-right {
+  animation: slideInRight 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-anim-scale-up {
+  animation: homeScaleUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-anim-blur-in {
+  animation: homeBlurIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.home-float {
+  animation: homeFloat 5s ease-in-out infinite;
+}
+
+.home-float-delay {
+  animation: homeFloat 6s ease-in-out 1.5s infinite;
+}
+
+.home-gradient-animate {
+  background-size: 200% 200%;
+  animation: homeGradient 8s ease infinite;
+}
+
+.home-hero-ken-burns {
+  animation: heroKenBurns 12s ease-out forwards;
+}
+
+.home-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 60%
+  );
+  animation: homeShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.home-card-glow {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    border-color 0.35s ease;
+}
+
+.home-card-glow:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 40px -12px rgba(14, 165, 233, 0.35),
+    0 8px 16px -8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .home-card-glow:hover {
+  box-shadow:
+    0 20px 40px -12px rgba(14, 165, 233, 0.25),
+    0 8px 16px -8px rgba(0, 0, 0, 0.4);
+}
+
+.home-mesh {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 20% 20%, rgba(14, 165, 233, 0.12) 0, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(99, 102, 241, 0.1) 0, transparent 45%),
+    radial-gradient(at 0% 80%, rgba(16, 185, 129, 0.08) 0, transparent 45%);
+}
+
+.dark .home-mesh {
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(at 20% 20%, rgba(14, 165, 233, 0.15) 0, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(99, 102, 241, 0.12) 0, transparent 45%),
+    radial-gradient(at 0% 80%, rgba(16, 185, 129, 0.1) 0, transparent 45%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-anim-prep,
+  .home-anim-fade-up,
+  .home-anim-fade-in,
+  .home-anim-slide-left,
+  .home-anim-slide-right,
+  .home-anim-scale-up,
+  .home-anim-blur-in,
+  .home-float,
+  .home-float-delay,
+  .home-gradient-animate,
+  .home-hero-ken-burns,
+  .home-shine::after {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

@@ -277,6 +277,19 @@ export async function listCategoriesSimple(laboratoireId?: string) {
   return data || [];
 }
 
+/** Toutes les catégories pour l'admin (y compris inactives) */
+export async function listCategoriesAdmin(laboratoireId?: string) {
+  let query = supabase.from('categories').select('*').order('nom', { ascending: true });
+
+  if (laboratoireId) {
+    query = query.eq('laboratoire_id', laboratoireId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
 export async function listProduitsSimple(search?: string) {
   try {
     let query = supabase
@@ -336,7 +349,7 @@ export async function deleteProduitSimple(id: string) {
 // ============================================================
 
 export { listProduitsSimple as listProduits };
-export { listCategoriesSimple as listCategories };
+export { listCategoriesAdmin as listCategories };
 export { listLaboratoiresSimple as listLaboratoires };
 export { deleteProduitSimple as deleteProduit };
 
@@ -364,14 +377,26 @@ export async function createProduit(data: {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
+  const insertPayload: Record<string, unknown> = {
+    categorie_id: data.categorie_id,
+    nom: data.nom,
+    slug,
+    prix: data.prix,
+    statut: 'disponible',
+    is_active: true,
+    quantite_stock: data.quantite_stock ?? 0,
+    seuil_alerte: data.seuil_alerte ?? 5,
+  };
+  if (data.nom_en) insertPayload.nom_en = data.nom_en;
+  if (data.reference) insertPayload.reference = data.reference;
+  if (data.code_barre) insertPayload.code_barre = data.code_barre;
+  if (data.description) insertPayload.description = data.description;
+  if (data.description_en) insertPayload.description_en = data.description_en;
+  if (data.image_principale_url) insertPayload.image_principale_url = data.image_principale_url;
+
   const { data: result, error } = await supabase
     .from('produits')
-    .insert({
-      ...data,
-      slug,
-      statut: 'disponible',
-      is_active: true,
-    })
+    .insert(insertPayload)
     .select()
     .single();
 
@@ -397,10 +422,11 @@ export async function updateProduit(
     image_principale_url?: string;
   }
 ) {
-  // Générer nouveau slug si nom change
-  let updateData: any = { ...data, updated_at: new Date().toISOString() };
-  
+  const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+
+  if (data.categorie_id) updateData.categorie_id = data.categorie_id;
   if (data.nom) {
+    updateData.nom = data.nom;
     updateData.slug = data.nom
       .toLowerCase()
       .normalize('NFD')
@@ -408,6 +434,15 @@ export async function updateProduit(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
   }
+  if (data.nom_en !== undefined) updateData.nom_en = data.nom_en || null;
+  if (data.reference !== undefined) updateData.reference = data.reference || null;
+  if (data.code_barre !== undefined) updateData.code_barre = data.code_barre || null;
+  if (data.description !== undefined) updateData.description = data.description || null;
+  if (data.description_en !== undefined) updateData.description_en = data.description_en || null;
+  if (data.prix !== undefined) updateData.prix = data.prix;
+  if (data.quantite_stock !== undefined) updateData.quantite_stock = data.quantite_stock;
+  if (data.seuil_alerte !== undefined) updateData.seuil_alerte = data.seuil_alerte;
+  if (data.image_principale_url) updateData.image_principale_url = data.image_principale_url;
 
   const { data: result, error } = await supabase
     .from('produits')
@@ -536,6 +571,12 @@ export async function uploadAndSaveProductImages(
   produit_id: string,
   images: { base64: string; filename: string }[]
 ) {
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY) {
+    throw new Error(
+      'Cloudinary non configuré. Ajoutez CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY et CLOUDINARY_API_SECRET dans .env.local'
+    );
+  }
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   
   // Upload all images to Cloudinary
