@@ -1,6 +1,13 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
+import {
+  sendNewOrderToAdmin,
+  sendOrderConfirmationToClient,
+  type OrderEmailPayload,
+} from '@/lib/email';
+import { ADMIN_ORDER_EMAIL, DELIVERY_FEE_FCFA } from '@/lib/order-config';
+import { formatPhoneForStorage } from '@/lib/phone-utils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -281,6 +288,177 @@ export async function getAdminNotifications(): Promise<{ success: boolean; notif
   } catch (error: any) {
     console.error('Erreur getAdminNotifications:', error);
     return { success: true, notifications: [] };
+  }
+}
+
+export type CreateOrderInput = {
+  userId?: string | null;
+  cart: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string | null;
+  }>;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  notes?: string;
+  deliveryOption: 'pickup' | 'delivery';
+  paymentMethod: 'om' | 'mtn';
+};
+
+export async function createOrderFromCheckout(
+  input: CreateOrderInput
+): Promise<{
+  success: boolean;
+  orderId?: string;
+  numero?: string;
+  error?: string;
+}> {
+  try {
+    const supabase = await createAdminSupabaseClient();
+    const cartItems = input.cart || [];
+
+    if (cartItems.length === 0) {
+      return { success: false, error: 'Panier vide' };
+    }
+
+    const sousTotal = cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const fraisLivraison =
+      input.deliveryOption === 'delivery' ? DELIVERY_FEE_FCFA : 0;
+    const totalCommande = sousTotal + fraisLivraison;
+    const phone = formatPhoneForStorage(input.phone);
+
+    const methodePaiement =
+      input.paymentMethod === 'om' ? 'orange_money' : 'mtn_mobile_money';
+    const typeLivraison =
+      input.deliveryOption === 'delivery' ? 'livraison_domicile' : 'retrait_magasin';
+
+    const clientNote = input.notes?.trim()
+      ? `Note client: ${input.notes.trim()}`
+      : null;
+
+    const { data: order, error: orderError } = await supabase
+      .from('commandes')
+      .insert({
+        user_id: input.userId || null,
+        client_nom: input.lastName,
+        client_prenom: input.firstName,
+        client_phone: phone,
+        client_email: input.email?.trim() || null,
+        adresse_livraison:
+          input.deliveryOption === 'delivery' ? input.address || '' : 'Retrait sur place',
+        ville_livraison: input.city || 'Yaoundé',
+        type_livraison: typeLivraison,
+        sous_total: sousTotal,
+        frais_livraison: fraisLivraison,
+        total_commande: totalCommande,
+        statut: 'en_attente',
+        methode_paiement: methodePaiement,
+        note_admin: clientNote,
+      })
+      .select()
+      .single();
+
+    if (orderError || !order) {
+      console.error('Erreur création commande:', orderError);
+      return {
+        success: false,
+        error: orderError?.message || 'Impossible de créer la commande',
+      };
+    }
+
+    const orderItems = cartItems.map((item) => ({
+      commande_id: order.id,
+      produit_id: item.id,
+      produit_nom: item.name,
+      produit_image_url: item.image || null,
+      quantite: item.quantity,
+      prix_unitaire: item.price,
+      prix_total: item.price * item.quantity,
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('commande_items')
+      .insert(orderItems);
+
+    if (itemsError) {
+      console.error('Erreur articles commande:', itemsError);
+      await supabase.from('commandes').delete().eq('id', order.id);
+      return { success: false, error: itemsError.message };
+    }
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const numero = order.numero_commande || order.id.slice(0, 8);
+    const trackingUrl = `${siteUrl}/orders/${order.id}?phone=${encodeURIComponent(phone)}`;
+
+    const emailPayload: OrderEmailPayload = {
+      numero,
+      orderId: order.id,
+      clientName: `${input.firstName} ${input.lastName}`.trim(),
+      clientEmail: input.email,
+      clientPhone: phone,
+      address: input.deliveryOption === 'delivery' ? input.address : undefined,
+      city: input.city,
+      deliveryType:
+        input.deliveryOption === 'delivery'
+          ? 'Livraison à domicile'
+          : 'Retrait sur place',
+      paymentMethod:
+        input.paymentMethod === 'om' ? 'Orange Money' : 'MTN Mobile Money',
+      subtotal: sousTotal,
+      deliveryFee: fraisLivraison,
+      total: totalCommande,
+      items: cartItems.map((i) => ({
+        name: i.name,
+        quantity: i.quantity,
+        price: i.price,
+      })),
+      notes: input.notes,
+      trackingUrl,
+    };
+
+    try {
+      await sendAdminNotification('new_order', {
+        id: order.id,
+        numero,
+        client_nom: order.client_nom,
+        client_prenom: order.client_prenom,
+        total_commande: totalCommande,
+        methode_paiement: methodePaiement,
+      });
+    } catch (e) {
+      console.error('Notification admin:', e);
+    }
+
+    const [clientMail, adminMail] = await Promise.all([
+      sendOrderConfirmationToClient(emailPayload),
+      sendNewOrderToAdmin(emailPayload, ADMIN_ORDER_EMAIL),
+    ]);
+
+    if (!clientMail.ok && input.email) {
+      console.warn('Email client:', clientMail.error);
+    }
+    if (!adminMail.ok) {
+      console.warn('Email admin:', adminMail.error);
+    }
+
+    return {
+      success: true,
+      orderId: order.id,
+      numero,
+    };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur serveur';
+    console.error('createOrderFromCheckout:', error);
+    return { success: false, error: message };
   }
 }
 

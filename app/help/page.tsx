@@ -95,7 +95,7 @@ export default function HelpPage() {
             },
             {
               question: 'Combien coûte la livraison ?',
-              answer: '• Retrait sur place : Gratuit\n• Livraison express : 1 500 FCFA\n• Livraison gratuite : Pour les commandes supérieures à 500 000 FCFA\n\nLes frais de livraison sont calculés automatiquement lors du checkout.',
+              answer: '• Retrait sur place : Gratuit\n• Livraison à domicile : 2 000 FCFA\n\nLes frais de livraison sont ajoutés au checkout si vous choisissez la livraison.',
               icon: Package
             },
             {

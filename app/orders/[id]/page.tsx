@@ -26,6 +26,9 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const isGuestTracking =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('phone');
 
   useEffect(() => {
     if (id) {
@@ -35,7 +38,15 @@ export default function OrderTrackingPage() {
 
   const fetchOrder = async () => {
     try {
-      const response = await fetch(`/api/orders/${id}`);
+      const params =
+        typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search)
+          : null;
+      const phone = params?.get('phone');
+      const url = phone
+        ? `/api/orders/${id}?phone=${encodeURIComponent(phone)}`
+        : `/api/orders/${id}`;
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setOrder(data);

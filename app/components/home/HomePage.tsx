@@ -9,7 +9,6 @@ import AnimateInView from './AnimateInView';
 import SectionHeading from './SectionHeading';
 import Footer from '../Footer';
 import StarRating from '../StarRating';
-import AuthRedirect from '../AuthRedirect';
 import {
   FlaskConical,
   TestTube,
@@ -27,7 +26,6 @@ import {
   ShoppingCart
 } from 'lucide-react';
 
-import { useAuth } from '../../context/AuthContext';
 import { useI18n } from '../../context/I18nContext';
 import { useCart } from '../../context/CartContext';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary-image';
@@ -68,7 +66,6 @@ const featureMeta = [
 ];
 
 export default function HomePage({ categories }: HomePageProps) {
-  const { user } = useAuth();
   const { locale } = useI18n();
   const { addToCart } = useCart();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
@@ -181,9 +178,8 @@ export default function HomePage({ categories }: HomePageProps) {
   }, [isMounted]);
 
   return (
-    <AuthRedirect>
-      <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
-        <Header />
+    <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <Header />
 
       {/* Hero Carousel */}
       <HeroCarousel
@@ -599,6 +595,5 @@ export default function HomePage({ categories }: HomePageProps) {
 
       <Footer />
       </div>
-    </AuthRedirect>
   );
 }

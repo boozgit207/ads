@@ -1,16 +1,57 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { createAdminSupabaseClient } from '@/app/actions/orders';
 import { canUserDeleteOrder, normalizeOrderForClient } from '@/lib/order-utils';
-import { NextResponse } from 'next/server';
+import { normalizePhoneDigits } from '@/lib/phone-utils';
+import { NextRequest, NextResponse } from 'next/server';
+
+async function fetchOrderForGuest(id: string, phoneParam: string) {
+  const supabase = await createAdminSupabaseClient();
+  const phoneDigits = normalizePhoneDigits(phoneParam);
+
+  const { data: order, error } = await supabase
+    .from('commandes')
+    .select(`
+      *,
+      commande_items (
+        id,
+        produit_nom,
+        produit_image_url,
+        quantite,
+        prix_unitaire
+      )
+    `)
+    .eq('id', id)
+    .single();
+
+  if (error || !order) {
+    return null;
+  }
+
+  if (normalizePhoneDigits(order.client_phone || '') !== phoneDigits) {
+    return null;
+  }
+
+  return order;
+}
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const phone = request.nextUrl.searchParams.get('phone');
 
     if (!id) {
       return NextResponse.json({ error: 'ID requis' }, { status: 400 });
+    }
+
+    if (phone) {
+      const guestOrder = await fetchOrderForGuest(id, phone);
+      if (guestOrder) {
+        return NextResponse.json(normalizeOrderForClient(guestOrder));
+      }
+      return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
     }
 
     const supabase = await createServerSupabaseClient();

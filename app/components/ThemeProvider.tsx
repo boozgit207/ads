@@ -21,7 +21,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const savedDarkMode = localStorage.getItem('ads-dark-mode');
-      const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      // Mode clair par défaut (ignore prefers-color-scheme)
+      const isDarkMode = savedDarkMode === 'true';
 
       setIsDark(isDarkMode);
       // Force the dark class on html element

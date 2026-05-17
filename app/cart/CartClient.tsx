@@ -82,8 +82,6 @@ export default function CartClient() {
   }[locale];
 
   const subtotal = cart.reduce((sum: number, item: any) => sum + (item.price || 0) * item.quantity, 0);
-  const deliveryFee = subtotal > 500000 ? 0 : 1500;
-  const total = subtotal + deliveryFee;
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -236,15 +234,13 @@ export default function CartClient() {
                     </div>
                     <div className="flex justify-between text-zinc-600 dark:text-zinc-400 text-sm lg:text-base">
                       <span className="font-medium">{t.delivery}</span>
-                      <span className={`font-semibold ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
-                        {deliveryFee === 0 ? t.free : `${deliveryFee.toLocaleString()} FCFA`}
-                      </span>
+                      <span className="font-semibold text-zinc-400">—</span>
                     </div>
                     <div className="border-t-2 border-zinc-200 dark:border-zinc-800 pt-4 lg:pt-5">
                       <div className="flex justify-between">
                         <span className="font-bold text-lg lg:text-xl text-zinc-900 dark:text-white">{t.orderTotal}</span>
                         <span className="font-bold text-2xl lg:text-3xl text-zinc-900 dark:text-white">
-                          {total.toLocaleString()} FCFA
+                          {subtotal.toLocaleString()} FCFA
                         </span>
                       </div>
                     </div>

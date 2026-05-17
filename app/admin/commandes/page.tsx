@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import { ThemeProvider } from '../components/ThemeProvider';
+import AdminLayout from '../components/AdminLayout';
 import {
   Search,
   Eye,
@@ -182,37 +181,10 @@ export default function CommandesPage() {
   };
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 flex">
-        {/* Background decoration */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        </div>
+    <AdminLayout title="Commandes" titleEn="Orders">
+      <div className="space-y-6">
+            <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
 
-        <Sidebar />
-        
-        <div className="flex-1 lg:ml-64 transition-all duration-300">
-          {/* Header */}
-          <header className="sticky top-0 z-40 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="flex h-16 items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                    <Package className="w-5 h-5" />
-                  </div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent">
-                    Gestion des commandes
-                  </h1>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Main content */}
-          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-8 pt-20 lg:pt-8">
-            {/* Stats summary */}
-            <div className="grid gap-6 sm:grid-cols-4 mb-8">
               {[
                 { label: 'En attente', value: stats.en_attente, Icon: Clock, gradient: 'from-yellow-500 to-amber-500', statusFilter: 'en_attente' },
                 { label: 'Payées', value: stats.paiement_recu || 0, Icon: CheckCircle2, gradient: 'from-blue-500 to-cyan-500', statusFilter: 'paiement_recu' },
@@ -222,10 +194,10 @@ export default function CommandesPage() {
                 <button
                   key={label}
                   onClick={() => setSelectedStatus(selectedStatus === statusFilter ? '' : statusFilter)}
-                  className={`group relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 border shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 text-left ${
-                    selectedStatus === statusFilter 
-                      ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-500/20' 
-                      : 'border-zinc-200/50 dark:border-zinc-800/50'
+                  className={`rounded-xl p-4 sm:p-5 bg-white border text-left transition-all hover:shadow-md ${
+                    selectedStatus === statusFilter
+                      ? 'border-blue-500 ring-2 ring-blue-500/20'
+                      : 'border-slate-200'
                   }`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-10 transition-opacity rounded-full -translate-y-1/2 translate-x-1/2`}></div>
@@ -243,7 +215,7 @@ export default function CommandesPage() {
             </div>
 
             {/* Filters */}
-            <div className="bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl p-6 mb-8">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6">
               <div className="flex gap-4 flex-wrap items-center">
                 <div className="relative flex-1 min-w-[200px]">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
@@ -312,7 +284,7 @@ export default function CommandesPage() {
             )}
 
             {/* Orders table */}
-            <div className="bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-xl overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-zinc-50/50 dark:bg-zinc-800/50 border-b border-zinc-200/50 dark:border-zinc-800/50">
@@ -479,7 +451,6 @@ export default function CommandesPage() {
                 </button>
               </div>
             </div>
-          </main>
 
           {/* Modal Order Details */}
           {showModal && selectedOrder && (
@@ -498,6 +469,31 @@ export default function CommandesPage() {
                   </button>
                 </div>
                 <div className="p-6 space-y-6">
+                  {/* Articles */}
+                  {selectedOrder.commande_items && selectedOrder.commande_items.length > 0 && (
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                        <Package className="w-4 h-4 text-blue-600" />
+                        Produits commandés
+                      </h3>
+                      <ul className="space-y-2">
+                        {selectedOrder.commande_items.map((item: any) => (
+                          <li key={item.id} className="flex justify-between text-sm text-slate-700 py-2 border-b border-slate-100 last:border-0">
+                            <span>{item.produit_nom} × {item.quantite}</span>
+                            <span className="font-medium">
+                              {((item.prix_unitaire || 0) * (item.quantite || 1)).toLocaleString()} FCFA
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-3 text-sm text-slate-500">
+                        Paiement : {selectedOrder.methode_paiement === 'orange_money' ? 'Orange Money' :
+                          selectedOrder.methode_paiement === 'mtn_mobile_money' ? 'MTN Mobile Money' :
+                          selectedOrder.methode_paiement || '—'}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Customer info */}
                   <div className="p-4 bg-zinc-50 dark:bg-zinc-800 rounded-2xl">
                     <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
@@ -659,8 +655,7 @@ export default function CommandesPage() {
               </div>
             </div>
           )}
-        </div>
       </div>
-    </ThemeProvider>
+    </AdminLayout>
   );
 }

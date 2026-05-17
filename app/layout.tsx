@@ -96,6 +96,10 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo_1.svg" />
+      </head>
+      <body className="min-h-full flex flex-col">
         <Script
           id="dark-mode-script"
           strategy="beforeInteractive"
@@ -104,7 +108,10 @@ export default async function RootLayout({
               (function() {
                 try {
                   const savedDarkMode = localStorage.getItem('ads-dark-mode');
-                  const isDarkMode = savedDarkMode === 'true' || (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  const isDarkMode = savedDarkMode === 'true';
+                  if (savedDarkMode === null) {
+                    try { localStorage.setItem('ads-dark-mode', 'false'); } catch (e) {}
+                  }
                   if (isDarkMode) {
                     document.documentElement.classList.add('dark');
                     document.documentElement.classList.remove('light');
@@ -119,10 +126,6 @@ export default async function RootLayout({
             `,
           }}
         />
-        <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/logo_1.svg" />
-      </head>
-      <body className="min-h-full flex flex-col">
         <LoadingScreen />
         <StructuredData />
         <I18nProvider>

@@ -23,6 +23,9 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
+import { CONTACT } from '@/lib/config';
+import { DELIVERY_FEE_FCFA } from '@/lib/order-config';
+import { formatPhoneForStorage } from '@/lib/phone-utils';
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -46,6 +49,8 @@ export default function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [finalAmount, setFinalAmount] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderNumero, setOrderNumero] = useState<string | null>(null);
+  const [trackingPhone, setTrackingPhone] = useState('');
 
   useEffect(() => {
     // Pre-fill form data when user is available
@@ -74,7 +79,7 @@ export default function CheckoutPage() {
       notes: 'Notes (optionnel)',
       delivery: 'Mode de livraison',
       pickup: 'Retrait sur place (Gratuit)',
-      deliveryOption: 'Livraison à domicile (+1 500 FCFA)',
+      deliveryOption: `Livraison à domicile (+${DELIVERY_FEE_FCFA.toLocaleString('fr-FR')} FCFA)`,
       payment: 'Mode de paiement',
       om: 'Orange Money',
       mtn: 'MTN Mobile Money',
@@ -86,9 +91,11 @@ export default function CheckoutPage() {
       confirmOrder: 'Confirmer la commande',
       processing: 'Traitement en cours...',
       paymentInstructions: {
-        om: 'Instructions Orange Money:\n1. Composez #150#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro: 697 12 13 28\n4. Montant: {amount}\n5. Validez avec votre code',
-        mtn: 'Instructions MTN MoMo:\n1. Composez *126#\n2. Choisissez 1 (Transfert)\n3. Entrez le numéro\n4. Montant: {amount}\n5. Confirmez avec votre code',
+        om: `Paiement Orange Money (hors plateforme):\n1. Composez #150#\n2. Transfert d'argent\n3. Numéro marchand: ${CONTACT.phoneOrange}\n4. Montant à payer: {amount}\n5. Validez avec votre code secret`,
+        mtn: `Paiement MTN Mobile Money (hors plateforme):\n1. Composez *126#\n2. Transfert d'argent\n3. Numéro marchand MTN: ${CONTACT.phoneMtn}\n4. Montant à payer: {amount}\n5. Confirmez avec votre code secret`,
       },
+      trackOrder: 'Suivre ma commande',
+      paymentNote: 'Le paiement se fait en dehors du site (OM ou MTN). Votre commande est enregistrée dès validation.',
       thankYou: 'Merci pour votre commande !',
       orderReceived: 'Votre commande a été reçue et est en cours de traitement.',
       orderNumber: 'N° de commande',
@@ -110,7 +117,7 @@ export default function CheckoutPage() {
       notes: 'Notes (optional)',
       delivery: 'Delivery method',
       pickup: 'Pickup (Free)',
-      deliveryOption: 'Home delivery (+1 500 FCFA)',
+      deliveryOption: `Home delivery (+${DELIVERY_FEE_FCFA.toLocaleString('en-US')} FCFA)`,
       payment: 'Payment Method',
       om: 'Orange Money',
       mtn: 'MTN Mobile Money',
@@ -122,9 +129,11 @@ export default function CheckoutPage() {
       confirmOrder: 'Confirm order',
       processing: 'Processing...',
       paymentInstructions: {
-        om: 'Orange Money instructions:\n1. Dial #150#\n2. Select 1 (Transfer)\n3. Enter number: 697 12 13 28\n4. Amount: {amount}\n5. Confirm with PIN',
-        mtn: 'MTN MoMo instructions:\n1. Dial *126#\n2. Select 1 (Transfer)\n3. Enter number\n4. Amount: {amount}\n5. Confirm with PIN',
+        om: `Orange Money (off-site):\n1. Dial #150#\n2. Money transfer\n3. Merchant: ${CONTACT.phoneOrange}\n4. Amount: {amount}\n5. Confirm with PIN`,
+        mtn: `MTN Mobile Money (off-site):\n1. Dial *126#\n2. Money transfer\n3. MTN number: ${CONTACT.phoneMtn}\n4. Amount: {amount}\n5. Confirm with PIN`,
       },
+      trackOrder: 'Track my order',
+      paymentNote: 'Payment is made outside the site (OM or MTN). Your order is saved upon confirmation.',
       thankYou: 'Thank you for your order!',
       orderReceived: 'Your order has been received and is being processed.',
       orderNumber: 'Order number',
@@ -135,21 +144,10 @@ export default function CheckoutPage() {
   }[locale];
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryFee = deliveryOption === 'delivery' ? 1500 : 0;
+  const deliveryFee = deliveryOption === 'delivery' ? DELIVERY_FEE_FCFA : 0;
   const total = subtotal + deliveryFee;
 
-  // Helper function to format phone number with country code
-  const formatPhoneNumber = (phone: string): string => {
-    // Remove all non-digit characters
-    let cleaned = phone.replace(/\D/g, '');
-    
-    // If number is 9 digits and starts with 6 (Cameroon format), add 237 prefix
-    if (cleaned.length === 9 && cleaned.startsWith('6')) {
-      cleaned = '237' + cleaned;
-    }
-    
-    return cleaned;
-  };
+  const formatAmount = (n: number) => `${n.toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US')} FCFA`;
 
   const handleSubmit = async () => {
     if (step === 'info') {
@@ -161,45 +159,63 @@ export default function CheckoutPage() {
     } else if (step === 'delivery') {
       setStep('payment');
     } else if (step === 'payment') {
-      // Paiement Camerpay (OM/MTN)
-      setIsLoading(true);
+      if (deliveryOption === 'delivery' && !formData.address?.trim()) {
+        showToast(locale === 'fr' ? 'Adresse de livraison requise' : 'Delivery address required', 'error');
+        return;
+      }
 
-      // Générer un ID de commande pour Camerpay
-      const camerpayOrderId = `ADS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      setIsLoading(true);
+      const phoneStored = formatPhoneForStorage(formData.phone);
 
       try {
-        const response = await fetch('/api/payments/camerpay', {
+        const response = await fetch('/api/orders/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: user?.id,
             cart,
-            amount: total,
-            phone: formatPhoneNumber(formData.phone),
-            operator: paymentMethod === 'om' ? 'orange' : 'mtn',
-            reference: camerpayOrderId,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: phoneStored,
+            email: formData.email,
+            address: formData.address,
+            city: formData.city,
+            notes: formData.notes,
+            deliveryOption,
+            paymentMethod,
           }),
         });
 
         const data = await response.json();
 
         if (data.success) {
-          // Stocker le montant avant de vider le panier
           setFinalAmount(total);
-          // Stocker l'ID de la commande
           setOrderId(data.orderId);
-          // Vider le panier
+          setOrderNumero(data.numero);
+          setTrackingPhone(phoneStored);
+          localStorage.setItem(
+            'ads-last-order',
+            JSON.stringify({
+              id: data.orderId,
+              numero: data.numero,
+              phone: phoneStored,
+            })
+          );
           clearCart();
-          // Mettre à jour le compteur de commandes
-          const currentCount = parseInt(localStorage.getItem('ads-order-count') || '0');
-          localStorage.setItem('ads-order-count', (currentCount + 1).toString());
+          const currentCount = parseInt(localStorage.getItem('ads-order-count') || '0', 10);
+          localStorage.setItem('ads-order-count', String(currentCount + 1));
           setOrderComplete(true);
         } else {
-          showToast(data.error || 'Échec du paiement. Veuillez réessayer.', 'error');
+          showToast(data.error || (locale === 'fr' ? 'Échec de la commande.' : 'Order failed.'), 'error');
         }
       } catch (error) {
         console.error('Erreur lors de la commande:', error);
-        showToast('Une erreur est survenue lors du traitement de votre commande. Veuillez réessayer ou contacter le support.', 'error');
+        showToast(
+          locale === 'fr'
+            ? 'Une erreur est survenue. Réessayez ou contactez le support.'
+            : 'An error occurred. Please try again or contact support.',
+          'error'
+        );
       }
 
       setIsLoading(false);
@@ -224,10 +240,25 @@ export default function CheckoutPage() {
             
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 text-left">
                 <p className="text-sm text-amber-800 dark:text-amber-200 whitespace-pre-line">
-                  {t.paymentInstructions[paymentMethod].replace('{amount}', `${finalAmount.toLocaleString()} FCFA`)}
+                  {t.paymentInstructions[paymentMethod].replace('{amount}', formatAmount(finalAmount))}
                 </p>
               </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            {orderNumero && (
+              <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 mb-4">
+                {t.orderNumber}: {orderNumero}
+              </p>
+            )}
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">{t.paymentNote}</p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              {orderId && (
+                <Link
+                  href={`/orders/${orderId}?phone=${encodeURIComponent(trackingPhone)}`}
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700"
+                >
+                  {t.trackOrder}
+                </Link>
+              )}
               <Link
                 href="/products"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700"
@@ -521,7 +552,7 @@ export default function CheckoutPage() {
                         </div>
                         <div>
                           <p className="font-bold text-lg text-zinc-900 dark:text-white">{t.mtn}</p>
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">Paiement mobile simple</p>
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{CONTACT.phoneMtn}</p>
                         </div>
                       </div>
                     </label>
@@ -532,9 +563,12 @@ export default function CheckoutPage() {
                   <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/30 border-2 border-amber-200 dark:border-amber-800 rounded-2xl shadow-sm">
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-base text-amber-800 dark:text-amber-200 whitespace-pre-line font-medium">
-                        {t.paymentInstructions[paymentMethod].replace('{amount}', `${finalAmount.toLocaleString()} FCFA`)}
-                      </p>
+                      <div>
+                        <p className="text-base text-amber-800 dark:text-amber-200 whitespace-pre-line font-medium">
+                          {t.paymentInstructions[paymentMethod].replace('{amount}', formatAmount(total))}
+                        </p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300 mt-3">{t.paymentNote}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

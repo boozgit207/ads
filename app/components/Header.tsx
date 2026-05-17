@@ -17,6 +17,7 @@ import {
   LogOut,
   Settings,
   ShoppingCart,
+  Package,
   Grid3X3,
   ShoppingBag,
   FileText,
@@ -321,6 +322,15 @@ export default function Header() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-3">
+          <Link
+            href="/suivi"
+            onClick={closeAllMenus}
+            className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800"
+            aria-label={locale === 'fr' ? 'Suivi commande' : 'Track order'}
+          >
+            <Package className="w-5 h-5" />
+          </Link>
+
           {/* Cart Icon */}
           <Link
             href="/cart"
