@@ -121,7 +121,6 @@ export default async function RootLayout({
         />
         <link rel="icon" href="/logo_1.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo_1.svg" />
-        <GoogleAnalytics />
       </head>
       <body className="min-h-full flex flex-col">
         <LoadingScreen />
@@ -138,6 +137,7 @@ export default async function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </I18nProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );

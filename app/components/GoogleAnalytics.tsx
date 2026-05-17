@@ -66,7 +66,7 @@ export default function GoogleAnalytics() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${measurementId}', { anonymize_ip: true, send_page_view: true });
+          gtag('config', '${measurementId}', { anonymize_ip: true, send_page_view: false });
         `}
       </Script>
       <Suspense fallback={null}>

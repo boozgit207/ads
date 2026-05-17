@@ -42,9 +42,43 @@ export default function Header() {
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
+  const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false);
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
+  const [isMobileAboutOpen, setIsMobileAboutOpen] = useState(false);
 
-  // Close dropdowns when clicking outside
+  const closeAllMenus = () => {
+    setIsMobileMenuOpen(false);
+    setIsAccountMenuOpen(false);
+    setIsLangMenuOpen(false);
+    setIsCatalogMenuOpen(false);
+    setIsMobileCatalogOpen(false);
+    setIsAboutMenuOpen(false);
+    setIsMobileAboutOpen(false);
+  };
+
+  useEffect(() => {
+    closeAllMenus();
+  }, [pathname]);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeAllMenus();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -54,11 +88,17 @@ export default function Header() {
       if (isAboutMenuOpen && !target.closest('[data-about-menu]')) {
         setIsAboutMenuOpen(false);
       }
+      if (isLangMenuOpen && !target.closest('[data-lang-menu]')) {
+        setIsLangMenuOpen(false);
+      }
+      if (isAccountMenuOpen && !target.closest('[data-account-menu]')) {
+        setIsAccountMenuOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isCatalogMenuOpen, isAboutMenuOpen]);
+  }, [isCatalogMenuOpen, isAboutMenuOpen, isLangMenuOpen, isAccountMenuOpen]);
   const [orderCount, setOrderCount] = useState(0);
   const [laboratories, setLaboratories] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -136,11 +176,10 @@ export default function Header() {
   const common = t.common;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 shadow-sm">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity group">
-          <img src="/logo_1.svg" alt={imageAlt('logo', locale)} className="h-16 w-16 group-hover:scale-110 transition-transform" />
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95 shadow-sm">
+      <div className="mx-auto flex h-16 md:h-20 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center hover:opacity-80 transition-opacity group" onClick={closeAllMenus}>
+          <img src="/logo_1.svg" alt={imageAlt('logo', locale)} className="h-11 w-11 md:h-14 md:w-14 group-hover:scale-105 transition-transform" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -285,7 +324,8 @@ export default function Header() {
           {/* Cart Icon */}
           <Link
             href="/cart"
-            className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400 relative"
+            onClick={closeAllMenus}
+            className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400 relative"
             aria-label={nav.cart}
           >
             <ShoppingCart className="w-5 h-5" />
@@ -302,7 +342,7 @@ export default function Header() {
           </div>
 
           {/* Language Selector */}
-          <div className="relative">
+          <div className="relative" data-lang-menu>
             <button
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
               className="hidden sm:flex h-11 items-center gap-2 px-4 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
@@ -349,7 +389,7 @@ export default function Header() {
 
           {/* Account */}
           {user ? (
-            <div className="relative">
+            <div className="relative hidden sm:block" data-account-menu>
               <button
                 onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
                 className="flex h-11 items-center gap-3 pl-3 pr-4 rounded-xl border border-slate-200 transition-all hover:border-sky-300 hover:bg-slate-50 dark:border-slate-700 dark:hover:border-sky-600 dark:hover:bg-slate-800"
@@ -460,13 +500,22 @@ export default function Header() {
         </div>
       </div>
 
+      {isMobileMenuOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 top-16 z-40 md:hidden bg-black/25"
+          aria-label={locale === 'fr' ? 'Fermer le menu' : 'Close menu'}
+          onClick={closeAllMenus}
+        />
+      )}
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+        <div className="relative z-50 md:hidden border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 max-h-[min(70vh,calc(100dvh-4rem))] overflow-y-auto overscroll-contain">
           <nav className="flex flex-col p-4 space-y-1">
             <Link
               href="/"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={closeAllMenus}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Home className="w-5 h-5" />
@@ -476,23 +525,21 @@ export default function Header() {
             {/* Catalog Dropdown Mobile */}
             <div>
               <button
-                onClick={() => setIsCatalogMenuOpen(!isCatalogMenuOpen)}
+                type="button"
+                onClick={() => setIsMobileCatalogOpen(!isMobileCatalogOpen)}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
               >
                 <span className="flex items-center gap-3">
                   <Grid3X3 className="w-5 h-5" />
                   {nav.catalog}
                 </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isCatalogMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${isMobileCatalogOpen ? 'rotate-180' : ''}`} />
               </button>
-              {isCatalogMenuOpen && (
-                <div className="pl-4 pr-2 py-2 space-y-1">
+              {isMobileCatalogOpen && (
+                <div className="pl-4 pr-2 py-2 space-y-1 max-h-64 overflow-y-auto">
                   <Link
                     href="/products"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsCatalogMenuOpen(false);
-                    }}
+                    onClick={closeAllMenus}
                     className="block px-4 py-2 text-sm font-semibold text-sky-600 dark:text-sky-400"
                   >
                     {locale === 'fr' ? 'Tout le catalogue' : 'Full catalog'}
@@ -505,10 +552,7 @@ export default function Header() {
                         <div className="flex items-center gap-1">
                           <Link
                             href={catalogPath(lab)}
-                            onClick={() => {
-                              setIsMobileMenuOpen(false);
-                              setIsCatalogMenuOpen(false);
-                            }}
+                            onClick={closeAllMenus}
                             className="flex-1 flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 min-w-0"
                           >
                             <LabLogo slug={lab.slug} nom={lab.nom} size="sm" className="shrink-0 rounded bg-white border border-slate-100 dark:border-slate-700" />
@@ -536,10 +580,7 @@ export default function Header() {
                               <Link
                                 key={cat.id}
                                 href={catalogPath(lab, cat)}
-                                onClick={() => {
-                                  setIsMobileMenuOpen(false);
-                                  setIsCatalogMenuOpen(false);
-                                }}
+                                onClick={closeAllMenus}
                                 className="block px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                               >
                                 {cat.nom}
@@ -554,62 +595,38 @@ export default function Header() {
               )}
             </div>
 
-            <Link
-              href="/cart"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
-            >
-              <div className="relative">
-                <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center justify-center">
-                    {cartCount > 9 ? '9+' : cartCount}
-                  </span>
-                )}
-              </div>
-              {nav.cart}
-            </Link>
-
             {/* About Dropdown Mobile */}
             <div>
               <button
-                onClick={() => setIsAboutMenuOpen(!isAboutMenuOpen)}
+                type="button"
+                onClick={() => setIsMobileAboutOpen(!isMobileAboutOpen)}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
               >
                 <span className="flex items-center gap-3">
                   <HelpCircle className="w-5 h-5" />
                   {nav.about}
                 </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isAboutMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${isMobileAboutOpen ? 'rotate-180' : ''}`} />
               </button>
-              {isAboutMenuOpen && (
+              {isMobileAboutOpen && (
                 <div className="pl-8 pr-4 py-2 space-y-1">
                   <Link
                     href="/help"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsAboutMenuOpen(false);
-                    }}
+                    onClick={closeAllMenus}
                     className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                   >
                     {locale === 'fr' ? 'Aide' : 'Help'}
                   </Link>
                   <Link
                     href="/help#payment"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsAboutMenuOpen(false);
-                    }}
+                    onClick={closeAllMenus}
                     className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                   >
                     {locale === 'fr' ? 'Paiement' : 'Payment'}
                   </Link>
                   <Link
                     href="/help#details"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsAboutMenuOpen(false);
-                    }}
+                    onClick={closeAllMenus}
                     className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors rounded-lg"
                   >
                     {locale === 'fr' ? 'Détails' : 'Details'}
@@ -619,8 +636,17 @@ export default function Header() {
             </div>
 
             <Link
+              href="/blog"
+              onClick={closeAllMenus}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
+            >
+              <FileText className="w-5 h-5" />
+              {nav.blog}
+            </Link>
+
+            <Link
               href="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={closeAllMenus}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-sky-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-sky-400"
             >
               <Mail className="w-5 h-5" />
@@ -665,10 +691,44 @@ export default function Header() {
               </div>
             </div>
 
-            {!user && (
+            {user ? (
+              <div className="border-t border-slate-200 dark:border-slate-800 pt-2 space-y-1">
+                <p className="px-4 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                  {user.first_name ? `${user.first_name} ${user.last_name ?? ''}`.trim() : user.email}
+                </p>
+                <Link href="/account" onClick={closeAllMenus} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                  <User className="w-5 h-5" />
+                  {nav.account}
+                </Link>
+                <Link href="/account?tab=orders" onClick={closeAllMenus} className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                  <span className="flex items-center gap-3">
+                    <ShoppingBag className="w-5 h-5" />
+                    {locale === 'fr' ? 'Mes commandes' : 'My orders'}
+                  </span>
+                  {orderCount > 0 && (
+                    <span className="bg-sky-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">{orderCount}</span>
+                  )}
+                </Link>
+                <Link href="/account?tab=settings" onClick={closeAllMenus} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                  <Settings className="w-5 h-5" />
+                  {locale === 'fr' ? 'Paramètres' : 'Settings'}
+                </Link>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    closeAllMenus();
+                    await signOut();
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                >
+                  <LogOut className="w-5 h-5" />
+                  {nav.logout}
+                </button>
+              </div>
+            ) : (
               <Link
                 href="/auth"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={closeAllMenus}
                 className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-3 text-sm font-medium text-white transition-all hover:shadow-lg"
               >
                 <User className="w-5 h-5" />
