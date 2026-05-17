@@ -8,21 +8,16 @@ import Footer from '../components/Footer';
 import LoadingScreen from '../components/LoadingScreen';
 import { showToast } from '../components/Toast';
 import { Product, Laboratory, Category } from '../actions/catalog';
-import {
-  ShoppingCart,
-  Eye,
-  FlaskConical,
-  Check,
-  PanelLeftOpen,
-} from 'lucide-react';
+import { FlaskConical, Check, PanelLeftOpen } from 'lucide-react';
 import CatalogFiltersPanel, { OPEN_CATALOG_FILTERS_EVENT } from './CatalogFiltersPanel';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../context/I18nContext';
 import StarRating from '../components/StarRating';
 import { getProductDisplayName, getProductImageAlt } from '@/lib/image-seo';
 import { catalogPath } from '@/lib/catalog-urls';
-import { optimizeCloudinaryUrl } from '@/lib/cloudinary-image';
 import LabLogo from '@/app/components/LabLogo';
+import LabCatalogBanner from '@/app/components/catalog/LabCatalogBanner';
+import ProductCardActions from '@/app/components/products/ProductCardActions';
 
 interface ProductsClientProps {
   products: Product[];
@@ -338,30 +333,13 @@ export default function ProductsClient({
 
       {displayLab && (
         <div className="pt-4">
-          <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-lg">
-            <div className="relative h-36 sm:h-44 md:h-52">
-              {displayLab.image_url ? (
-                <Image
-                  src={optimizeCloudinaryUrl(displayLab.image_url, 1200)}
-                  alt={displayLab.nom}
-                  fill
-                  className="object-cover"
-                  unoptimized={displayLab.image_url.includes('cloudinary.com')}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-700" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-950/85 via-blue-900/70 to-indigo-900/50" />
-              <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">{displayLab.nom}</h2>
-                {displayLab.description && (
-                  <p className="text-blue-100 text-sm sm:text-base mt-1 max-w-2xl line-clamp-2">
-                    {displayLab.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+          <LabCatalogBanner
+            nom={displayLab.nom}
+            slug={displayLab.slug}
+            description={displayLab.description}
+            productCount={filteredProducts.length}
+            productCountLabel={locale === 'fr' ? 'produits' : 'products'}
+          />
         </div>
       )}
 
@@ -399,26 +377,30 @@ export default function ProductsClient({
             {/* Si une catégorie est spécifique, afficher directement les produits sans regrouper par laboratoire */}
             {selectedCategoryId !== 'Tous' ? (
               <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                {/* Category Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 px-6 py-4 flex items-center gap-4">
-                  {(displayLab || displayCategory) && (
-                    <div className="rounded-xl bg-white p-2 shadow-md shrink-0">
-                      <LabLogo
-                        slug={displayLab?.slug || laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.slug}
-                        nom={displayLab?.nom || laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.nom}
-                        size="md"
-                      />
-                    </div>
-                  )}
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {displayCategory?.nom || categories.find((c) => c.id === selectedCategoryId)?.nom}
-                    </h2>
-                    <p className="text-blue-100 text-sm mt-1">
-                      {filteredProducts.length} {locale === 'fr' ? 'produits' : 'products'}
-                    </p>
+                {(displayLab || displayCategory) && (
+                  <div className="p-4 pb-0">
+                    <LabCatalogBanner
+                      nom={
+                        displayLab?.nom ||
+                        laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.nom ||
+                        displayCategory?.nom ||
+                        ''
+                      }
+                      slug={
+                        displayLab?.slug ||
+                        laboratories.find((l) => l.id === displayCategory?.laboratoire_id)?.slug
+                      }
+                      description={
+                        displayLab?.description ||
+                        (displayCategory
+                          ? `${displayCategory.nom} — ${filteredProducts.length} ${locale === 'fr' ? 'produits' : 'products'}`
+                          : undefined)
+                      }
+                      productCount={filteredProducts.length}
+                      productCountLabel={locale === 'fr' ? 'produits' : 'products'}
+                    />
                   </div>
-                </div>
+                )}
 
                 {/* Products Grid */}
                 <div className="p-6">
@@ -496,23 +478,15 @@ export default function ProductsClient({
                     <StarRating rating={product.averageRating || 0} size={14} />
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-3">
-                    <Link
-                      href={productHref(product)}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 font-semibold transition-all duration-300"
-                    >
-                      <Eye className="w-5 h-5" />
-                      {t.viewDetails}
-                    </Link>
-                    <button
-                      onClick={() => addToCart(product)}
-                      disabled={!isInStock(product)}
-                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 disabled:from-zinc-300 disabled:to-zinc-400 disabled:shadow-none transition-all duration-300"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                    </button>
-                  </div>
+                  <ProductCardActions
+                    href={productHref(product)}
+                    price={product.prix}
+                    promoPrice={product.prix_promo}
+                    inStock={isInStock(product)}
+                    onAddToCart={() => addToCart(product)}
+                    locale={locale}
+                    priceOnRequest={t.priceOnRequest}
+                  />
                 </div>
               </div>
                     ))}
@@ -536,30 +510,14 @@ export default function ProductsClient({
 
                   return (
                     <div key={lab.id} className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                      {/* Laboratory Header */}
-                      <div className="relative h-28 sm:h-32 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 overflow-hidden">
-                        {lab.image_url && (
-                          <Image
-                            src={optimizeCloudinaryUrl(lab.image_url, 800)}
-                            alt={lab.nom}
-                            fill
-                            className="object-cover opacity-40"
-                            unoptimized={lab.image_url.includes('cloudinary.com')}
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-indigo-900/70" />
-                        <div className="relative px-6 py-4 flex items-end h-full gap-4">
-                          {/* Laboratory Logo */}
-                          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0 p-2">
-                            <LabLogo slug={lab.slug} nom={lab.nom} size="xl" className="w-full h-full" />
-                          </div>
-                          <div>
-                            <h2 className="text-2xl font-bold text-white">{lab.nom}</h2>
-                            <p className="text-blue-100 text-sm mt-1">
-                              {labProducts.length} {locale === 'fr' ? 'produits' : 'products'}
-                            </p>
-                          </div>
-                        </div>
+                      <div className="p-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <LabCatalogBanner
+                          nom={lab.nom}
+                          slug={lab.slug}
+                          description={lab.description}
+                          productCount={labProducts.length}
+                          productCountLabel={locale === 'fr' ? 'produits' : 'products'}
+                        />
                       </div>
 
                       {/* Categories */}
@@ -650,23 +608,15 @@ export default function ProductsClient({
                                         <StarRating rating={product.averageRating || 0} size={14} />
                                       </div>
 
-                                      {/* Actions */}
-                                      <div className="flex gap-3">
-                                        <Link
-                                          href={productHref(product)}
-                                          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 font-semibold transition-all duration-300"
-                                        >
-                                          <Eye className="w-5 h-5" />
-                                          {t.viewDetails}
-                                        </Link>
-                                        <button
-                                          onClick={() => addToCart(product)}
-                                          disabled={!isInStock(product)}
-                                          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 disabled:from-zinc-300 disabled:to-zinc-400 disabled:shadow-none transition-all duration-300"
-                                        >
-                                          <ShoppingCart className="w-5 h-5" />
-                                        </button>
-                                      </div>
+                                      <ProductCardActions
+                                        href={productHref(product)}
+                                        price={product.prix}
+                                        promoPrice={product.prix_promo}
+                                        inStock={isInStock(product)}
+                                        onAddToCart={() => addToCart(product)}
+                                        locale={locale}
+                                        priceOnRequest={t.priceOnRequest}
+                                      />
                                     </div>
                                   </div>
                                 ))}

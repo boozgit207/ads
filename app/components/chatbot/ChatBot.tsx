@@ -60,9 +60,9 @@ export default function ChatBot() {
         { id: '1', label: locale === 'fr' ? '� Rechercher des produits' : '🔍 Search products', action: 'products' },
         { id: '2', label: locale === 'fr' ? '🛒 Voir mon panier' : '🛒 View my cart', action: 'cart' },
         { id: '3', label: locale === 'fr' ? '� Modes de paiement' : '💳 Payment methods', action: 'payment' },
-        { id: '4', label: locale === 'fr' ? '🚚 Livraison' : '🚚 Delivery', action: 'delivery' },
-        { id: '5', label: locale === 'fr' ? '📞 Contact' : '📞 Contact', action: 'contact' },
-        { id: '6', label: locale === 'fr' ? 'ℹ️ À propos d\'ADS' : 'ℹ️ About ADS', action: 'about' }
+        { id: '4', label: locale === 'fr' ? 'Livraison' : 'Delivery', action: 'delivery' },
+        { id: '5', label: locale === 'fr' ? 'Contact' : 'Contact', action: 'contact' },
+        { id: '6', label: locale === 'fr' ? 'À propos d\'ADS' : 'About ADS', action: 'about' }
       ]
     }]);
   }, [locale]);
@@ -382,23 +382,50 @@ export default function ChatBot() {
 
   const handleSend = () => processMessage(input);
 
+  const pushAssistantResponse = (action: string) => {
+    const response = handleOption(action);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `${Date.now()}-bot`,
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date(),
+        options: response.options,
+        action: response.action,
+      },
+    ]);
+    setIsTyping(false);
+  };
+
+  const handleOptionClick = (action: string, label: string) => {
+    setShowSuggestions(false);
+    setMessages((prev) => [
+      ...prev,
+      { id: `${Date.now()}-user`, role: 'user', content: label, timestamp: new Date() },
+    ]);
+    setIsTyping(true);
+    window.setTimeout(() => pushAssistantResponse(action), 280);
+  };
+
   return (
     <>
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-110 ${
+        className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-xl shadow-sky-500/25 hover:scale-[1.02] transition-all ${
           isOpen ? 'hidden' : 'flex'
         }`}
-        aria-label="Open chat"
+        aria-label={locale === 'fr' ? 'Ouvrir le chat' : 'Open chat'}
       >
-        <MessageCircle className="w-6 h-6" />
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
+        <MessageCircle className="w-5 h-5" />
+        <span className="text-sm font-semibold hidden sm:inline">{locale === 'fr' ? 'Assistant' : 'Assistant'}</span>
+        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
       </button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[400px] h-[600px] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-700 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[min(100vw-2rem,420px)] h-[min(85vh,640px)] bg-white dark:bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -417,11 +444,7 @@ export default function ChatBot() {
               </div>
             </div>
             <button
-              onClick={() => {
-                setIsOpen(false);
-                setMessages([]);
-                setShowSuggestions(true);
-              }}
+              onClick={() => setIsOpen(false)}
               className="p-2 hover:bg-white/20 rounded-xl transition-colors"
               aria-label="Fermer le chat"
             >
@@ -456,10 +479,10 @@ export default function ChatBot() {
                       {message.options.map((option) => (
                         <button
                           key={option.id}
-                          onClick={() => processMessage(option.id)}
-                          className="w-full text-left px-4 py-2 bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-300 rounded-lg text-sm font-medium hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors"
+                          onClick={() => handleOptionClick(option.action, option.label)}
+                          className="w-full text-left px-4 py-2.5 bg-white dark:bg-zinc-800 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-200 rounded-xl text-sm font-medium hover:bg-sky-50 dark:hover:bg-sky-950/50 transition-colors"
                         >
-                          {option.id}. {option.label}
+                          {option.label}
                         </button>
                       ))}
                     </div>

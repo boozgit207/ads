@@ -40,6 +40,7 @@ import {
 import { getHomeContent } from '@/lib/home-content';
 import { PARTNER_LABS } from '@/lib/lab-logos';
 import LabLogo from '../LabLogo';
+import ProductCardActions from '../products/ProductCardActions';
 
 interface HomePageProps {
   categories: { id: string; nom: string; description?: string | null }[];
@@ -257,7 +258,7 @@ export default function HomePage({ categories }: HomePageProps) {
       <section className="py-20 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative order-2 lg:order-1">
+            <AnimateInView animation="slide-right" delay={100} className="relative order-2 lg:order-1">
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl transform -rotate-3 opacity-20"></div>
               <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
                 <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-green-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
@@ -273,8 +274,8 @@ export default function HomePage({ categories }: HomePageProps) {
                   />
                 </div>
               </div>
-            </div>
-            <div className="space-y-6 order-1 lg:order-2">
+            </AnimateInView>
+            <AnimateInView animation="slide-left" delay={200} className="space-y-6 order-1 lg:order-2">
               <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
                 {copy.mission.title}
               </h2>
@@ -294,16 +295,16 @@ export default function HomePage({ categories }: HomePageProps) {
                   <h3 className="font-semibold text-slate-900 dark:text-white">{copy.mission.card2}</h3>
                 </div>
               </div>
-            </div>
+            </AnimateInView>
           </div>
         </div>
       </section>
 
       {/* Nos Solutions */}
-      <section className="py-20 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-slate-800 dark:to-slate-900">
+      <section className="py-20 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+            <AnimateInView animation="slide-right" className="space-y-6">
               <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
                 {copy.offer.title}
               </h2>
@@ -324,8 +325,8 @@ export default function HomePage({ categories }: HomePageProps) {
                   ))}
                 </ul>
               </div>
-            </div>
-            <div className="relative">
+            </AnimateInView>
+            <AnimateInView animation="slide-left" delay={150} className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-violet-400 to-purple-500 rounded-3xl transform rotate-3 opacity-20"></div>
               <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
                 <div className="w-full aspect-square bg-gradient-to-br from-violet-100 to-purple-100 dark:from-slate-700 dark:to-slate-600 rounded-3xl overflow-hidden">
@@ -341,7 +342,7 @@ export default function HomePage({ categories }: HomePageProps) {
                   />
                 </div>
               </div>
-            </div>
+            </AnimateInView>
           </div>
         </div>
       </section>
@@ -524,30 +525,18 @@ export default function HomePage({ categories }: HomePageProps) {
                     <div className="mb-3">
                       <StarRating rating={product.averageRating || 0} size={14} />
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <Link
-                        href={`/product/${product.slug || product.id}`}
-                        className="flex-1 text-center py-2 rounded-xl border-2 border-sky-600 text-sky-700 dark:text-sky-400 dark:border-sky-500 font-semibold hover:bg-sky-600 hover:text-white transition-colors text-sm"
-                      >
-                        Voir détails
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (product.price && product.price > 0) {
-                            addToCart(product);
-                          }
-                        }}
-                        className="w-11 h-11 rounded-full bg-sky-600 hover:bg-sky-700 text-white flex items-center justify-center transition-colors flex-shrink-0"
-                        aria-label={
-                          locale === 'fr'
-                            ? `Ajouter ${getProductDisplayName(product, locale)} au panier`
-                            : `Add ${getProductDisplayName(product, locale)} to cart`
+                    <ProductCardActions
+                      href={`/product/${product.slug || product.id}`}
+                      price={product.price || 0}
+                      inStock={(product.stock ?? 0) > 0}
+                      onAddToCart={() => {
+                        if (product.price && product.price > 0) {
+                          addToCart(product);
                         }
-                      >
-                        <ShoppingCart className="w-5 h-5" aria-hidden />
-                      </button>
-                    </div>
+                      }}
+                      locale={locale}
+                      priceOnRequest={locale === 'fr' ? 'Prix sur demande' : 'Price on request'}
+                    />
                   </div>
                 </div>
               ))}

@@ -32,6 +32,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useI18n } from '../../context/I18nContext';
 import { getProductImageAlt } from '@/lib/image-seo';
+import LabLogo from '@/app/components/LabLogo';
 import { addReview, deleteReview, updateReview } from '../../actions/reviews';
 
 interface ProductDetailClientProps {
@@ -349,9 +350,27 @@ export default function ProductDetailClient({
             {/* Product Info */}
             <div className="space-y-8">
               <div>
-                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-3">
-                  {product.laboratoire?.nom || product.categorie?.laboratoire?.nom} • {product.categorie?.nom}
-                </p>
+                <div className="flex flex-wrap items-center gap-4 mb-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-100 dark:border-blue-900/50">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-center p-2 shrink-0">
+                    <LabLogo
+                      slug={product.laboratoire?.slug || product.categorie?.laboratoire?.slug}
+                      nom={product.laboratoire?.nom || product.categorie?.laboratoire?.nom}
+                      size="xl"
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                      {t.laboratory}
+                    </p>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-white">
+                      {product.laboratoire?.nom || product.categorie?.laboratoire?.nom}
+                    </p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-0.5">
+                      {product.categorie?.nom}
+                    </p>
+                  </div>
+                </div>
                 <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-5 leading-tight">
                   {getProductName()}
                 </h1>
